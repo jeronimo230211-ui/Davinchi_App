@@ -3,834 +3,658 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Davinchi · Pedidos</title>
+<title>Davinchi · Estuches & Vitrinas</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --gold: #C8A45A;
-  --gold-light: #E2C07E;
-  --gold-pale: #F7EDD5;
-  --gold-dim: #7A6030;
-  --ink: #1C1A14;
-  --surface: #F9F5EE;
-  --surface2: #F0EAD8;
-  --surface3: #E8DFC8;
-  --border: rgba(120,90,30,0.14);
-  --border-mid: rgba(120,90,30,0.28);
-  --border-strong: rgba(200,164,90,0.55);
-  --text: #2A2618;
-  --text-muted: #7A7060;
-  --text-dim: #AEA898;
-  --green: #3D8A5A;
-  --green-bg: #EBF5F0;
-  --red: #C0442A;
-  --red-bg: #FAEAE6;
-  --radius: 16px;
-  --radius-sm: 10px;
-  --shadow: 0 2px 16px rgba(60,40,0,0.08);
+  --gold: #C8A45A; --gold-light: #E2C07E; --gold-pale: #F7EDD5; --gold-dim: #7A6030;
+  --ink: #1C1A14; --surface: #F9F5EE; --surface2: #F0EAD8; --surface3: #E8DFC8;
+  --border: rgba(120,90,30,0.14); --border-mid: rgba(120,90,30,0.28); --border-strong: rgba(200,164,90,0.55);
+  --text: #2A2618; --text-muted: #7A7060; --text-dim: #AEA898;
+  --green: #3D8A5A; --green-bg: #EBF5F0; --red: #C0442A; --red-bg: #FAEAE6;
+  --blue: #2563EB; --blue-bg: #EFF6FF;
+  --radius: 16px; --radius-sm: 10px; --shadow: 0 2px 16px rgba(60,40,0,0.08);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; }
-body {
-  font-family: 'Outfit', sans-serif;
-  background: #EDE6D6;
-  color: var(--text);
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  min-height: 100%;
-}
-.app {
-  width: 100%;
-  max-width: 440px;
-  min-height: 100vh;
-  background: var(--surface);
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);display:flex;justify-content:center;min-height:100%;}
+.app{width:100%;max-width:440px;min-height:100vh;background:var(--surface);display:flex;flex-direction:column;position:relative;}
 
-/* ── Header ── */
-.header {
-  padding: 18px 20px 14px;
-  background: var(--ink);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky; top: 0; z-index: 100;
-}
-.logo-wrap { display: flex; flex-direction: column; }
-.logo {
-  font-family: 'Playfair Display', serif;
-  font-size: 21px; font-weight: 700;
-  color: var(--gold);
-  letter-spacing: 0.06em;
-}
-.logo-sub { font-size: 11px; color: #6A6050; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 1px; }
-.client-chip {
-  background: rgba(200,164,90,0.12);
-  border: 1px solid rgba(200,164,90,0.3);
-  border-radius: 20px;
-  padding: 5px 12px;
-  font-size: 12px;
-  color: var(--gold-light);
-  cursor: pointer;
-  transition: background .2s;
-  max-width: 140px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.client-chip:hover { background: rgba(200,164,90,0.2); }
+/* ── LANDING ── */
+#screen-landing{min-height:100vh;background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0;}
+.landing-hero{width:100%;padding:52px 32px 40px;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;}
+.hero-gem{width:76px;height:76px;border-radius:50%;border:1.5px solid rgba(200,164,90,0.35);background:rgba(200,164,90,0.07);display:flex;align-items:center;justify-content:center;font-size:30px;}
+.hero-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:#F0EAD8;line-height:1.15;}
+.hero-title span{color:var(--gold);}
+.hero-sub{font-size:13px;color:#5A5448;line-height:1.65;max-width:270px;}
+.landing-cards{width:100%;background:var(--surface);border-radius:24px 24px 0 0;padding:28px 24px 40px;display:flex;flex-direction:column;gap:14px;flex:1;}
+.landing-card{border-radius:var(--radius-sm);padding:20px;cursor:pointer;transition:transform .15s,box-shadow .15s;border:1.5px solid var(--border);}
+.landing-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+.landing-card:active{transform:scale(0.98);}
+.card-client{background:#fff;}
+.card-vendor{background:var(--ink);border-color:rgba(200,164,90,0.25);}
+.lc-icon{font-size:26px;margin-bottom:10px;}
+.lc-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:500;margin-bottom:4px;}
+.card-client .lc-title{color:var(--text);}
+.card-vendor .lc-title{color:var(--gold-light);}
+.lc-desc{font-size:13px;line-height:1.5;}
+.card-client .lc-desc{color:var(--text-muted);}
+.card-vendor .lc-desc{color:#5A5448;}
+.lc-arrow{float:right;font-size:18px;margin-top:-30px;}
+.card-client .lc-arrow{color:var(--gold-dim);}
+.card-vendor .lc-arrow{color:var(--gold);}
 
-/* ── Screens ── */
-.screen { display: none; flex-direction: column; flex: 1; }
-.screen.active { display: flex; }
+/* ── API KEY SCREEN ── */
+#screen-apikey{position:fixed;inset:0;z-index:9999;background:#1C1A14;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;gap:18px;text-align:center;font-family:'Outfit',sans-serif;}
+.ak-title{font-family:'Playfair Display',serif;font-size:22px;color:#F0EAD8;}
+.ak-title span{color:var(--gold);}
+.ak-sub{font-size:13px;color:#5A5448;line-height:1.65;max-width:300px;}
+.ak-input{width:100%;max-width:340px;background:#111;border:1.5px solid rgba(200,164,90,0.25);border-radius:10px;padding:13px 16px;font-family:'Outfit',sans-serif;font-size:14px;color:#F0EAD8;outline:none;}
+.ak-btn{width:100%;max-width:340px;padding:14px;background:var(--gold);color:var(--ink);border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:500;cursor:pointer;}
+.ak-err{font-size:12px;color:#E05A4E;display:none;}
+.ak-skip{font-size:12px;color:#3A3830;cursor:pointer;text-decoration:underline;}
 
-/* ══ WELCOME ══ */
-#screen-welcome {
-  background: var(--ink);
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  padding: 0;
-  min-height: calc(100vh - 60px);
-}
-.welcome-hero {
-  width: 100%;
-  padding: 48px 32px 36px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  text-align: center;
-}
-.hero-gem {
-  width: 72px; height: 72px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(200,164,90,0.4);
-  background: rgba(200,164,90,0.08);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 28px;
-}
-.hero-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 30px; font-weight: 700;
-  color: #F0EAD8;
-  line-height: 1.18;
-}
-.hero-title span { color: var(--gold); }
-.hero-sub { font-size: 14px; color: #6A6050; line-height: 1.6; max-width: 280px; }
-.welcome-form {
-  width: 100%;
-  background: var(--surface);
-  border-radius: 24px 24px 0 0;
-  padding: 32px 28px 40px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  flex: 1;
-}
-.form-label {
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-dim);
-  font-weight: 500;
-}
-.form-input {
-  width: 100%;
-  background: var(--surface2);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 13px 16px;
-  font-family: 'Outfit', sans-serif;
-  font-size: 15px;
-  color: var(--text);
-  outline: none;
-  transition: border-color .2s;
-}
-.form-input:focus { border-color: var(--border-strong); }
-.form-input::placeholder { color: var(--text-dim); }
-.btn-start {
-  width: 100%;
-  padding: 15px;
-  background: var(--gold);
-  color: var(--ink);
-  border: none;
-  border-radius: var(--radius-sm);
-  font-family: 'Outfit', sans-serif;
-  font-size: 15px; font-weight: 500;
-  cursor: pointer;
-  letter-spacing: 0.02em;
-  transition: background .2s, transform .1s;
-  margin-top: 4px;
-}
-.btn-start:hover { background: var(--gold-light); }
-.btn-start:active { transform: scale(0.98); }
-.welcome-disclaimer { font-size: 12px; color: var(--text-dim); text-align: center; line-height: 1.5; }
+/* ── HEADER ── */
+.header{padding:16px 20px 13px;background:var(--ink);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--gold);letter-spacing:.05em;}
+.logo-sub{font-size:10px;color:#5A5448;letter-spacing:.1em;text-transform:uppercase;margin-top:1px;}
+.client-chip{background:rgba(200,164,90,0.1);border:1px solid rgba(200,164,90,0.28);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--gold-light);cursor:pointer;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
-/* ══ CATALOG ══ */
-#screen-catalog { background: var(--surface); }
-.section-header {
-  padding: 18px 20px 12px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-  position: sticky; top: 60px; z-index: 90;
-}
-.section-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 500; color: var(--text); }
-.section-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-.catalog-grid {
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  overflow-y: auto;
-  flex: 1;
-  padding-bottom: 24px;
-}
-.product-card {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  transition: border-color .2s, transform .15s;
-  cursor: pointer;
-}
-.product-card:hover { border-color: var(--border-strong); transform: translateY(-1px); }
-.product-card:active { transform: scale(0.99); }
-.product-visual {
-  height: 100px;
-  background: var(--surface2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 42px;
-  position: relative;
-}
-.stock-badge {
-  position: absolute;
-  top: 10px; right: 10px;
-  padding: 3px 9px;
-  border-radius: 20px;
-  font-size: 10px;
-  font-weight: 500;
-  font-family: 'Outfit', sans-serif;
-}
-.stock-ok { background: var(--green-bg); color: var(--green); }
-.stock-low { background: var(--red-bg); color: var(--red); }
-.product-body { padding: 14px 16px 16px; }
-.product-name { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
-.product-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px; }
-.product-footer { display: flex; align-items: center; justify-content: space-between; }
-.product-price { font-size: 17px; font-weight: 500; color: var(--gold-dim); }
-.btn-add {
-  padding: 7px 16px;
-  background: var(--ink);
-  color: var(--gold-light);
-  border: none;
-  border-radius: 20px;
-  font-size: 12px; font-weight: 500;
-  cursor: pointer;
-  font-family: 'Outfit', sans-serif;
-  transition: background .2s;
-}
-.btn-add:hover { background: #2e2b20; }
+/* ── SCREENS ── */
+.screen{display:none;flex-direction:column;flex:1;}
+.screen.active{display:flex;}
 
-/* ══ CHAT ══ */
-#screen-chat { background: var(--surface); }
-.chat-banner {
-  padding: 12px 18px;
-  background: var(--surface2);
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.chat-banner-info { font-size: 12px; }
-.chat-banner-info strong { color: var(--gold-dim); display: block; font-size: 13px; }
-.chat-banner-info span { color: var(--text-muted); }
-.btn-ver-catalogo {
-  padding: 6px 12px;
-  border: 1px solid var(--border-mid);
-  border-radius: 20px;
-  background: transparent;
-  color: var(--text-muted);
-  font-size: 11px;
-  cursor: pointer;
-  font-family: 'Outfit', sans-serif;
-  transition: border-color .2s, color .2s;
-  white-space: nowrap;
-}
-.btn-ver-catalogo:hover { border-color: var(--border-strong); color: var(--gold-dim); }
-.chat-messages {
-  flex: 1; overflow-y: auto;
-  padding: 20px 16px;
-  display: flex; flex-direction: column; gap: 12px;
-  scroll-behavior: smooth;
-}
-.msg { display: flex; gap: 10px; animation: fadeup .22s ease; }
-@keyframes fadeup { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
-.msg.user { flex-direction: row-reverse; }
-.msg-av {
-  width: 30px; height: 30px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; font-size: 13px;
-}
-.msg-av.ai { background: var(--ink); color: var(--gold); font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; }
-.msg-av.user { background: var(--gold-pale); color: var(--gold-dim); font-size: 11px; font-weight: 500; }
-.bubble {
-  max-width: 80%;
-  padding: 10px 14px;
-  font-size: 14px; line-height: 1.55;
-  border-radius: 14px;
-}
-.msg.ai .bubble {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-bottom-left-radius: 4px;
-  color: var(--text);
-  box-shadow: 0 1px 6px rgba(60,40,0,0.05);
-}
-.msg.user .bubble {
-  background: var(--ink);
-  color: #E8DFC8;
-  border-bottom-right-radius: 4px;
-}
-.bubble strong { color: var(--gold-dim); font-weight: 500; }
+/* ── LOGIN VENDOR ── */
+#screen-login{background:var(--ink);align-items:center;justify-content:center;padding:40px 28px;gap:20px;text-align:center;}
+.login-title{font-family:'Playfair Display',serif;font-size:26px;color:#F0EAD8;}
+.login-title span{color:var(--gold);}
+.login-sub{font-size:13px;color:#5A5448;line-height:1.6;}
+.login-form{width:100%;display:flex;flex-direction:column;gap:10px;}
+.login-input{width:100%;background:#111;border:1.5px solid rgba(200,164,90,0.2);border-radius:var(--radius-sm);padding:13px 16px;font-family:'Outfit',sans-serif;font-size:14px;color:#F0EAD8;outline:none;transition:border-color .2s;}
+.login-input:focus{border-color:rgba(200,164,90,0.5);}
+.login-input::placeholder{color:#3A3830;}
+.btn-login{width:100%;padding:14px;background:var(--gold);color:var(--ink);border:none;border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:background .2s;}
+.btn-login:hover{background:var(--gold-light);}
+.login-err{font-size:12px;color:#E05A4E;display:none;}
+.btn-back-landing{background:transparent;border:1px solid rgba(200,164,90,0.2);color:#5A5448;border-radius:20px;padding:7px 16px;font-family:'Outfit',sans-serif;font-size:12px;cursor:pointer;margin-top:8px;}
 
-/* Order confirm card */
-.order-confirm {
-  background: #fff;
-  border: 1.5px solid var(--border-strong);
-  border-radius: var(--radius-sm);
-  padding: 16px;
-  margin-top: 6px;
-  box-shadow: var(--shadow);
-}
-.oc-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 14px; color: var(--gold-dim);
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
-}
-.oc-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; }
-.oc-row .lbl { color: var(--text-muted); }
-.oc-row .val { color: var(--text); font-weight: 500; text-align: right; max-width: 58%; }
-.oc-total {
-  margin-top: 10px; padding-top: 10px;
-  border-top: 1px solid var(--border-mid);
-  display: flex; justify-content: space-between;
-  font-size: 15px; font-weight: 500;
-}
-.oc-total .lbl { color: var(--text); }
-.oc-total .val { color: var(--gold-dim); }
-.oc-btns { display: flex; gap: 8px; margin-top: 12px; }
-.oc-btn {
-  flex: 1; padding: 11px;
-  border-radius: var(--radius-sm);
-  font-family: 'Outfit', sans-serif;
-  font-size: 13px; font-weight: 500;
-  cursor: pointer; border: none;
-  transition: opacity .2s;
-}
-.oc-btn:hover { opacity: .85; }
-.oc-btn.ok { background: var(--green); color: #fff; }
-.oc-btn.edit { background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border-mid); }
+/* ── SECTION HEADER ── */
+.section-header{padding:16px 20px 12px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:60px;z-index:90;}
+.section-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:500;}
+.section-sub{font-size:12px;color:var(--text-muted);margin-top:2px;}
 
-/* Chips */
-.chip-row {
-  padding: 6px 16px 2px;
-  display: flex; gap: 7px; flex-wrap: wrap;
-}
-.chip {
-  padding: 7px 13px;
-  border: 1px solid var(--border-mid);
-  border-radius: 20px;
-  font-size: 12px; color: var(--text-muted);
-  cursor: pointer; background: #fff;
-  transition: border-color .2s, color .2s, background .2s;
-  white-space: nowrap;
-  font-family: 'Outfit', sans-serif;
-}
-.chip:hover { border-color: var(--border-strong); color: var(--gold-dim); background: var(--gold-pale); }
-.chat-input-wrap {
-  padding: 12px 14px 20px;
-  border-top: 1px solid var(--border);
-  background: var(--surface);
-  display: flex; gap: 8px; align-items: flex-end;
-}
-.chat-in {
-  flex: 1;
-  background: #fff;
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
-  padding: 11px 14px;
-  font-family: 'Outfit', sans-serif;
-  font-size: 14px; color: var(--text);
-  outline: none; resize: none;
-  max-height: 100px; min-height: 44px;
-  transition: border-color .2s; line-height: 1.4;
-}
-.chat-in:focus { border-color: var(--border-strong); }
-.chat-in::placeholder { color: var(--text-dim); }
-.btn-send {
-  width: 44px; height: 44px;
-  border-radius: 50%;
-  background: var(--ink); color: var(--gold);
-  border: none; cursor: pointer; font-size: 18px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  transition: background .2s, transform .1s;
-}
-.btn-send:hover { background: #2e2b20; }
-.btn-send:active { transform: scale(0.92); }
-.btn-send:disabled { background: var(--border); cursor: not-allowed; }
+/* ── CATALOG ── */
+#screen-catalog{background:var(--surface);}
+.catalog-grid{padding:14px;display:flex;flex-direction:column;gap:11px;overflow-y:auto;flex:1;padding-bottom:20px;}
+.product-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:border-color .2s,transform .15s;}
+.product-card:hover{border-color:var(--border-strong);transform:translateY(-1px);}
+.product-visual{height:90px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:38px;position:relative;}
+.stock-badge{position:absolute;top:8px;right:8px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:500;}
+.stock-ok{background:var(--green-bg);color:var(--green);}
+.stock-low{background:var(--red-bg);color:var(--red);}
+.product-body{padding:12px 15px 14px;}
+.product-name{font-family:'Playfair Display',serif;font-size:14px;font-weight:500;margin-bottom:3px;}
+.product-desc{font-size:12px;color:var(--text-muted);line-height:1.45;margin-bottom:9px;}
+.product-footer-cart{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.product-price{font-size:16px;font-weight:500;color:var(--gold-dim);}
+.qty-control{display:flex;align-items:center;border:1.5px solid var(--border-mid);border-radius:20px;overflow:hidden;background:#fff;}
+.qty-btn{width:30px;height:30px;border:none;background:transparent;font-size:17px;font-weight:300;cursor:pointer;color:var(--text-muted);display:flex;align-items:center;justify-content:center;transition:background .15s;}
+.qty-btn:hover{background:var(--surface2);}
+.qty-btn.plus:hover{background:var(--ink);color:var(--gold-light);}
+.qty-num{min-width:26px;text-align:center;font-size:13px;font-weight:500;}
+.btn-add-cart{padding:7px 13px;background:var(--ink);color:var(--gold-light);border:none;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Outfit',sans-serif;transition:background .2s;white-space:nowrap;}
+.btn-add-cart:hover{background:#2e2b20;}
+.btn-add-cart.in-cart{background:var(--green);color:#fff;}
 
-/* Typing */
-.typing { display: flex; gap: 4px; align-items: center; padding: 3px 2px; }
-.typing span {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--border-mid);
-  animation: tbounce 1.2s ease-in-out infinite;
-}
-.typing span:nth-child(2) { animation-delay: .18s; }
-.typing span:nth-child(3) { animation-delay: .36s; }
-@keyframes tbounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+/* ── CHAT ── */
+#screen-chat{background:var(--surface);}
+.chat-banner{padding:10px 18px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.chat-banner-info strong{color:var(--gold-dim);display:block;font-size:13px;}
+.chat-banner-info span{color:var(--text-muted);font-size:12px;}
+.btn-ver-cat{padding:6px 12px;border:1px solid var(--border-mid);border-radius:20px;background:transparent;color:var(--text-muted);font-size:11px;cursor:pointer;font-family:'Outfit',sans-serif;transition:border-color .2s,color .2s;white-space:nowrap;}
+.btn-ver-cat:hover{border-color:var(--border-strong);color:var(--gold-dim);}
+.chat-messages{flex:1;overflow-y:auto;padding:18px 14px;display:flex;flex-direction:column;gap:11px;scroll-behavior:smooth;}
+.msg{display:flex;gap:9px;animation:fadeup .22s ease;}
+@keyframes fadeup{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{flex-direction:row-reverse;}
+.msg-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;}
+.msg-av.ai{background:var(--ink);color:var(--gold);font-family:'Playfair Display',serif;font-size:14px;font-weight:700;}
+.msg-av.user{background:var(--gold-pale);color:var(--gold-dim);font-size:11px;font-weight:500;}
+.bubble{max-width:80%;padding:10px 13px;font-size:14px;line-height:1.55;border-radius:14px;}
+.msg.ai .bubble{background:#fff;border:1px solid var(--border);border-bottom-left-radius:4px;box-shadow:0 1px 5px rgba(60,40,0,.05);}
+.msg.user .bubble{background:var(--ink);color:#E8DFC8;border-bottom-right-radius:4px;}
+.bubble strong{color:var(--gold-dim);font-weight:500;}
+.order-confirm{background:#fff;border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);padding:15px;margin-top:6px;box-shadow:var(--shadow);}
+.oc-title{font-family:'Playfair Display',serif;font-size:14px;color:var(--gold-dim);margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid var(--border);}
+.oc-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;}
+.oc-row .lbl{color:var(--text-muted);}
+.oc-row .val{color:var(--text);font-weight:500;text-align:right;max-width:60%;}
+.oc-total{margin-top:9px;padding-top:9px;border-top:1px solid var(--border-mid);display:flex;justify-content:space-between;font-size:14px;font-weight:500;}
+.oc-total .val{color:var(--gold-dim);}
+.oc-btns{display:flex;gap:7px;margin-top:11px;}
+.oc-btn{flex:1;padding:10px;border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:opacity .2s;}
+.oc-btn:hover{opacity:.85;}
+.oc-btn.ok{background:var(--green);color:#fff;}
+.oc-btn.edit{background:var(--surface2);color:var(--text-muted);border:1px solid var(--border-mid);}
+.chip-row{padding:6px 14px 2px;display:flex;gap:6px;flex-wrap:wrap;}
+.chip{padding:6px 12px;border:1px solid var(--border-mid);border-radius:20px;font-size:12px;color:var(--text-muted);cursor:pointer;background:#fff;transition:border-color .2s,color .2s;white-space:nowrap;font-family:'Outfit',sans-serif;}
+.chip:hover{border-color:var(--border-strong);color:var(--gold-dim);}
+.chat-input-wrap{padding:10px 13px 18px;border-top:1px solid var(--border);background:var(--surface);display:flex;gap:8px;align-items:flex-end;}
+.chat-in{flex:1;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:10px 13px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--text);outline:none;resize:none;max-height:100px;min-height:42px;transition:border-color .2s;line-height:1.4;}
+.chat-in:focus{border-color:var(--border-strong);}
+.chat-in::placeholder{color:var(--text-dim);}
+.btn-send{width:42px;height:42px;border-radius:50%;background:var(--ink);color:var(--gold);border:none;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s,transform .1s;}
+.btn-send:hover{background:#2e2b20;}
+.btn-send:active{transform:scale(.92);}
+.btn-send:disabled{background:var(--border);cursor:not-allowed;}
+.typing{display:flex;gap:4px;align-items:center;padding:3px 2px;}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--border-mid);animation:tbounce 1.2s ease-in-out infinite;}
+.typing span:nth-child(2){animation-delay:.18s;}
+.typing span:nth-child(3){animation-delay:.36s;}
+@keyframes tbounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
 
-/* ══ MY ORDERS ══ */
-#screen-myorders { background: var(--surface); }
-.my-orders-list {
-  flex: 1; overflow-y: auto;
-  padding: 16px;
-  display: flex; flex-direction: column; gap: 10px;
-  padding-bottom: 24px;
-}
-.my-order-card {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 16px;
-  box-shadow: var(--shadow);
-}
-.moc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-.moc-id { font-size: 11px; color: var(--text-dim); letter-spacing: 0.06em; }
-.moc-status {
-  padding: 3px 10px; border-radius: 20px;
-  font-size: 11px; font-weight: 500;
-}
-.st-pending { background: #FEF3DC; color: #8A6010; }
-.st-confirmed { background: var(--green-bg); color: var(--green); }
-.moc-products { font-size: 13px; color: var(--text); margin-bottom: 6px; line-height: 1.5; }
-.moc-footer { display: flex; justify-content: space-between; align-items: center; }
-.moc-date { font-size: 11px; color: var(--text-dim); }
-.moc-total { font-size: 14px; font-weight: 500; color: var(--gold-dim); }
-.empty-orders {
-  flex: 1; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 10px; padding: 40px; text-align: center;
-}
-.empty-orders .icon { font-size: 40px; opacity: .3; }
-.empty-orders p { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
-.btn-goto-chat {
-  margin-top: 8px;
-  padding: 11px 24px;
-  background: var(--ink); color: var(--gold-light);
-  border: none; border-radius: var(--radius-sm);
-  font-family: 'Outfit', sans-serif; font-size: 14px;
-  cursor: pointer; transition: background .2s;
-}
-.btn-goto-chat:hover { background: #2e2b20; }
+/* ── CART ── */
+#screen-cart{background:var(--surface);}
+.cart-list{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px;padding-bottom:20px;}
+.cart-item{background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px 14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);}
+.cart-item-emoji{font-size:26px;flex-shrink:0;}
+.cart-item-info{flex:1;min-width:0;}
+.cart-item-name{font-size:13px;font-weight:500;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cart-item-price{font-size:11px;color:var(--text-muted);}
+.cart-item-sub{font-size:13px;font-weight:500;color:var(--gold-dim);margin-top:2px;}
+.cart-remove{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .2s,color .2s;}
+.cart-remove:hover{border-color:var(--red);color:var(--red);}
+.cart-summary{padding:14px 18px;border-top:1px solid var(--border);background:#fff;}
+.cart-total-row{display:flex;justify-content:space-between;margin-bottom:11px;}
+.cart-total-row .lbl{color:var(--text-muted);font-size:13px;}
+.cart-total-row .val{font-size:17px;font-weight:500;color:var(--gold-dim);}
+.btn-send-cart{width:100%;padding:13px;background:var(--ink);color:var(--gold-light);border:none;border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:background .2s;}
+.btn-send-cart:hover{background:#2e2b20;}
+.empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:40px;text-align:center;}
+.empty-state .icon{font-size:38px;opacity:.25;}
+.empty-state p{font-size:14px;color:var(--text-muted);line-height:1.5;}
+.btn-goto{margin-top:8px;padding:10px 22px;background:var(--ink);color:var(--gold-light);border:none;border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;}
 
-/* Contact banner */
-.contact-banner {
-  margin: 16px; padding: 16px;
-  background: var(--ink);
-  border-radius: var(--radius-sm);
-  display: flex; align-items: center; gap: 14px;
-}
-.contact-icon { font-size: 24px; }
-.contact-text { flex: 1; }
-.contact-text strong { color: var(--gold-light); font-size: 13px; display: block; }
-.contact-text span { color: #6A6050; font-size: 12px; }
-.btn-whatsapp {
-  padding: 8px 14px;
-  background: #25D366; color: #fff;
-  border: none; border-radius: 20px;
-  font-size: 12px; font-weight: 500;
-  cursor: pointer; font-family: 'Outfit', sans-serif;
-  white-space: nowrap;
-  transition: background .2s;
-}
-.btn-whatsapp:hover { background: #1ebe59; }
+/* ── MY ORDERS ── */
+#screen-myorders{background:var(--surface);}
+.my-orders-list{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px;padding-bottom:20px;}
+.my-order-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;box-shadow:var(--shadow);}
+.moc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.moc-id{font-size:11px;color:var(--text-dim);letter-spacing:.05em;}
+.moc-status{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;}
+.st-new{background:#FEF3DC;color:#8A6010;}
+.st-process{background:var(--blue-bg);color:var(--blue);}
+.st-done{background:var(--green-bg);color:var(--green);}
+.moc-products{font-size:13px;margin-bottom:5px;line-height:1.45;}
+.moc-footer{display:flex;justify-content:space-between;align-items:center;}
+.moc-date{font-size:11px;color:var(--text-dim);}
+.moc-total{font-size:13px;font-weight:500;color:var(--gold-dim);}
+.contact-banner{margin:0 14px 14px;padding:14px 16px;background:var(--ink);border-radius:var(--radius-sm);display:flex;align-items:center;gap:12px;}
+.contact-text strong{color:var(--gold-light);font-size:13px;display:block;}
+.contact-text span{color:#5A5448;font-size:12px;}
+.btn-wa{padding:8px 13px;background:#25D366;color:#fff;border:none;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap;}
 
-/* ── Nav ── */
-.nav {
-  display: flex;
-  border-top: 1px solid var(--border);
-  background: #fff;
-  position: sticky; bottom: 0; z-index: 100;
-}
-.nav-btn {
-  flex: 1; padding: 10px 6px 12px;
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  border: none; background: transparent; cursor: pointer;
-  color: var(--text-dim);
-  font-family: 'Outfit', sans-serif;
-  font-size: 10px; letter-spacing: 0.04em;
-  transition: color .2s;
-  position: relative;
-}
-.nav-btn.active { color: var(--gold-dim); }
-.nav-btn svg { width: 20px; height: 20px; }
-.nav-badge {
-  position: absolute; top: 7px; right: calc(50% - 18px);
-  background: var(--red); color: #fff;
-  font-size: 9px; font-weight: 600;
-  min-width: 15px; height: 15px;
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  padding: 0 3px;
-}
+/* ── VENDOR PANEL ── */
+#screen-vendor{background:var(--surface);}
+.vendor-header{padding:14px 18px;background:var(--ink);border-bottom:1px solid rgba(200,164,90,0.15);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:90;}
+.vendor-header-left strong{color:var(--gold-light);font-size:14px;display:block;}
+.vendor-header-left span{color:#5A5448;font-size:11px;}
+.btn-logout{padding:6px 12px;border:1px solid rgba(200,164,90,0.2);border-radius:20px;background:transparent;color:#5A5448;font-size:11px;cursor:pointer;font-family:'Outfit',sans-serif;}
+.vendor-tabs{display:flex;border-bottom:1px solid var(--border);background:#fff;position:sticky;top:56px;z-index:89;}
+.vtab{flex:1;padding:11px 6px;text-align:center;font-size:12px;font-weight:500;cursor:pointer;color:var(--text-muted);border-bottom:2px solid transparent;transition:color .2s,border-color .2s;font-family:'Outfit',sans-serif;}
+.vtab.active{color:var(--gold-dim);border-bottom-color:var(--gold);}
+.vendor-content{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;padding-bottom:20px;}
 
-/* ── Cart styles ── */
-.qty-control {
-  display: flex; align-items: center; gap: 0;
-  border: 1.5px solid var(--border-mid);
-  border-radius: 20px; overflow: hidden;
-  background: #fff;
-}
-.qty-btn {
-  width: 32px; height: 32px;
-  border: none; background: transparent;
-  font-size: 18px; font-weight: 300;
-  cursor: pointer; color: var(--text-muted);
-  display: flex; align-items: center; justify-content: center;
-  transition: background .15s, color .15s;
-  line-height: 1; font-family: 'Outfit', sans-serif;
-}
-.qty-btn:hover { background: var(--surface2); color: var(--gold-dim); }
-.qty-btn.plus:hover { background: var(--ink); color: var(--gold-light); }
-.qty-num {
-  min-width: 28px; text-align: center;
-  font-size: 14px; font-weight: 500;
-  color: var(--text); font-family: 'Outfit', sans-serif;
-}
-.product-footer-cart { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.btn-add-cart {
-  padding: 7px 14px;
-  background: var(--ink); color: var(--gold-light);
-  border: none; border-radius: 20px;
-  font-size: 12px; font-weight: 500;
-  cursor: pointer; font-family: 'Outfit', sans-serif;
-  transition: background .2s, opacity .2s;
-  white-space: nowrap;
-}
-.btn-add-cart:hover { background: #2e2b20; }
-.btn-add-cart.in-cart { background: var(--green); color: #fff; }
-.cart-bar {
-  margin: 0 16px 16px;
-  background: var(--ink);
-  border-radius: var(--radius-sm);
-  padding: 14px 18px;
-  display: none; align-items: center; justify-content: space-between; gap: 12px;
-}
-.cart-bar.visible { display: flex; }
-.cart-bar-info strong { color: var(--gold-light); font-size: 14px; display: block; }
-.cart-bar-info span { color: #6A6050; font-size: 12px; }
-.btn-cart-send {
-  padding: 10px 18px;
-  background: var(--gold); color: var(--ink);
-  border: none; border-radius: var(--radius-sm);
-  font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500;
-  cursor: pointer; white-space: nowrap;
-  transition: background .2s;
-}
-.btn-cart-send:hover { background: var(--gold-light); }
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:4px;}
+.stat-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center;box-shadow:var(--shadow);}
+.stat-num{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--gold-dim);}
+.stat-lbl{font-size:10px;color:var(--text-dim);margin-top:2px;letter-spacing:.04em;}
 
-/* Cart screen */
-#screen-cart { background: var(--surface); }
-.cart-list { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
-.cart-item {
-  background: #fff; border: 1px solid var(--border);
-  border-radius: var(--radius-sm); padding: 14px 16px;
-  display: flex; align-items: center; gap: 14px;
-  box-shadow: 0 1px 6px rgba(60,40,0,0.04);
-}
-.cart-item-emoji { font-size: 28px; flex-shrink: 0; }
-.cart-item-info { flex: 1; min-width: 0; }
-.cart-item-name { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.cart-item-price { font-size: 12px; color: var(--text-muted); }
-.cart-item-subtotal { font-size: 13px; font-weight: 500; color: var(--gold-dim); margin-top: 2px; }
-.cart-remove { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border); background: transparent; color: var(--text-dim); cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: border-color .2s, color .2s; }
-.cart-remove:hover { border-color: var(--red); color: var(--red); }
-.cart-summary {
-  padding: 16px 18px;
-  border-top: 1px solid var(--border);
-  background: #fff;
-}
-.cart-total-row { display: flex; justify-content: space-between; margin-bottom: 12px; }
-.cart-total-row .lbl { color: var(--text-muted); font-size: 13px; }
-.cart-total-row .val { font-size: 18px; font-weight: 500; color: var(--gold-dim); }
-.btn-send-cart {
-  width: 100%; padding: 14px;
-  background: var(--ink); color: var(--gold-light);
-  border: none; border-radius: var(--radius-sm);
-  font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 500;
-  cursor: pointer; transition: background .2s;
-}
-.btn-send-cart:hover { background: #2e2b20; }
-.empty-cart { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 40px; text-align: center; }
-.empty-cart .icon { font-size: 40px; opacity: .25; }
-.empty-cart p { font-size: 14px; color: var(--text-muted); }
+/* Vendor order card */
+.vendor-order{background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;box-shadow:var(--shadow);}
+.vo-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.vo-shop{font-weight:500;font-size:14px;}
+.vo-time{font-size:11px;color:var(--text-dim);}
+.vo-contact{font-size:12px;color:var(--text-muted);margin-bottom:6px;}
+.vo-products{font-size:12px;color:var(--text);line-height:1.5;margin-bottom:8px;}
+.vo-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:gap;}
+.vo-total{font-size:14px;font-weight:500;color:var(--gold-dim);}
+.vo-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px;}
+.btn-status{padding:5px 11px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:none;font-family:'Outfit',sans-serif;transition:opacity .2s;}
+.btn-status:hover{opacity:.82;}
+.btn-s-process{background:var(--blue-bg);color:var(--blue);border:1px solid #BFDBFE;}
+.btn-s-done{background:var(--green-bg);color:var(--green);border:1px solid #BBF7D0;}
+.btn-wa-small{padding:5px 11px;background:#25D366;color:#fff;border:none;border-radius:20px;font-size:11px;cursor:pointer;font-family:'Outfit',sans-serif;}
+.vo-pago{font-size:11px;color:var(--text-muted);}
+.status-pill{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;}
+.loading-orders{text-align:center;padding:40px;color:var(--text-muted);font-size:14px;}
+.section-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim);font-weight:500;margin-top:4px;}
+
+/* ── NAV ── */
+.nav{display:flex;border-top:1px solid var(--border);background:#fff;position:sticky;bottom:0;z-index:100;}
+.nav-btn{flex:1;padding:9px 5px 11px;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:transparent;cursor:pointer;color:var(--text-dim);font-family:'Outfit',sans-serif;font-size:10px;letter-spacing:.04em;transition:color .2s;position:relative;}
+.nav-btn.active{color:var(--gold-dim);}
+.nav-btn svg{width:19px;height:19px;}
+.nav-badge{position:absolute;top:6px;right:calc(50% - 17px);background:var(--red);color:#fff;font-size:9px;font-weight:600;min-width:15px;height:15px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px;}
 
 /* Toast */
-.toast {
-  position: fixed; bottom: 72px;
-  left: 50%; transform: translateX(-50%);
-  background: var(--green); color: #fff;
-  padding: 9px 20px; border-radius: 20px;
-  font-size: 13px; font-weight: 500;
-  z-index: 999; opacity: 0;
-  transition: opacity .3s; pointer-events: none;
-  white-space: nowrap; box-shadow: 0 4px 16px rgba(0,0,0,.15);
-}
-.toast.show { opacity: 1; }
-::-webkit-scrollbar { width: 3px; }
-::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
+.toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:9px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.15);}
+.toast.show{opacity:1;}
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-thumb{background:var(--border-mid);border-radius:2px;}
 </style>
 </head>
 <body>
 <div class="app">
 
-<!-- hidden api key store -->
 <input type="hidden" id="api-key-store" value="">
 
 <!-- API KEY SCREEN -->
-<div id="screen-apikey" style="position:fixed;inset:0;z-index:9999;background:#1C1A14;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;gap:20px;text-align:center;font-family:'Outfit',sans-serif;">
-  <div style="font-size:36px">🔑</div>
-  <div style="font-family:'Playfair Display',serif;font-size:24px;color:#F0EAD8;line-height:1.2">Activar asistente<br><span style="color:#C8A45A">Davinchi</span></div>
-  <div style="font-size:13px;color:#6A6050;line-height:1.7;max-width:300px">
-    Ingresa tu API key de Anthropic para activar el chat con IA.<br>
-    <a href="https://console.anthropic.com" target="_blank" style="color:#C8A45A;text-decoration:none">Obtenerla gratis en console.anthropic.com →</a>
-  </div>
-  <input id="apikey-input" type="password" placeholder="sk-ant-api03-..." style="width:100%;max-width:340px;background:#111;border:1.5px solid rgba(200,164,90,0.25);border-radius:10px;padding:13px 16px;font-family:'Outfit',sans-serif;font-size:14px;color:#F0EAD8;outline:none;" oninput="this.style.borderColor=this.value?'rgba(200,164,90,0.6)':'rgba(200,164,90,0.25)'" onkeydown="if(event.key==='Enter')saveApiKey()">
-  <button onclick="saveApiKey()" style="width:100%;max-width:340px;padding:14px;background:#C8A45A;color:#1C1A14;border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:500;cursor:pointer;">Activar →</button>
-  <div id="apikey-error" style="font-size:12px;color:#C0442A;display:none">Ingresa una API key válida (comienza con sk-ant-)</div>
-  <div style="font-size:11px;color:#3A3830;max-width:300px">La clave se guarda en tu navegador y nunca se envía a terceros.</div>
+<div id="screen-apikey" style="display:none;position:fixed;inset:0;z-index:9999;background:#1C1A14;flex-direction:column;align-items:center;justify-content:center;padding:32px;gap:16px;text-align:center;font-family:'Outfit',sans-serif;">
+  <div style="font-size:34px">🔑</div>
+  <div class="ak-title">Activar <span>Davinchi</span></div>
+  <div class="ak-sub">Ingresa tu API key de Anthropic para activar el asistente IA.<br><a href="https://console.anthropic.com" target="_blank" style="color:var(--gold)">console.anthropic.com →</a></div>
+  <input id="apikey-input" class="ak-input" type="password" placeholder="sk-ant-api03-..." onkeydown="if(event.key==='Enter')saveApiKey()">
+  <button class="ak-btn" onclick="saveApiKey()">Activar →</button>
+  <div id="apikey-error" class="ak-err">Ingresa una clave válida (sk-ant-...)</div>
+  <div class="ak-skip" onclick="skipApiKey()">Continuar sin IA (solo catálogo)</div>
 </div>
 
-<!-- HEADER -->
-<div class="header" id="main-header" style="display:none">
-  <div class="logo-wrap">
-    <div class="logo">Davinchi</div>
-    <div class="logo-sub">Estuches & Vitrinas</div>
-  </div>
-  <div class="client-chip" id="client-chip" onclick="showToast('Para cambiar de cuenta, recarga la página')">
-    <span id="chip-name">—</span>
-  </div>
-</div>
-
-<!-- ══ WELCOME ══ -->
-<div id="screen-welcome" class="screen active" style="min-height:100vh;background:var(--ink)">
-  <div class="welcome-hero">
+<!-- LANDING -->
+<div id="screen-landing" class="screen active">
+  <div class="landing-hero">
     <div class="hero-gem">💎</div>
-    <div class="hero-title">Catálogo &<br><span>pedidos</span> Davinchi</div>
-    <div class="hero-sub">Estuches y vitrinas para joyerías. Haz tu pedido en minutos, directamente desde aquí.</div>
+    <div class="hero-title">Bienvenido a<br><span>Davinchi</span></div>
+    <div class="hero-sub">Estuches y vitrinas para joyerías. ¿Cómo deseas continuar?</div>
   </div>
-  <div class="welcome-form">
-    <div class="form-label">Nombre de tu joyería</div>
-    <input id="shop-input" class="form-input" type="text" placeholder="Ej: Joyería Luna" autocomplete="off">
-    <div class="form-label" style="margin-top:4px">Tu nombre</div>
-    <input id="contact-input" class="form-input" type="text" placeholder="Ej: María García" autocomplete="off">
-    <button class="btn-start" onclick="enterApp()">Ver catálogo →</button>
-    <div class="welcome-disclaimer">
-      Al ingresar aceptas que tus pedidos sean procesados por el equipo Davinchi.<br>
-      <a href="https://wa.me/573001234567" style="color:var(--text-dim)">¿Preguntas? Escríbenos →</a>
+  <div class="landing-cards">
+    <div class="landing-card card-client" onclick="goClient()">
+      <div class="lc-icon">🛍️</div>
+      <div class="lc-title">Soy cliente</div>
+      <div class="lc-desc">Ver catálogo, hacer pedidos y consultar mis compras</div>
+      <div class="lc-arrow">→</div>
+    </div>
+    <div class="landing-card card-vendor" onclick="goVendor()">
+      <div class="lc-icon">📊</div>
+      <div class="lc-title">Soy vendedor / CEO</div>
+      <div class="lc-desc">Panel de gestión, pedidos y resumen de ventas</div>
+      <div class="lc-arrow" style="color:var(--gold)">→</div>
     </div>
   </div>
 </div>
 
-<!-- ══ CATALOG ══ -->
-<div id="screen-catalog" class="screen">
-  <div class="section-header">
-    <div class="section-title">Nuestro catálogo</div>
-    <div class="section-sub">Toca cualquier producto para pedirlo</div>
+<!-- LOGIN VENDOR -->
+<div id="screen-login" class="screen">
+  <div style="font-size:34px">🔐</div>
+  <div class="login-title">Panel <span>Davinchi</span></div>
+  <div class="login-sub">Acceso exclusivo para el equipo interno</div>
+  <div class="login-form">
+    <input id="login-user" class="login-input" type="text" placeholder="Usuario" autocomplete="off">
+    <input id="login-pass" class="login-input" type="password" placeholder="Contraseña" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn-login" onclick="doLogin()">Ingresar →</button>
+    <div id="login-err" class="login-err">Usuario o contraseña incorrectos</div>
   </div>
+  <button class="btn-back-landing" onclick="showLanding()">← Volver</button>
+</div>
+
+<!-- CLIENT HEADER -->
+<div class="header" id="client-header" style="display:none">
+  <div><div class="logo">Davinchi</div><div class="logo-sub">Estuches & Vitrinas</div></div>
+  <div class="client-chip" id="client-chip">—</div>
+</div>
+
+<!-- WELCOME CLIENT -->
+<div id="screen-welcome" class="screen">
+  <div style="background:var(--ink);flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0;min-height:calc(100vh - 60px)">
+    <div style="width:100%;padding:44px 28px 32px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center">
+      <div style="font-size:28px">💎</div>
+      <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#F0EAD8;line-height:1.2">Haz tu pedido<br><span style="color:var(--gold)">Davinchi</span></div>
+      <div style="font-size:13px;color:#5A5448;line-height:1.6;max-width:270px">Explora el catálogo o usa el asistente para pedir fácilmente</div>
+    </div>
+    <div style="width:100%;background:var(--surface);border-radius:24px 24px 0 0;padding:28px 24px 36px;display:flex;flex-direction:column;gap:12px;flex:1">
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:500">Nombre de tu joyería</div>
+      <input id="shop-input" style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;font-family:'Outfit',sans-serif;font-size:15px;color:var(--text);outline:none;" type="text" placeholder="Ej: Joyería Luna" autocomplete="off">
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:500;margin-top:2px">Tu nombre</div>
+      <input id="contact-input" style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;font-family:'Outfit',sans-serif;font-size:15px;color:var(--text);outline:none;" type="text" placeholder="Ej: María García" autocomplete="off">
+      <button onclick="enterApp()" style="width:100%;padding:14px;background:var(--gold);color:var(--ink);border:none;border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:15px;font-weight:500;cursor:pointer;margin-top:4px;">Ver catálogo →</button>
+      <div style="font-size:12px;color:var(--text-dim);text-align:center">Al continuar aceptas que tus pedidos sean procesados por Davinchi</div>
+    </div>
+  </div>
+</div>
+
+<!-- CATALOG -->
+<div id="screen-catalog" class="screen">
+  <div class="section-header"><div class="section-title">Catálogo</div><div class="section-sub">Toca un producto para agregarlo</div></div>
   <div class="catalog-grid" id="catalog-grid"></div>
 </div>
 
-<!-- ══ CHAT ══ -->
+<!-- CHAT -->
 <div id="screen-chat" class="screen">
   <div class="chat-banner">
-    <div class="chat-banner-info">
-      <strong id="banner-shop">Tu joyería</strong>
-      <span>Asistente Davinchi</span>
-    </div>
-    <button class="btn-ver-catalogo" onclick="switchScreen('catalog')">Ver catálogo</button>
+    <div class="chat-banner-info"><strong id="banner-shop">Tu joyería</strong><span>Asistente Davinchi</span></div>
+    <button class="btn-ver-cat" onclick="switchScreen('catalog')">Ver catálogo</button>
   </div>
   <div class="chat-messages" id="chat-messages"></div>
   <div class="chip-row" id="chip-row"></div>
   <div class="chat-input-wrap">
-    <textarea class="chat-in" id="chat-in" placeholder="Escribe tu pedido o pregunta aquí..." rows="1"
-      onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+    <textarea class="chat-in" id="chat-in" placeholder="Escribe tu pedido aquí..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
     <button class="btn-send" id="btn-send" onclick="sendMsg()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-      </svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
     </button>
   </div>
 </div>
 
-<!-- ══ MY ORDERS ══ -->
-<div id="screen-myorders" class="screen">
-  <div class="section-header">
-    <div class="section-title">Mis pedidos</div>
-    <div class="section-sub" id="my-orders-sub">Historial de esta sesión</div>
-  </div>
-  <div class="my-orders-list" id="my-orders-list"></div>
-  <div class="contact-banner">
-    <div class="contact-icon">💬</div>
-    <div class="contact-text">
-      <strong>¿Necesitas hablar con un asesor?</strong>
-      <span>Estamos disponibles en horario laboral</span>
-    </div>
-    <button class="btn-whatsapp" onclick="openWhatsApp()">WhatsApp</button>
-  </div>
-</div>
-
-<!-- ══ CART ══ -->
+<!-- CART -->
 <div id="screen-cart" class="screen">
-  <div class="section-header">
-    <div class="section-title">Mi carrito</div>
-    <div class="section-sub" id="cart-sub">0 productos</div>
-  </div>
-  <div class="cart-list" id="cart-list">
-    <div class="empty-cart"><div class="icon">🛒</div><p>Tu carrito está vacío.<br>Agrega productos desde el catálogo.</p></div>
-  </div>
+  <div class="section-header"><div class="section-title">Mi carrito</div><div class="section-sub" id="cart-sub">0 productos</div></div>
+  <div class="cart-list" id="cart-list"><div class="empty-state"><div class="icon">🛒</div><p>Tu carrito está vacío.<br>Agrega productos del catálogo.</p><button class="btn-goto" onclick="switchScreen('catalog')">Ver catálogo</button></div></div>
   <div class="cart-summary" id="cart-summary" style="display:none">
-    <div class="cart-total-row">
-      <span class="lbl">Total del pedido</span>
-      <span class="val" id="cart-total-display">$0</span>
-    </div>
-    <button class="btn-send-cart" onclick="sendCartToChat()">Enviar pedido al asistente →</button>
+    <div class="cart-total-row"><span class="lbl">Total</span><span class="val" id="cart-total-display">$0</span></div>
+    <button class="btn-send-cart" onclick="sendCartToChat()">Confirmar pedido →</button>
   </div>
 </div>
 
-<!-- NAV -->
-<div class="nav" id="main-nav" style="display:none">
-  <button class="nav-btn" id="nav-catalog" onclick="switchScreen('catalog')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
-    </svg>
+<!-- MY ORDERS -->
+<div id="screen-myorders" class="screen">
+  <div class="section-header"><div class="section-title">Mis pedidos</div><div class="section-sub" id="my-orders-sub">Esta sesión</div></div>
+  <div class="my-orders-list" id="my-orders-list"><div class="empty-state"><div class="icon">📋</div><p>Aún no tienes pedidos.</p><button class="btn-goto" onclick="switchScreen('chat')">Hacer un pedido</button></div></div>
+  <div class="contact-banner">
+    <div style="font-size:22px">💬</div>
+    <div class="contact-text"><strong>¿Necesitas un asesor?</strong><span>Disponible en horario laboral</span></div>
+    <button class="btn-wa" onclick="openWA()">WhatsApp</button>
+  </div>
+</div>
+
+<!-- CLIENT NAV -->
+<div class="nav" id="client-nav" style="display:none">
+  <button class="nav-btn active" id="nav-catalog" onclick="switchScreen('catalog')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
     Catálogo
   </button>
   <button class="nav-btn" id="nav-cart" onclick="switchScreen('cart')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-    </svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
     Carrito
     <span class="nav-badge" id="cart-badge" style="display:none">0</span>
   </button>
-  <button class="nav-btn active" id="nav-chat" onclick="switchScreen('chat')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-    </svg>
+  <button class="nav-btn" id="nav-chat" onclick="switchScreen('chat')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     Pedir
   </button>
   <button class="nav-btn" id="nav-myorders" onclick="switchScreen('myorders')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
-    </svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
     Pedidos
     <span class="nav-badge" id="orders-badge" style="display:none">0</span>
   </button>
 </div>
 
+<!-- VENDOR PANEL -->
+<div id="screen-vendor" class="screen">
+  <div class="vendor-header">
+    <div class="vendor-header-left"><strong id="vendor-welcome">Panel Davinchi</strong><span id="vendor-role-label">—</span></div>
+    <button class="btn-logout" onclick="doLogout()">Salir</button>
+  </div>
+  <div class="vendor-tabs">
+    <div class="vtab active" id="vtab-pedidos" onclick="switchVTab('pedidos')">Pedidos</div>
+    <div class="vtab" id="vtab-resumen" onclick="switchVTab('resumen')">Resumen</div>
+  </div>
+  <div class="vendor-content" id="vendor-content">
+    <div class="loading-orders">Cargando pedidos...</div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbybY_Xn1L2TpnDUOgQ_HYxXASeIvLN0JSV5KQS2FZRedDpL1MeWwkrEYDgxJMPHkmCgZA/exec';
+const WA_NUMBER  = '573001234567';
+
 const CATALOG = [
-  { id:'VG3P',  name:'Vitrina Giratoria 3P',    price:450000, stock:4,  emoji:'🔄', desc:'Vitrina giratoria de 3 pisos. Ideal para anillos y aretes.' },
-  { id:'ETN',   name:'Estuche Terciopelo Negro', price:85000,  stock:18, emoji:'⬛', desc:'Estuche forrado en terciopelo negro, cierre magnético.' },
-  { id:'ETR',   name:'Estuche Terciopelo Rojo',  price:75000,  stock:2,  emoji:'🟥', desc:'Estuche en terciopelo rojo intenso. Últimas unidades.' },
-  { id:'EA360', name:'Exhibidor Acrílico 360°',  price:220000, stock:3,  emoji:'🔮', desc:'Exhibidor giratorio en acrílico transparente de alta calidad.' },
-  { id:'CMP',   name:'Caja Madera Premium',       price:680000, stock:12, emoji:'📦', desc:'Caja artesanal en madera con interior acolchado.' },
-  { id:'SBJ',   name:'Soporte Busto Joyería',    price:95000,  stock:20, emoji:'💍', desc:'Busto exhibidor de terciopelo para collares y cadenas.' },
-  { id:'BO',    name:'Bandeja Organizadora',      price:65000,  stock:7,  emoji:'🗂️', desc:'Bandeja con compartimentos para organizar joyería.' },
+  {id:'VG3P', name:'Vitrina Giratoria 3P',    price:450000,stock:4, emoji:'🔄',desc:'Vitrina giratoria de 3 pisos. Ideal para anillos y aretes.'},
+  {id:'ETN',  name:'Estuche Terciopelo Negro', price:85000, stock:18,emoji:'⬛',desc:'Estuche forrado en terciopelo negro, cierre magnético.'},
+  {id:'ETR',  name:'Estuche Terciopelo Rojo',  price:75000, stock:2, emoji:'🟥',desc:'Estuche en terciopelo rojo intenso. Últimas unidades.'},
+  {id:'EA360',name:'Exhibidor Acrílico 360°',  price:220000,stock:3, emoji:'🔮',desc:'Exhibidor giratorio en acrílico transparente.'},
+  {id:'CMP',  name:'Caja Madera Premium',       price:680000,stock:12,emoji:'📦',desc:'Caja artesanal en madera con interior acolchado.'},
+  {id:'SBJ',  name:'Soporte Busto Joyería',    price:95000, stock:20,emoji:'💍',desc:'Busto exhibidor de terciopelo para collares.'},
+  {id:'BO',   name:'Bandeja Organizadora',      price:65000, stock:7, emoji:'🗂️',desc:'Bandeja con compartimentos para organizar joyería.'},
+];
+
+const VENDORS = [
+  {user:'admin',    pass:'davinchi2025', name:'Administrador', role:'CEO'},
+  {user:'vendedor1',pass:'vend001',      name:'Carlos Reyes',  role:'Vendedor'},
+  {user:'vendedor2',pass:'vend002',      name:'Ana Gómez',     role:'Vendedor'},
 ];
 
 const PAY_METHODS = ['Contado','Transferencia','Crédito 15 días','Crédito 30 días'];
-const WA_NUMBER = '573001234567';
-
-let shopName = '', contactName = '', orders = [], history = [], pendingOrder = null;
 const fmt = n => new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',minimumFractionDigits:0}).format(n);
 const dateStr = () => new Date().toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'});
 const timeStr = () => new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
 
+let shopName='', contactName='', cart={}, chatHistory=[], clientOrders=[], pendingOrder=null;
+let currentVendor=null, vendorTab='pedidos', allOrders=[];
+
+// ── API KEY ──
 function saveApiKey() {
-  const key = document.getElementById('apikey-input').value.trim();
-  if (!key || !key.startsWith('sk-ant-')) {
-    document.getElementById('apikey-error').style.display = 'block';
-    return;
-  }
-  localStorage.setItem('dav_apikey', key);
-  document.getElementById('api-key-store').value = key;
-  document.getElementById('screen-apikey').style.display = 'none';
+  const k = document.getElementById('apikey-input').value.trim();
+  if(!k||!k.startsWith('sk-ant-')){document.getElementById('apikey-error').style.display='block';return;}
+  localStorage.setItem('dav_apikey',k);
+  document.getElementById('api-key-store').value=k;
+  hideApiKeyScreen();
+}
+function skipApiKey(){hideApiKeyScreen();}
+function hideApiKeyScreen(){
+  const s=document.getElementById('screen-apikey');
+  s.style.display='none';
+}
+function getApiKey(){return document.getElementById('api-key-store').value||localStorage.getItem('dav_apikey')||'';}
+
+// ── LANDING ──
+function showLanding(){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-landing').classList.add('active');
+  document.getElementById('client-header').style.display='none';
+  document.getElementById('client-nav').style.display='none';
+}
+function goClient(){
+  document.getElementById('screen-landing').classList.remove('active');
+  document.getElementById('screen-welcome').classList.add('active');
+  document.getElementById('client-header').style.display='flex';
+}
+function goVendor(){
+  document.getElementById('screen-landing').classList.remove('active');
+  document.getElementById('screen-login').classList.add('active');
 }
 
-function enterApp() {
-  shopName = document.getElementById('shop-input').value.trim();
-  contactName = document.getElementById('contact-input').value.trim();
-  if (!shopName) { document.getElementById('shop-input').focus(); return; }
-  if (!contactName) { document.getElementById('contact-input').focus(); return; }
-  document.getElementById('chip-name').textContent = shopName;
-  document.getElementById('banner-shop').textContent = shopName;
+// ── LOGIN ──
+function doLogin(){
+  const u=document.getElementById('login-user').value.trim();
+  const p=document.getElementById('login-pass').value;
+  const v=VENDORS.find(x=>x.user===u&&x.pass===p);
+  if(!v){document.getElementById('login-err').style.display='block';return;}
+  currentVendor=v;
+  document.getElementById('login-err').style.display='none';
+  document.getElementById('login-user').value='';
+  document.getElementById('login-pass').value='';
+  document.getElementById('screen-login').classList.remove('active');
+  document.getElementById('vendor-welcome').textContent=`Hola, ${v.name}`;
+  document.getElementById('vendor-role-label').textContent=v.role;
+  document.getElementById('screen-vendor').classList.add('active');
+  loadVendorOrders();
+}
+function doLogout(){
+  currentVendor=null;
+  document.getElementById('screen-vendor').classList.remove('active');
+  showLanding();
+}
+
+// ── VENDOR PANEL ──
+function switchVTab(tab){
+  vendorTab=tab;
+  document.querySelectorAll('.vtab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('vtab-'+tab).classList.add('active');
+  renderVendorContent();
+}
+
+async function loadVendorOrders(){
+  document.getElementById('vendor-content').innerHTML='<div class="loading-orders">⏳ Cargando pedidos desde Google Sheets...</div>';
+  try{
+    const res=await fetch(SHEETS_URL);
+    const data=await res.json();
+    if(data.success){
+      allOrders=data.pedidos.filter(p=>p.ID);
+      renderVendorContent();
+    } else {
+      document.getElementById('vendor-content').innerHTML='<div class="loading-orders">Error al cargar pedidos. Intenta de nuevo.</div>';
+    }
+  }catch(e){
+    document.getElementById('vendor-content').innerHTML='<div class="loading-orders">⚠️ Sin conexión. Verifica tu internet.</div>';
+  }
+}
+
+function renderVendorContent(){
+  if(vendorTab==='pedidos') renderVendorOrders();
+  else renderVendorResumen();
+}
+
+function statusPill(s){
+  const map={
+    'Nuevo':'<span class="status-pill st-new">Nuevo</span>',
+    'En proceso':'<span class="status-pill st-process">En proceso</span>',
+    'Entregado':'<span class="status-pill st-done">Entregado</span>',
+  };
+  return map[s]||`<span class="status-pill st-new">${s}</span>`;
+}
+
+function renderVendorOrders(){
+  const content=document.getElementById('vendor-content');
+  if(!allOrders.length){
+    content.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>No hay pedidos aún.<br>Cuando los clientes hagan pedidos aparecerán aquí.</p></div>';
+    return;
+  }
+  const nuevos=allOrders.filter(o=>o.Estado==='Nuevo');
+  const otros=allOrders.filter(o=>o.Estado!=='Nuevo');
+
+  let html='';
+  if(nuevos.length){
+    html+=`<div class="section-label">🔴 Nuevos (${nuevos.length})</div>`;
+    html+=nuevos.map(o=>orderCard(o)).join('');
+  }
+  if(otros.length){
+    html+=`<div class="section-label" style="margin-top:8px">Anteriores</div>`;
+    html+=otros.map(o=>orderCard(o)).join('');
+  }
+  content.innerHTML=html;
+}
+
+function orderCard(o){
+  const waMsg=encodeURIComponent(`Hola ${o.Contacto}, te escribimos de Davinchi sobre tu pedido ${o.ID}. Total: ${o.Total}. Entrega: ${o['Entrega']}. ¿Tienes alguna consulta?`);
+  return `
+  <div class="vendor-order" id="vo-${o.ID}">
+    <div class="vo-header">
+      <div>
+        <div class="vo-shop">${o['Joyería']}</div>
+        <div class="vo-contact">${o.Contacto} · ${o.Fecha} ${o.Hora}</div>
+      </div>
+      ${statusPill(o.Estado)}
+    </div>
+    <div class="vo-products">${o.Productos}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div class="vo-total">${o.Total}</div>
+      <div class="vo-pago">${o.Pago} · Entrega: ${o.Entrega}</div>
+    </div>
+    <div class="vo-actions">
+      ${o.Estado!=='En proceso'&&o.Estado!=='Entregado'?`<button class="btn-status btn-s-process" onclick="updateStatus('${o.ID}','En proceso')">En proceso</button>`:''}
+      ${o.Estado!=='Entregado'?`<button class="btn-status btn-s-done" onclick="updateStatus('${o.ID}','Entregado')">Entregado</button>`:''}
+      <button class="btn-wa-small" onclick="window.open('https://wa.me/${WA_NUMBER.replace('+','')}?text=${waMsg}','_blank')">WhatsApp</button>
+    </div>
+  </div>`;
+}
+
+async function updateStatus(id, newStatus){
+  const order=allOrders.find(o=>o.ID===id);
+  if(!order)return;
+  order.Estado=newStatus;
+  showToast(`Pedido marcado como "${newStatus}"`);
+  renderVendorOrders();
+  try{
+    await fetch(SHEETS_URL+'?action=updateStatus&id='+encodeURIComponent(id)+'&status='+encodeURIComponent(newStatus));
+  }catch(e){}
+}
+
+function renderVendorResumen(){
+  const content=document.getElementById('vendor-content');
+  const today=dateStr();
+  const todayOrders=allOrders.filter(o=>o.Fecha===today);
+  const totalHoy=todayOrders.reduce((s,o)=>s+parseMoney(o.Total),0);
+  const totalGeneral=allOrders.reduce((s,o)=>s+parseMoney(o.Total),0);
+  const nuevos=allOrders.filter(o=>o.Estado==='Nuevo').length;
+
+  content.innerHTML=`
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num">${allOrders.length}</div><div class="stat-lbl">Total pedidos</div></div>
+      <div class="stat-card"><div class="stat-num">${nuevos}</div><div class="stat-lbl">Pendientes</div></div>
+      <div class="stat-card"><div class="stat-num">${todayOrders.length}</div><div class="stat-lbl">Hoy</div></div>
+    </div>
+    <div class="stat-card" style="text-align:center;margin-bottom:4px">
+      <div class="stat-num" style="font-size:18px">${fmt(totalHoy)}</div>
+      <div class="stat-lbl">Ventas de hoy</div>
+    </div>
+    <div class="stat-card" style="text-align:center">
+      <div class="stat-num" style="font-size:18px">${fmt(totalGeneral)}</div>
+      <div class="stat-lbl">Ventas totales</div>
+    </div>
+    <div class="section-label" style="margin-top:8px">Pedidos de hoy</div>
+    ${todayOrders.length?todayOrders.map(o=>orderCard(o)).join(''):'<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">No hay pedidos hoy aún</div>'}
+  `;
+}
+
+function parseMoney(s){
+  if(!s)return 0;
+  return parseInt(String(s).replace(/[^0-9]/g,''))||0;
+}
+
+// ── CLIENT ──
+function enterApp(){
+  shopName=document.getElementById('shop-input').value.trim();
+  contactName=document.getElementById('contact-input').value.trim();
+  if(!shopName){document.getElementById('shop-input').focus();return;}
+  if(!contactName){document.getElementById('contact-input').focus();return;}
+  document.getElementById('client-chip').textContent=shopName;
+  document.getElementById('banner-shop').textContent=shopName;
   document.getElementById('screen-welcome').classList.remove('active');
-  document.getElementById('main-header').style.display = 'flex';
-  document.getElementById('main-nav').style.display = 'flex';
+  document.getElementById('client-nav').style.display='flex';
   renderCatalog();
   initChat();
   switchScreen('catalog');
 }
 
-let cart = {}; // { productId: qty }
+// ── CART ──
+let cart2={};
+function cartTotal(){return Object.entries(cart2).reduce((s,[id,q])=>{const p=CATALOG.find(x=>x.id===id);return s+(p?p.price*q:0);},0);}
+function cartCount(){return Object.values(cart2).reduce((s,q)=>s+q,0);}
 
-function cartTotal() {
-  return Object.entries(cart).reduce((sum, [id, qty]) => {
-    const p = CATALOG.find(x => x.id === id);
-    return sum + (p ? p.price * qty : 0);
-  }, 0);
-}
-function cartCount() { return Object.values(cart).reduce((s, q) => s + q, 0); }
-
-function renderCatalog() {
-  const grid = document.getElementById('catalog-grid');
-  grid.innerHTML = CATALOG.map(p => {
-    const qty = cart[p.id] || 0;
-    const inCart = qty > 0;
+function renderCatalog(){
+  document.getElementById('catalog-grid').innerHTML=CATALOG.map(p=>{
+    const q=cart2[p.id]||0;
     return `
-    <div class="product-card" id="pcard-${p.id}">
-      <div class="product-visual" style="cursor:default">
+    <div class="product-card">
+      <div class="product-visual">
         ${p.emoji}
-        <span class="stock-badge ${p.stock <= 3 ? 'stock-low' : 'stock-ok'}">
-          ${p.stock <= 3 ? `Solo ${p.stock} uds` : 'Disponible'}
-        </span>
+        <span class="stock-badge ${p.stock<=3?'stock-low':'stock-ok'}">${p.stock<=3?`Solo ${p.stock} uds`:'Disponible'}</span>
       </div>
       <div class="product-body">
         <div class="product-name">${p.name}</div>
         <div class="product-desc">${p.desc}</div>
         <div class="product-footer-cart">
           <div class="product-price">${fmt(p.price)}</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div class="qty-control" id="qtyctl-${p.id}" style="${inCart ? '' : 'display:none'}">
-              <button class="qty-btn minus" onclick="changeQty('${p.id}',-1)">−</button>
-              <span class="qty-num" id="qty-${p.id}">${qty}</span>
-              <button class="qty-btn plus" onclick="changeQty('${p.id}',1)">+</button>
+          <div style="display:flex;align-items:center;gap:7px">
+            <div class="qty-control" id="qctl-${p.id}" style="${q>0?'':'display:none'}">
+              <button class="qty-btn" onclick="chQty('${p.id}',-1)">−</button>
+              <span class="qty-num" id="qn-${p.id}">${q}</span>
+              <button class="qty-btn plus" onclick="chQty('${p.id}',1)">+</button>
             </div>
-            <button class="btn-add-cart ${inCart ? 'in-cart' : ''}" id="btnadd-${p.id}"
-              onclick="addToCart('${p.id}')">
-              ${inCart ? '✓ En carrito' : 'Agregar'}
+            <button class="btn-add-cart ${q>0?'in-cart':''}" id="badd-${p.id}" onclick="addCart('${p.id}')">
+              ${q>0?'✓ En carrito':'Agregar'}
             </button>
           </div>
         </div>
@@ -839,367 +663,267 @@ function renderCatalog() {
   }).join('');
 }
 
-function addToCart(id) {
-  if (cart[id]) return;
-  cart[id] = 1;
-  updateCartUI();
-  renderCatalog();
-  showToast('Agregado al carrito');
+function addCart(id){
+  if(cart2[id])return;
+  cart2[id]=1;
+  updateCartUI();renderCatalog();showToast('Agregado al carrito');
 }
-
-function changeQty(id, delta) {
-  const p = CATALOG.find(x => x.id === id);
-  if (!p) return;
-  const newQty = (cart[id] || 0) + delta;
-  if (newQty <= 0) {
-    delete cart[id];
-  } else if (newQty > p.stock) {
-    showToast(`Máximo ${p.stock} unidades disponibles`);
-    return;
-  } else {
-    cart[id] = newQty;
-  }
-  updateCartUI();
-  renderCatalog();
+function chQty(id,d){
+  const p=CATALOG.find(x=>x.id===id);
+  const nq=(cart2[id]||0)+d;
+  if(nq<=0){delete cart2[id];}
+  else if(nq>p.stock){showToast(`Máximo ${p.stock} unidades`);return;}
+  else{cart2[id]=nq;}
+  updateCartUI();renderCatalog();
 }
-
-function updateCartUI() {
-  const count = cartCount();
-  const badge = document.getElementById('cart-badge');
-  badge.textContent = count;
-  badge.style.display = count > 0 ? 'flex' : 'none';
+function updateCartUI(){
+  const c=cartCount();
+  const b=document.getElementById('cart-badge');
+  b.textContent=c;b.style.display=c>0?'flex':'none';
   renderCartScreen();
 }
-
-function renderCartScreen() {
-  const list = document.getElementById('cart-list');
-  const summary = document.getElementById('cart-summary');
-  const items = Object.entries(cart).filter(([,q]) => q > 0);
-  document.getElementById('cart-sub').textContent = `${items.length} producto${items.length !== 1 ? 's' : ''}`;
-
-  if (!items.length) {
-    list.innerHTML = `<div class="empty-cart"><div class="icon">🛒</div><p>Tu carrito está vacío.<br>Agrega productos desde el catálogo.</p></div>`;
-    summary.style.display = 'none';
-    return;
+function renderCartScreen(){
+  const list=document.getElementById('cart-list');
+  const summ=document.getElementById('cart-summary');
+  const items=Object.entries(cart2).filter(([,q])=>q>0);
+  document.getElementById('cart-sub').textContent=`${items.length} producto${items.length!==1?'s':''}`;
+  if(!items.length){
+    list.innerHTML='<div class="empty-state"><div class="icon">🛒</div><p>Tu carrito está vacío.</p><button class="btn-goto" onclick="switchScreen(\'catalog\')">Ver catálogo</button></div>';
+    summ.style.display='none';return;
   }
-
-  list.innerHTML = items.map(([id, qty]) => {
-    const p = CATALOG.find(x => x.id === id);
-    return `
-    <div class="cart-item">
+  list.innerHTML=items.map(([id,q])=>{
+    const p=CATALOG.find(x=>x.id===id);
+    return `<div class="cart-item">
       <div class="cart-item-emoji">${p.emoji}</div>
       <div class="cart-item-info">
         <div class="cart-item-name">${p.name}</div>
         <div class="cart-item-price">${fmt(p.price)} c/u</div>
-        <div class="cart-item-subtotal">${fmt(p.price * qty)}</div>
+        <div class="cart-item-sub">${fmt(p.price*q)}</div>
       </div>
       <div class="qty-control">
-        <button class="qty-btn minus" onclick="changeQty('${id}',-1)">−</button>
-        <span class="qty-num">${qty}</span>
-        <button class="qty-btn plus" onclick="changeQty('${id}',1)">+</button>
+        <button class="qty-btn" onclick="chQty('${id}',-1)">−</button>
+        <span class="qty-num">${q}</span>
+        <button class="qty-btn plus" onclick="chQty('${id}',1)">+</button>
       </div>
-      <button class="cart-remove" onclick="changeQty('${id}', -999)">✕</button>
+      <button class="cart-remove" onclick="chQty('${id}',-999)">✕</button>
     </div>`;
   }).join('');
-
-  document.getElementById('cart-total-display').textContent = fmt(cartTotal());
-  summary.style.display = 'block';
+  document.getElementById('cart-total-display').textContent=fmt(cartTotal());
+  summ.style.display='block';
 }
-
-function sendCartToChat() {
-  const items = Object.entries(cart).filter(([,q]) => q > 0);
-  if (!items.length) return;
-  const lines = items.map(([id, qty]) => {
-    const p = CATALOG.find(x => x.id === id);
-    return `${qty} ${p.name}`;
-  });
-  const msg = `Quiero pedir: ${lines.join(', ')}`;
+function sendCartToChat(){
+  const items=Object.entries(cart2).filter(([,q])=>q>0);
+  if(!items.length)return;
+  const lines=items.map(([id,q])=>{const p=CATALOG.find(x=>x.id===id);return `${q} ${p.name}`;});
   switchScreen('chat');
-  document.getElementById('chat-in').value = msg;
+  document.getElementById('chat-in').value=`Quiero pedir: ${lines.join(', ')}`;
   sendMsg();
 }
 
-function initChat() {
-  history = [];
-  document.getElementById('chat-messages').innerHTML = '';
-  addAI(`Hola, bienvenida **${shopName}** 👋\n\nSoy el asistente de Davinchi. Puedo ayudarte a hacer tu pedido de estuches y vitrinas.\n\nCuéntame: ¿qué productos necesitas y cuántas unidades?`, false);
-  setChips(['Ver catálogo', '¿Qué tienen disponible?', 'Quiero hacer un pedido']);
+// ── CHAT ──
+function initChat(){
+  chatHistory=[];
+  document.getElementById('chat-messages').innerHTML='';
+  addAI(`Hola, bienvenida **${shopName}** 👋\n\nSoy el asistente de Davinchi. Cuéntame qué productos necesitas y en qué cantidades.`,false);
+  setChips(['Ver catálogo','¿Qué tienen disponible?','Quiero hacer un pedido']);
 }
-
-function setChips(list) {
-  document.getElementById('chip-row').innerHTML = list.map(c =>
-    `<button class="chip" onclick="sendChip('${c}')">${c}</button>`).join('');
+function setChips(list){
+  document.getElementById('chip-row').innerHTML=list.map(c=>`<button class="chip" onclick="sendChip('${c}')">${c}</button>`).join('');
 }
+function sendChip(t){document.getElementById('chat-in').value=t;sendMsg();}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';}
 
-function sendChip(t) {
-  document.getElementById('chat-in').value = t;
-  sendMsg();
-}
-
-function handleKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
-}
-
-function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
-}
-
-async function sendMsg() {
-  const inp = document.getElementById('chat-in');
-  const txt = inp.value.trim();
-  if (!txt) return;
-  inp.value = ''; inp.style.height = 'auto';
-  document.getElementById('btn-send').disabled = true;
-  document.getElementById('chip-row').innerHTML = '';
+async function sendMsg(){
+  const inp=document.getElementById('chat-in');
+  const txt=inp.value.trim();
+  if(!txt)return;
+  inp.value='';inp.style.height='auto';
+  document.getElementById('btn-send').disabled=true;
+  document.getElementById('chip-row').innerHTML='';
   addUser(txt);
-  history.push({ role:'user', content:txt });
+  chatHistory.push({role:'user',content:txt});
   showTyping();
-  try {
-    const API_KEY = document.getElementById('api-key-store')?.value || localStorage.getItem('dav_apikey') || '';
-    const headers = {
-      'Content-Type': 'application/json',
-      'anthropic-dangerous-direct-browser-access': 'true',
-      'anthropic-version': '2023-06-01',
-      'x-api-key': API_KEY
-    };
-
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: buildSystem(),
-        messages: history
-      })
-    });
-
-    if (!res.ok) {
-      const err = await res.json().catch(()=>({}));
-      const errMsg = err?.error?.message || `Error ${res.status}`;
-      removeTyping();
-      if (res.status === 401) {
-        addAI('❌ API key inválida. Verifica que copiaste la clave correctamente desde console.anthropic.com');
-      } else if (res.status === 403) {
-        addAI('❌ Sin permisos. Asegúrate de que la API key tenga acceso activo.');
-      } else {
-        addAI(`❌ Error: ${errMsg}`);
-      }
-      document.getElementById('btn-send').disabled = false;
-      return;
-    }
-
-    const data = await res.json();
-    const reply = data.content?.[0]?.text || 'Hubo un error. Intenta de nuevo.';
+  const apiKey=getApiKey();
+  if(!apiKey){
     removeTyping();
-    history.push({ role:'assistant', content:reply });
-    processReply(reply);
-  } catch(e) {
-    removeTyping();
-    if (e.message?.includes('fetch')) {
-      addAI('❌ Error de red. Si estás abriendo el archivo desde tu computador (file://), necesitas subirlo a un servidor web. Escríbenos por WhatsApp y te ayudamos.');
-    } else {
-      addAI('❌ Error inesperado: ' + e.message);
-    }
+    addAI('El asistente IA no está configurado. Puedes hacer tu pedido directamente desde el catálogo y el carrito, o contáctanos por WhatsApp.');
+    setChips(['Ver catálogo','Hablar con asesor']);
+    document.getElementById('btn-send').disabled=false;return;
   }
-  document.getElementById('btn-send').disabled = false;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:buildSystem(),messages:chatHistory})
+    });
+    if(!res.ok){const e=await res.json().catch(()=>({}));removeTyping();addAI(`Error: ${e?.error?.message||res.status}`);document.getElementById('btn-send').disabled=false;return;}
+    const data=await res.json();
+    const reply=data.content?.[0]?.text||'Error. Intenta de nuevo.';
+    removeTyping();
+    chatHistory.push({role:'assistant',content:reply});
+    processReply(reply);
+  }catch(e){removeTyping();addAI('Error de conexión. Intenta de nuevo.');}
+  document.getElementById('btn-send').disabled=false;
 }
 
-function buildSystem() {
-  const cat = CATALOG.map(p =>
-    `- ${p.emoji} ${p.name} | Precio: ${fmt(p.price)} | Stock: ${p.stock} uds | ID: ${p.id}`
-  ).join('\n');
-
-  return `Eres el asistente de pedidos de DAVINCHI, empresa colombiana de estuches y vitrinas para joyerías.
-
-CLIENTE: ${shopName} | Contacto: ${contactName}
-FECHA: ${dateStr()}
-
-CATÁLOGO COMPLETO:
-${cat}
-
-TU ROL:
-Ayudas al cliente a hacer su pedido de forma fácil y amigable. Eres cálido, profesional y eficiente.
-
-FLUJO PARA TOMAR UN PEDIDO:
-1. El cliente menciona qué quiere → confirmas disponibilidad y precio
-2. Preguntas la cantidad si no la menciona
-3. Preguntas la fecha de entrega deseada
-4. Preguntas forma de pago: ${PAY_METHODS.join(', ')}
-5. Cuando tengas todo, presenta el resumen y pide confirmación
-
-REGLAS IMPORTANTES:
-- Avisa claramente si hay poco stock (≤3 unidades)
-- Si piden más del stock disponible, informa el máximo disponible
-- Sugiere productos complementarios cuando sea natural
-- Sé conciso — el cliente está en su negocio y no tiene tiempo
-- Nunca inventes precios ni stocks
-- Si preguntan por el estado de un pedido ya confirmado, diles que el equipo Davinchi se contactará pronto
-- Para hablar con un asesor humano, tienen WhatsApp disponible
-
-CUANDO TENGAS TODA LA INFO (productos, cantidades, fecha entrega, forma de pago), incluye este bloque exacto al FINAL de tu respuesta:
-
-<PEDIDO_JSON>
-{
-  "shop": "${shopName}",
-  "contact": "${contactName}",
-  "products": [{"id":"ID","name":"nombre","qty":número,"price":precio,"subtotal":qty_x_precio}],
-  "payMethod": "forma de pago",
-  "deliveryDate": "fecha estimada",
-  "notes": "notas opcionales",
-  "total": número_total
-}
-</PEDIDO_JSON>`;
+function buildSystem(){
+  const cat=CATALOG.map(p=>`- ${p.emoji} ${p.name} | ${fmt(p.price)} | Stock: ${p.stock} uds`).join('\n');
+  return `Eres el asistente de pedidos de DAVINCHI, empresa de estuches y vitrinas para joyerías en Colombia.
+CLIENTE: ${shopName} | Contacto: ${contactName} | Fecha: ${dateStr()}
+CATÁLOGO:\n${cat}
+FORMAS DE PAGO: ${PAY_METHODS.join(', ')}
+Ayuda al cliente a hacer su pedido de forma natural. Cuando tengas productos, cantidades, fecha de entrega y forma de pago, genera el resumen con este bloque exacto al final:
+<PEDIDO_JSON>{"shop":"${shopName}","contact":"${contactName}","products":[{"id":"ID","name":"nombre","qty":número,"price":precio,"subtotal":qty_x_precio}],"payMethod":"pago","deliveryDate":"fecha","notes":"","total":número}</PEDIDO_JSON>
+Sé conciso y amigable. Avisa si hay poco stock (≤3 uds). Sugiere productos complementarios cuando sea natural.`;
 }
 
-function processReply(reply) {
-  const m = reply.match(/<PEDIDO_JSON>([\s\S]*?)<\/PEDIDO_JSON>/);
-  if (m) {
-    try {
-      const order = JSON.parse(m[1].trim());
-      pendingOrder = order;
-      const clean = reply.replace(/<PEDIDO_JSON>[\s\S]*?<\/PEDIDO_JSON>/,'').trim();
-      if (clean) addAI(clean, false);
-      showConfirmCard(order);
-      return;
-    } catch(e) {}
+function processReply(reply){
+  const m=reply.match(/<PEDIDO_JSON>([\s\S]*?)<\/PEDIDO_JSON>/);
+  if(m){
+    try{
+      const o=JSON.parse(m[1].trim());
+      pendingOrder=o;
+      const clean=reply.replace(/<PEDIDO_JSON>[\s\S]*?<\/PEDIDO_JSON>/,'').trim();
+      if(clean)addAI(clean,false);
+      showConfirmCard(o);return;
+    }catch(e){}
   }
   addAI(reply);
-  const low = reply.toLowerCase();
-  if (low.includes('catálogo') || low.includes('producto')) setChips(['Ver precios', 'Hacer pedido']);
-  else if (low.includes('confirma') || low.includes('resumen')) setChips(['Sí, confirmar', 'Quiero cambiar algo']);
-  else setChips(['Hacer un pedido', 'Ver catálogo', 'Hablar con asesor']);
+  setChips(['Hacer un pedido','Ver catálogo','Hablar con asesor']);
 }
 
-function showConfirmCard(o) {
-  const el = document.createElement('div');
-  el.className = 'msg ai';
-  el.innerHTML = `
-    <div class="msg-av ai">D</div>
-    <div style="max-width:88%">
-      <div class="order-confirm">
-        <div class="oc-title">Resumen de tu pedido</div>
-        <div class="oc-row"><span class="lbl">Joyería</span><span class="val">${o.shop}</span></div>
-        <div class="oc-row"><span class="lbl">Productos</span><span class="val">${o.products.map(p=>`${p.qty}× ${p.name}`).join('<br>')}</span></div>
-        <div class="oc-row"><span class="lbl">Entrega</span><span class="val">${o.deliveryDate}</span></div>
-        <div class="oc-row"><span class="lbl">Pago</span><span class="val">${o.payMethod}</span></div>
-        ${o.notes ? `<div class="oc-row"><span class="lbl">Notas</span><span class="val">${o.notes}</span></div>` : ''}
-        <div class="oc-total"><span class="lbl">Total</span><span class="val">${fmt(o.total)}</span></div>
-        <div class="oc-btns">
-          <button class="oc-btn ok" onclick="confirmOrder()">Confirmar pedido</button>
-          <button class="oc-btn edit" onclick="editOrder()">Modificar</button>
-        </div>
-      </div>
-    </div>`;
+function showConfirmCard(o){
+  const el=document.createElement('div');
+  el.className='msg ai';
+  el.innerHTML=`<div class="msg-av ai">D</div><div style="max-width:88%"><div class="order-confirm">
+    <div class="oc-title">Resumen de tu pedido</div>
+    <div class="oc-row"><span class="lbl">Joyería</span><span class="val">${o.shop}</span></div>
+    <div class="oc-row"><span class="lbl">Productos</span><span class="val">${o.products.map(p=>`${p.qty}× ${p.name}`).join('<br>')}</span></div>
+    <div class="oc-row"><span class="lbl">Entrega</span><span class="val">${o.deliveryDate}</span></div>
+    <div class="oc-row"><span class="lbl">Pago</span><span class="val">${o.payMethod}</span></div>
+    ${o.notes?`<div class="oc-row"><span class="lbl">Notas</span><span class="val">${o.notes}</span></div>`:''}
+    <div class="oc-total"><span>Total</span><span class="val">${fmt(o.total)}</span></div>
+    <div class="oc-btns">
+      <button class="oc-btn ok" onclick="confirmOrder()">Confirmar pedido</button>
+      <button class="oc-btn edit" onclick="editOrder()">Modificar</button>
+    </div>
+  </div></div>`;
   document.getElementById('chat-messages').appendChild(el);
   scrollBottom();
 }
 
-function confirmOrder() {
-  if (!pendingOrder) return;
-  const saved = { ...pendingOrder, id:'PED-'+Date.now(), date:dateStr(), time:timeStr(), status:'confirmed' };
-  orders.unshift(saved);
-  pendingOrder = null;
-  updateBadge();
+async function confirmOrder(){
+  if(!pendingOrder)return;
+  const o=pendingOrder;
+  const saved={
+    id:'PED-'+Date.now(),
+    shop:o.shop,contact:o.contact,
+    products:o.products,
+    total:o.total,payMethod:o.payMethod,
+    deliveryDate:o.deliveryDate,notes:o.notes||'',
+    date:dateStr(),time:timeStr(),status:'Nuevo'
+  };
+  clientOrders.unshift(saved);
+  pendingOrder=null;
+  updateOrdersBadge();
   renderMyOrders();
-  addAI(`✅ **¡Pedido confirmado!**\n\nGracias, ${contactName}. Tu pedido para **${saved.shop}** ha sido registrado.\n\nEl equipo Davinchi lo procesará y te contactará para coordinar la entrega. ¿Necesitas algo más?`);
-  setChips(['Hacer otro pedido', 'Ver mis pedidos', 'Hablar con asesor']);
-  showToast('¡Pedido enviado correctamente!');
+
+  // Save to Google Sheets
+  try{
+    await fetch(SHEETS_URL,{
+      method:'POST',
+      body:JSON.stringify({
+        id:saved.id,fecha:saved.date,hora:saved.time,
+        joyeria:saved.shop,contacto:saved.contact,
+        productos:saved.products.map(p=>`${p.qty}x ${p.name}`).join(' | '),
+        total:fmt(saved.total),pago:saved.payMethod,
+        entrega:saved.deliveryDate,notas:saved.notes
+      })
+    });
+  }catch(e){}
+
+  addAI(`✅ **¡Pedido confirmado!**\n\nGracias ${saved.contact}, tu pedido para **${saved.shop}** fue registrado.\n\nEl equipo Davinchi te contactará para coordinar la entrega. ¿Necesitas algo más?`);
+  setChips(['Hacer otro pedido','Ver mis pedidos','Hablar con asesor']);
+  showToast('¡Pedido enviado a Davinchi!');
 }
 
-function editOrder() {
-  pendingOrder = null;
-  addAI('Claro, dime qué quieres cambiar del pedido.');
-  setChips([]);
-}
+function editOrder(){pendingOrder=null;addAI('Claro, dime qué quieres cambiar.');}
 
-function addAI(text, scroll=true) {
-  const d = document.createElement('div');
-  d.className = 'msg ai';
-  d.innerHTML = `<div class="msg-av ai">D</div><div class="bubble">${fmt_text(text)}</div>`;
+function addAI(text,scroll=true){
+  const d=document.createElement('div');d.className='msg ai';
+  d.innerHTML=`<div class="msg-av ai">D</div><div class="bubble">${fmtTxt(text)}</div>`;
   document.getElementById('chat-messages').appendChild(d);
-  if (scroll) scrollBottom();
+  if(scroll)scrollBottom();
 }
-
-function addUser(text) {
-  const initials = contactName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-  const d = document.createElement('div');
-  d.className = 'msg user';
-  d.innerHTML = `<div class="bubble">${text}</div><div class="msg-av user">${initials}</div>`;
+function addUser(text){
+  const ini=contactName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const d=document.createElement('div');d.className='msg user';
+  d.innerHTML=`<div class="bubble">${text}</div><div class="msg-av user">${ini}</div>`;
   document.getElementById('chat-messages').appendChild(d);
   scrollBottom();
 }
+function showTyping(){
+  const d=document.createElement('div');d.className='msg ai';d.id='typing';
+  d.innerHTML=`<div class="msg-av ai">D</div><div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
+  document.getElementById('chat-messages').appendChild(d);scrollBottom();
+}
+function removeTyping(){document.getElementById('typing')?.remove();}
+function scrollBottom(){const m=document.getElementById('chat-messages');setTimeout(()=>m.scrollTop=m.scrollHeight,50);}
+function fmtTxt(t){return t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/\n/g,'<br>');}
 
-function showTyping() {
-  const d = document.createElement('div');
-  d.className = 'msg ai'; d.id = 'typing';
-  d.innerHTML = `<div class="msg-av ai">D</div><div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
-  document.getElementById('chat-messages').appendChild(d);
-  scrollBottom();
+// ── MY ORDERS ──
+function updateOrdersBadge(){
+  const b=document.getElementById('orders-badge');
+  b.textContent=clientOrders.length;
+  b.style.display=clientOrders.length?'flex':'none';
+}
+function renderMyOrders(){
+  const list=document.getElementById('my-orders-list');
+  document.getElementById('my-orders-sub').textContent=`${clientOrders.length} pedido${clientOrders.length!==1?'s':''}`;
+  if(!clientOrders.length){
+    list.innerHTML='<div class="empty-state"><div class="icon">📋</div><p>Aún no tienes pedidos.</p><button class="btn-goto" onclick="switchScreen(\'chat\')">Hacer un pedido</button></div>';return;
+  }
+  list.innerHTML=clientOrders.map(o=>`
+    <div class="my-order-card">
+      <div class="moc-header"><span class="moc-id">${o.id}</span><span class="moc-status st-new">Enviado ✓</span></div>
+      <div class="moc-products">${o.products?.map(p=>`${p.qty}× ${p.name}`).join(' · ')}</div>
+      <div class="moc-footer"><span class="moc-date">${o.date} · ${o.time} · ${o.payMethod}</span><span class="moc-total">${fmt(o.total)}</span></div>
+    </div>`).join('');
 }
 
-function removeTyping() { document.getElementById('typing')?.remove(); }
-function scrollBottom() { const m = document.getElementById('chat-messages'); setTimeout(()=>m.scrollTop=m.scrollHeight, 50); }
-function fmt_text(t) {
-  return t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/\n/g,'<br>');
-}
-
-function switchScreen(name) {
+// ── NAV ──
+function switchScreen(name){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('screen-'+name).classList.add('active');
   document.getElementById('nav-'+name)?.classList.add('active');
-  if (name==='myorders') renderMyOrders();
+  if(name==='myorders')renderMyOrders();
+  if(name==='cart')renderCartScreen();
 }
 
-function updateBadge() {
-  const b = document.getElementById('orders-badge');
-  b.textContent = orders.length;
-  b.style.display = orders.length ? 'flex' : 'none';
+function openWA(){
+  const msg=encodeURIComponent(`Hola Davinchi, soy ${contactName} de ${shopName}. Necesito ayuda con un pedido.`);
+  window.open(`https://wa.me/${WA_NUMBER}?text=${msg}`,'_blank');
 }
 
-function renderMyOrders() {
-  const list = document.getElementById('my-orders-list');
-  document.getElementById('my-orders-sub').textContent = `${orders.length} pedido${orders.length!==1?'s':''} en esta sesión`;
-  if (!orders.length) {
-    list.innerHTML = `<div class="empty-orders"><div class="icon">📋</div><p>Aún no has hecho pedidos.<br>Explora el catálogo o escríbenos.</p><button class="btn-goto-chat" onclick="switchScreen('chat')">Hacer un pedido</button></div>`;
-    return;
-  }
-  list.innerHTML = orders.map(o => `
-    <div class="my-order-card">
-      <div class="moc-header">
-        <span class="moc-id">${o.id}</span>
-        <span class="moc-status st-confirmed">Enviado ✓</span>
-      </div>
-      <div class="moc-products">${o.products?.map(p=>`${p.qty}× ${p.name}`).join(' · ')}</div>
-      <div class="moc-footer">
-        <span class="moc-date">${o.date} · ${o.time} · ${o.payMethod}</span>
-        <span class="moc-total">${fmt(o.total)}</span>
-      </div>
-    </div>`).join('');
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2600);
 }
 
-function openWhatsApp() {
-  const msg = encodeURIComponent(`Hola Davinchi, soy ${contactName} de ${shopName}. Necesito ayuda con un pedido.`);
-  window.open(`https://wa.me/${WA_NUMBER}?text=${msg}`, '_blank');
+// ── INIT ──
+const savedKey=localStorage.getItem('dav_apikey');
+if(savedKey){document.getElementById('api-key-store').value=savedKey;}
+else{
+  const s=document.getElementById('screen-apikey');
+  s.style.display='flex';
 }
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2800);
-}
-
-document.getElementById('shop-input').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('contact-input').focus(); });
-document.getElementById('contact-input').addEventListener('keydown', e => { if(e.key==='Enter') enterApp(); });
-
-// Load saved API key
-const savedKey = localStorage.getItem('dav_apikey');
-if (savedKey) {
-  document.getElementById('api-key-store').value = savedKey;
-  document.getElementById('screen-apikey').style.display = 'none';
-}
+document.getElementById('shop-input').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('contact-input').focus();});
+document.getElementById('contact-input').addEventListener('keydown',e=>{if(e.key==='Enter')enterApp();});
+document.getElementById('login-user').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('login-pass').focus();});
 </script>
 </div>
 </body>
