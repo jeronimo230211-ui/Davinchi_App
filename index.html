@@ -20,8 +20,12 @@ html,body{height:100%;}
 body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);display:flex;justify-content:center;min-height:100%;}
 .app{width:100%;max-width:440px;min-height:100vh;background:var(--surface);display:flex;flex-direction:column;position:relative;}
 
+/* ── SCREENS — only .active is visible ── */
+.screen{display:none !important;flex-direction:column;flex:1;}
+.screen.active{display:flex !important;}
+
 /* ── LANDING ── */
-#screen-landing{min-height:100vh;background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0;}
+#screen-landing{min-height:100vh;background:var(--ink);flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0;}
 .landing-hero{width:100%;padding:52px 32px 40px;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;}
 .hero-gem{width:76px;height:76px;border-radius:50%;border:1.5px solid rgba(200,164,90,0.35);background:rgba(200,164,90,0.07);display:flex;align-items:center;justify-content:center;font-size:30px;}
 .hero-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:#F0EAD8;line-height:1.15;}
@@ -59,10 +63,6 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
 .logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--gold);letter-spacing:.05em;}
 .logo-sub{font-size:10px;color:#5A5448;letter-spacing:.1em;text-transform:uppercase;margin-top:1px;}
 .client-chip{background:rgba(200,164,90,0.1);border:1px solid rgba(200,164,90,0.28);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--gold-light);cursor:pointer;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-
-/* ── SCREENS ── */
-.screen{display:none;flex-direction:column;flex:1;}
-.screen.active{display:flex;}
 
 /* ── LOGIN VENDOR ── */
 #screen-login{background:var(--ink);align-items:center;justify-content:center;padding:40px 28px;gap:20px;text-align:center;}
@@ -301,12 +301,15 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
 <!-- CLIENT HEADER -->
 <div class="header" id="client-header" style="display:none">
   <div><div class="logo">Davinchi</div><div class="logo-sub">Estuches & Vitrinas</div></div>
-  <div class="client-chip" id="client-chip">—</div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <button onclick="showLanding()" style="background:transparent;border:1px solid rgba(200,164,90,0.2);color:#5A5448;border-radius:20px;padding:5px 11px;font-family:'Outfit',sans-serif;font-size:11px;cursor:pointer;">← Salir</button>
+    <div class="client-chip" id="client-chip">—</div>
+  </div>
 </div>
 
 <!-- WELCOME CLIENT -->
 <div id="screen-welcome" class="screen">
-  <div style="background:var(--ink);flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0;min-height:calc(100vh - 60px)">
+  <div style="background:var(--ink);flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0;">
     <div style="width:100%;padding:44px 28px 32px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center">
       <div style="font-size:28px">💎</div>
       <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#F0EAD8;line-height:1.2">Haz tu pedido<br><span style="color:var(--gold)">Davinchi</span></div>
@@ -318,6 +321,7 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
       <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:500;margin-top:2px">Tu nombre</div>
       <input id="contact-input" style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;font-family:'Outfit',sans-serif;font-size:15px;color:var(--text);outline:none;" type="text" placeholder="Ej: María García" autocomplete="off">
       <button onclick="enterApp()" style="width:100%;padding:14px;background:var(--gold);color:var(--ink);border:none;border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:15px;font-weight:500;cursor:pointer;margin-top:4px;">Ver catálogo →</button>
+      <button onclick="showLanding()" style="width:100%;padding:11px;background:transparent;color:var(--text-dim);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;">← Volver</button>
       <div style="font-size:12px;color:var(--text-dim);text-align:center">Al continuar aceptas que tus pedidos sean procesados por Davinchi</div>
     </div>
   </div>
@@ -448,20 +452,22 @@ function hideApiKeyScreen(){
 }
 function getApiKey(){return document.getElementById('api-key-store').value||localStorage.getItem('dav_apikey')||'';}
 
-// ── LANDING ──
-function showLanding(){
+function hideAll(){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('screen-landing').classList.add('active');
   document.getElementById('client-header').style.display='none';
   document.getElementById('client-nav').style.display='none';
 }
+function showLanding(){
+  hideAll();
+  document.getElementById('screen-landing').classList.add('active');
+}
 function goClient(){
-  document.getElementById('screen-landing').classList.remove('active');
+  hideAll();
   document.getElementById('screen-welcome').classList.add('active');
   document.getElementById('client-header').style.display='flex';
 }
 function goVendor(){
-  document.getElementById('screen-landing').classList.remove('active');
+  hideAll();
   document.getElementById('screen-login').classList.add('active');
 }
 
@@ -475,7 +481,7 @@ function doLogin(){
   document.getElementById('login-err').style.display='none';
   document.getElementById('login-user').value='';
   document.getElementById('login-pass').value='';
-  document.getElementById('screen-login').classList.remove('active');
+  hideAll();
   document.getElementById('vendor-welcome').textContent=`Hola, ${v.name}`;
   document.getElementById('vendor-role-label').textContent=v.role;
   document.getElementById('screen-vendor').classList.add('active');
@@ -483,7 +489,6 @@ function doLogin(){
 }
 function doLogout(){
   currentVendor=null;
-  document.getElementById('screen-vendor').classList.remove('active');
   showLanding();
 }
 
@@ -621,7 +626,8 @@ function enterApp(){
   if(!contactName){document.getElementById('contact-input').focus();return;}
   document.getElementById('client-chip').textContent=shopName;
   document.getElementById('banner-shop').textContent=shopName;
-  document.getElementById('screen-welcome').classList.remove('active');
+  hideAll();
+  document.getElementById('client-header').style.display='flex';
   document.getElementById('client-nav').style.display='flex';
   renderCatalog();
   initChat();
