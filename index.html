@@ -16,16 +16,16 @@
   --radius: 16px; --radius-sm: 10px; --shadow: 0 2px 16px rgba(60,40,0,0.08);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;}
-body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);display:flex;justify-content:center;min-height:100%;}
-.app{width:100%;max-width:440px;min-height:100vh;background:var(--surface);display:flex;flex-direction:column;position:relative;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);display:flex;justify-content:center;align-items:flex-start;height:100vh;overflow:hidden;position:fixed;width:100%;}
+.app{width:100%;max-width:440px;height:100vh;background:var(--surface);display:flex;flex-direction:column;position:relative;overflow:hidden;}
 
 /* ── SCREENS — only .active is visible ── */
-.screen{display:none !important;flex-direction:column;flex:1;}
+.screen{display:none !important;flex-direction:column;flex:1;overflow-y:auto;height:100%;}
 .screen.active{display:flex !important;}
 
 /* ── LANDING ── */
-#screen-landing{min-height:100vh;background:var(--ink);flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0;}
+#screen-landing{min-height:100%;background:var(--ink);flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0;overflow-y:auto;}
 .landing-hero{width:100%;padding:52px 32px 40px;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;}
 .hero-gem{width:76px;height:76px;border-radius:50%;border:1.5px solid rgba(200,164,90,0.35);background:rgba(200,164,90,0.07);display:flex;align-items:center;justify-content:center;font-size:30px;}
 .hero-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:#F0EAD8;line-height:1.15;}
@@ -65,7 +65,7 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
 .client-chip{background:rgba(200,164,90,0.1);border:1px solid rgba(200,164,90,0.28);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--gold-light);cursor:pointer;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
 /* ── LOGIN VENDOR ── */
-#screen-login{background:var(--ink);align-items:center;justify-content:center;padding:40px 28px;gap:20px;text-align:center;}
+#screen-login{background:var(--ink);align-items:center;justify-content:center;padding:40px 28px;gap:20px;text-align:center;min-height:100%;}
 .login-title{font-family:'Playfair Display',serif;font-size:26px;color:#F0EAD8;}
 .login-title span{color:var(--gold);}
 .login-sub{font-size:13px;color:#5A5448;line-height:1.6;}
