@@ -353,10 +353,15 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
 </div>
 
 <!-- CART -->
-<div id="screen-cart" class="screen">
-  <div class="section-header"><div class="section-title">Mi carrito</div><div class="section-sub" id="cart-sub">0 productos</div></div>
-  <div class="cart-list" id="cart-list"><div class="empty-state"><div class="icon">🛒</div><p>Tu carrito está vacío.<br>Agrega productos del catálogo.</p><button class="btn-goto" onclick="switchScreen('catalog')">Ver catálogo</button></div></div>
-  <div class="cart-summary" id="cart-summary" style="display:none">
+<div id="screen-cart" class="screen" style="display:none;flex-direction:column;overflow:hidden;">
+  <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(120,90,30,0.14);background:#F9F5EE;flex-shrink:0;">
+    <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:#2A2618;">Mi carrito</div>
+    <div id="cart-sub" style="font-size:12px;color:#7A7060;margin-top:2px;">0 productos</div>
+  </div>
+  <div id="cart-list" style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px;padding-bottom:20px;min-height:0;">
+    <div class="empty-state"><div class="icon">🛒</div><p>Tu carrito está vacío.<br>Agrega productos del catálogo.</p><button class="btn-goto" onclick="switchScreen('catalog')">Ver catálogo</button></div>
+  </div>
+  <div class="cart-summary" id="cart-summary" style="display:none;flex-shrink:0;">
     <div class="cart-total-row"><span class="lbl">Total</span><span class="val" id="cart-total-display">$0</span></div>
     <button class="btn-send-cart" onclick="sendCartToChat()">Confirmar pedido →</button>
   </div>
@@ -744,8 +749,11 @@ function renderCartScreen(){
   }
   list.innerHTML=items.map(([id,q])=>{
     const p=CATALOG.find(x=>x.id===id);
+    const thumb = p.img
+      ? `<img src="${p.img}" style="width:52px;height:52px;object-fit:cover;border-radius:8px;flex-shrink:0;" onerror="this.style.display='none'">`
+      : `<div style="width:52px;height:52px;background:#F0EAD8;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">📦</div>`;
     return `<div class="cart-item">
-      <div class="cart-item-emoji">${p.emoji}</div>
+      ${thumb}
       <div class="cart-item-info">
         <div class="cart-item-name">${p.name}</div>
         <div class="cart-item-price">${fmt(p.price)} c/u</div>
@@ -948,7 +956,7 @@ function switchScreen(name){
   target.style.display='flex';
   document.getElementById('nav-'+name)?.classList.add('active');
   if(name==='myorders')renderMyOrders();
-  if(name==='cart')renderCartScreen();
+  if(name==='cart'){target.style.display='flex';renderCartScreen();}
   // Show FAB only on catalog
   const fab=document.getElementById('fab-cart');
   if(fab){
