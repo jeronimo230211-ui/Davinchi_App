@@ -21,7 +21,7 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
 .app{width:100%;max-width:440px;height:100vh;background:var(--surface);display:flex;flex-direction:column;position:relative;overflow:hidden;}
 
 /* ── SCREENS — only .active is visible ── */
-.screen{display:none !important;flex-direction:column;flex:1;overflow-y:auto;height:100%;}
+.screen{display:none !important;flex-direction:column;flex:1;overflow-y:auto;height:100%;min-height:0;}
 .screen.active{display:flex !important;}
 
 /* ── LANDING ── */
@@ -84,17 +84,17 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
 .section-sub{font-size:12px;color:var(--text-muted);margin-top:2px;}
 
 /* ── CATALOG ── */
-#screen-catalog{background:var(--surface);}
-.catalog-grid{padding:14px;display:flex;flex-direction:column;gap:11px;overflow-y:auto;flex:1;padding-bottom:20px;width:100%;}
-.product-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:border-color .2s,transform .15s;width:100%;}
+#screen-catalog{background:var(--surface);display:flex;flex-direction:column;min-height:0;}
+.catalog-grid{padding:14px;display:flex;flex-direction:column;gap:11px;overflow-y:auto;flex:1;padding-bottom:20px;width:100%;min-height:0;}
+.product-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:border-color .2s,transform .15s;width:100%;display:block;}
 .product-card:hover{border-color:var(--border-strong);transform:translateY(-1px);}
 .product-visual{height:90px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:38px;position:relative;width:100%;}
 .stock-badge{position:absolute;top:8px;right:8px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:500;}
 .stock-ok{background:var(--green-bg);color:var(--green);}
 .stock-low{background:var(--red-bg);color:var(--red);}
-.product-body{padding:12px 15px 14px;width:100%;}
-.product-name{font-family:'Playfair Display',serif;font-size:14px;font-weight:500;margin-bottom:3px;color:var(--text);display:block;}
-.product-desc{font-size:12px;color:var(--text-muted);line-height:1.45;margin-bottom:9px;display:block;}
+.product-body{padding:12px 15px 14px;width:100%;display:block;visibility:visible;}
+.product-name{font-family:'Playfair Display',serif;font-size:14px;font-weight:500;margin-bottom:3px;color:var(--text);display:block;visibility:visible;}
+.product-desc{font-size:12px;color:var(--text-muted);line-height:1.45;margin-bottom:9px;display:block;visibility:visible;}
 .product-footer-cart{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;}
 .product-price{font-size:16px;font-weight:500;color:var(--gold-dim);}
 .qty-control{display:flex;align-items:center;border:1.5px solid var(--border-mid);border-radius:20px;overflow:hidden;background:#fff;}
