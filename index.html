@@ -437,20 +437,10 @@ const timeStr = () => new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minu
 let shopName='', contactName='', cart={}, chatHistory=[], clientOrders=[], pendingOrder=null;
 let currentVendor=null, vendorTab='pedidos', allOrders=[];
 
-// ── API KEY ──
-function saveApiKey() {
-  const k = document.getElementById('apikey-input').value.trim();
-  if(!k||!k.startsWith('sk-ant-')){document.getElementById('apikey-error').style.display='block';return;}
-  localStorage.setItem('dav_apikey',k);
-  document.getElementById('api-key-store').value=k;
-  hideApiKeyScreen();
-}
-function skipApiKey(){hideApiKeyScreen();}
-function hideApiKeyScreen(){
-  const s=document.getElementById('screen-apikey');
-  s.style.display='none';
-}
-function getApiKey(){return document.getElementById('api-key-store').value||localStorage.getItem('dav_apikey')||'';}
+function getApiKey(){return 'server-side';}
+function saveApiKey(){}
+function skipApiKey(){}
+function hideApiKeyScreen(){document.getElementById('screen-apikey').style.display='none';}
 
 function hideAll(){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -750,17 +740,10 @@ async function sendMsg(){
   addUser(txt);
   chatHistory.push({role:'user',content:txt});
   showTyping();
-  const apiKey=getApiKey();
-  if(!apiKey){
-    removeTyping();
-    addAI('El asistente IA no está configurado. Puedes hacer tu pedido directamente desde el catálogo y el carrito, o contáctanos por WhatsApp.');
-    setChips(['Ver catálogo','Hablar con asesor']);
-    document.getElementById('btn-send').disabled=false;return;
-  }
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
+    const res=await fetch('/api/chat',{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:buildSystem(),messages:chatHistory})
     });
     if(!res.ok){const e=await res.json().catch(()=>({}));removeTyping();addAI(`Error: ${e?.error?.message||res.status}`);document.getElementById('btn-send').disabled=false;return;}
@@ -919,13 +902,8 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'),2600);
 }
 
-// ── INIT ──
-const savedKey=localStorage.getItem('dav_apikey');
-if(savedKey){document.getElementById('api-key-store').value=savedKey;}
-else{
-  const s=document.getElementById('screen-apikey');
-  s.style.display='flex';
-}
+// API key lives securely on Vercel server
+document.getElementById('screen-apikey').style.display='none';
 
 document.getElementById('shop-input').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('contact-input').focus();});
 document.getElementById('contact-input').addEventListener('keydown',e=>{if(e.key==='Enter')enterApp();});
