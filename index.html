@@ -641,25 +641,24 @@ function cartCount(){return Object.values(cart2).reduce((s,q)=>s+q,0);}
 function renderCatalog(){
   document.getElementById('catalog-grid').innerHTML=CATALOG.map(p=>{
     const q=cart2[p.id]||0;
-    return `
-    <div style="background:#fff;border:1px solid rgba(120,90,30,0.14);border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(60,40,0,0.08);width:100%;display:block;margin-bottom:0;">
-      <div style="height:90px;background:#F0EAD8;display:flex;align-items:center;justify-content:center;font-size:38px;position:relative;width:100%;">
+    return `<div style="background:#fff;border:1px solid rgba(120,90,30,0.14);border-radius:16px;box-shadow:0 2px 16px rgba(60,40,0,0.08);width:100%;">
+      <div style="height:90px;background:#F0EAD8;display:flex;align-items:center;justify-content:center;font-size:38px;position:relative;width:100%;border-radius:16px 16px 0 0;">
         ${p.emoji}
         <span style="position:absolute;top:8px;right:8px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:500;background:${p.stock<=3?'#FAEAE6':'#EBF5F0'};color:${p.stock<=3?'#C0442A':'#3D8A5A'};">${p.stock<=3?`Solo ${p.stock} uds`:'Disponible'}</span>
       </div>
-      <div style="padding:12px 15px 14px;width:100%;display:block;background:#fff;">
-        <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:500;margin-bottom:3px;color:#2A2618;display:block;">${p.name}</div>
-        <div style="font-size:12px;color:#7A7060;line-height:1.45;margin-bottom:9px;display:block;">${p.desc}</div>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;">
-          <div style="font-size:16px;font-weight:500;color:#7A6030;">${fmt(p.price)}</div>
+      <div style="padding:12px 15px 14px;width:100%;border-radius:0 0 16px 16px;">
+        <p style="font-family:'Playfair Display',serif;font-size:14px;font-weight:500;margin:0 0 4px 0;color:#2A2618;">${p.name}</p>
+        <p style="font-size:12px;color:#7A7060;line-height:1.45;margin:0 0 10px 0;">${p.desc}</p>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:16px;font-weight:500;color:#7A6030;">${fmt(p.price)}</span>
           <div style="display:flex;align-items:center;gap:7px;">
-            <div id="qctl-${p.id}" style="display:${q>0?'flex':'none'};align-items:center;border:1.5px solid rgba(120,90,30,0.28);border-radius:20px;overflow:hidden;background:#fff;">
-              <button onclick="chQty('${p.id}',-1)" style="width:30px;height:30px;border:none;background:transparent;font-size:17px;cursor:pointer;color:#7A7060;">−</button>
-              <span id="qn-${p.id}" style="min-width:26px;text-align:center;font-size:13px;font-weight:500;">${q}</span>
-              <button onclick="chQty('${p.id}',1)" style="width:30px;height:30px;border:none;background:transparent;font-size:17px;cursor:pointer;color:#7A7060;">+</button>
+            <div id="qctl-${p.id}" style="display:${q>0?'flex':'none'};align-items:center;border:1.5px solid rgba(120,90,30,0.28);border-radius:20px;background:#fff;">
+              <button onclick="chQty('${p.id}',-1)" style="width:30px;height:30px;border:none;background:transparent;font-size:17px;cursor:pointer;color:#7A7060;line-height:1;">−</button>
+              <span id="qn-${p.id}" style="min-width:26px;text-align:center;font-size:13px;font-weight:500;color:#2A2618;">${q}</span>
+              <button onclick="chQty('${p.id}',1)" style="width:30px;height:30px;border:none;background:transparent;font-size:17px;cursor:pointer;color:#7A7060;line-height:1;">+</button>
             </div>
-            <button id="badd-${p.id}" onclick="addCart('${p.id}')" style="padding:7px 13px;background:${q>0?'#3D8A5A':'#1C1A14'};color:${q>0?'#fff':'#E2C07E'};border:none;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap;">
-              ${q>0?'✓ En carrito':'Agregar'}
+            <button id="badd-${p.id}" onclick="addCart('${p.id}')" style="padding:7px 13px;background:${q>0?'#3D8A5A':'#1C1A14'};color:${q>0?'#fff':'#E2C07E'};border:none;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Outfit',sans-serif;">
+              ${q>0?'✓ Agregado':'Agregar'}
             </button>
           </div>
         </div>
