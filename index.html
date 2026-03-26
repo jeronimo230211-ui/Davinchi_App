@@ -727,12 +727,8 @@ function updateCartUI(){
 }
 
 function fabCartAction(){
-  // If only catalog screen — go to cart
-  // If cart has items — go directly to chat to confirm
-  const c=cartCount();
-  if(c>0){
-    sendCartToChat();
-  }
+  document.getElementById('fab-cart').style.display='none';
+  sendCartToChat();
 }
 function renderCartScreen(){
   const list=document.getElementById('cart-list');
@@ -950,6 +946,11 @@ function switchScreen(name){
   document.getElementById('nav-'+name)?.classList.add('active');
   if(name==='myorders')renderMyOrders();
   if(name==='cart')renderCartScreen();
+  // Show FAB only on catalog
+  const fab=document.getElementById('fab-cart');
+  if(fab){
+    fab.style.display=(name==='catalog' && cartCount()>0)?'flex':'none';
+  }
 }
 
 function openWA(){
