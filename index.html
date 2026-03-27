@@ -467,7 +467,10 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
 <div id="screen-vendor" class="screen">
   <div class="vendor-header">
     <div class="vendor-header-left"><strong id="vendor-welcome">Panel Davinchi</strong><span id="vendor-role-label">—</span></div>
-    <button class="btn-logout" onclick="doLogout()">Salir</button>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button onclick="loadVendorOrders()" style="padding:5px 12px;border:1px solid rgba(200,164,90,0.2);border-radius:20px;background:transparent;color:#C8A45A;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif;">↻ Actualizar</button>
+      <button class="btn-logout" onclick="doLogout()">Salir</button>
+    </div>
   </div>
   <div class="vendor-tabs">
     <div class="vtab active" id="vtab-pedidos" onclick="switchVTab('pedidos')">Pedidos</div>
@@ -618,10 +621,13 @@ function doLogin(){
   document.getElementById('vendor-role-label').textContent=v.role;
   const vs=document.getElementById('screen-vendor');
   vs.classList.add('active'); vs.style.display='flex';
+  lastKnownOrderCount=0;
   loadVendorOrders();
+  startVendorRefresh();
 }
 function doLogout(){
   currentVendor=null;
+  stopVendorRefresh();
   showLanding();
 }
 
@@ -633,20 +639,65 @@ function switchVTab(tab){
   renderVendorContent();
 }
 
-async function loadVendorOrders(){
-  document.getElementById('vendor-content').innerHTML='<div class="loading-orders">⏳ Cargando pedidos desde Google Sheets...</div>';
+let vendorRefreshInterval = null;
+let lastKnownOrderCount = 0;
+
+async function loadVendorOrders(silent=false){
+  if(!silent) document.getElementById('vendor-content').innerHTML='<div class="loading-orders">⏳ Cargando pedidos...</div>';
   try{
-    const res=await fetch(SHEETS_URL);
+    const res=await fetch(SHEETS_URL+'?t='+Date.now());
     const data=await res.json();
     if(data.success){
-      allOrders=data.pedidos.filter(p=>p.ID);
+      const newOrders=data.pedidos.filter(p=>p.ID);
+      // Detect new orders since last check
+      if(silent && newOrders.length > lastKnownOrderCount){
+        const diff = newOrders.length - lastKnownOrderCount;
+        showVendorAlert(`🔔 ${diff} pedido${diff>1?'s':''} nuevo${diff>1?'s':''} llegó`);
+        // Vibrate if supported
+        if(navigator.vibrate) navigator.vibrate([200,100,200]);
+      }
+      lastKnownOrderCount = newOrders.length;
+      allOrders = newOrders;
       renderVendorContent();
     } else {
-      document.getElementById('vendor-content').innerHTML='<div class="loading-orders">Error al cargar pedidos. Intenta de nuevo.</div>';
+      if(!silent) document.getElementById('vendor-content').innerHTML='<div class="loading-orders">Error al cargar. Intenta de nuevo.</div>';
     }
   }catch(e){
-    document.getElementById('vendor-content').innerHTML='<div class="loading-orders">⚠️ Sin conexión. Verifica tu internet.</div>';
+    if(!silent) document.getElementById('vendor-content').innerHTML='<div class="loading-orders">⚠️ Sin conexión.</div>';
   }
+}
+
+function showVendorAlert(msg){
+  // Remove existing alert
+  document.getElementById('vendor-alert')?.remove();
+  const el = document.createElement('div');
+  el.id = 'vendor-alert';
+  el.style.cssText = `
+    position:fixed;top:70px;left:50%;transform:translateX(-50%);
+    background:#1C1A14;color:#E2C07E;
+    padding:12px 20px;border-radius:20px;
+    font-size:14px;font-weight:500;font-family:'Outfit',sans-serif;
+    border:1px solid rgba(200,164,90,0.4);
+    z-index:500;white-space:nowrap;
+    box-shadow:0 4px 20px rgba(0,0,0,0.3);
+    animation:fadeup .3s ease;
+  `;
+  el.textContent = msg;
+  el.onclick = () => { el.remove(); switchVTab('pedidos'); };
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 6000);
+}
+
+function startVendorRefresh(){
+  stopVendorRefresh();
+  // Refresh every 30 seconds silently
+  vendorRefreshInterval = setInterval(()=>{
+    if(currentVendor) loadVendorOrders(true);
+  }, 30000);
+}
+
+function stopVendorRefresh(){
+  if(vendorRefreshInterval){ clearInterval(vendorRefreshInterval); vendorRefreshInterval=null; }
 }
 
 function renderVendorContent(){
