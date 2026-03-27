@@ -1036,6 +1036,11 @@ async function confirmOrder(){
     });
   }catch(e){}
 
+  // Clear cart after confirmed order
+  cart2={};
+  updateCartUI();
+  renderCatalog();
+
   addAI(`✅ **¡Pedido confirmado!**\n\nGracias ${saved.contact}, tu pedido para **${saved.shop}** fue registrado.\n\nEl equipo Davinchi te contactará para coordinar la entrega. ¿Necesitas algo más?`);
   setChips(['Hacer otro pedido','Ver mis pedidos','Hablar con asesor']);
   showToast('¡Pedido enviado a Davinchi!');
