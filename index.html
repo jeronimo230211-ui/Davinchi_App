@@ -307,23 +307,51 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
   </div>
 </div>
 
-<!-- WELCOME CLIENT -->
-<div id="screen-welcome" class="screen">
-  <div style="background:var(--ink);flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0;">
-    <div style="width:100%;padding:44px 28px 32px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center">
-      <div style="font-size:28px">💎</div>
-      <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#F0EAD8;line-height:1.2">Haz tu pedido<br><span style="color:var(--gold)">Davinchi</span></div>
-      <div style="font-size:13px;color:#5A5448;line-height:1.6;max-width:270px">Explora el catálogo o usa el asistente para pedir fácilmente</div>
+<!-- WELCOME CLIENT — registro primer ingreso -->
+<div id="screen-welcome" class="screen" style="display:none;flex-direction:column;overflow-y:auto;background:var(--ink);">
+  <div style="width:100%;padding:44px 28px 28px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;flex-shrink:0;">
+    <div style="font-size:28px;">💎</div>
+    <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#F0EAD8;line-height:1.2;">Bienvenido a<br><span style="color:var(--gold);">Davinchi</span></div>
+    <div id="welcome-sub" style="font-size:13px;color:#5A5448;line-height:1.6;max-width:270px;">Completa tu registro para empezar a pedir</div>
+  </div>
+  <div style="width:100%;background:var(--surface);border-radius:24px 24px 0 0;padding:28px 24px 36px;display:flex;flex-direction:column;gap:12px;flex:1;">
+
+    <!-- REGISTRO (primer ingreso) -->
+    <div id="registro-form">
+      <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:16px;">Solo lo pedimos una vez 👇</div>
+
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:500;margin-bottom:6px;">Nombre de tu joyería</div>
+      <input id="reg-shop" type="text" placeholder="Ej: Joyería Luna" autocomplete="off"
+        style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;font-family:'Outfit',sans-serif;font-size:16px;color:var(--text);outline:none;margin-bottom:12px;">
+
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:500;margin-bottom:6px;">Tu nombre</div>
+      <input id="reg-contact" type="text" placeholder="Ej: María García" autocomplete="off"
+        style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;font-family:'Outfit',sans-serif;font-size:16px;color:var(--text);outline:none;margin-bottom:12px;">
+
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:500;margin-bottom:6px;">Teléfono / WhatsApp</div>
+      <input id="reg-phone" type="tel" placeholder="Ej: 3001234567" autocomplete="off"
+        style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;font-family:'Outfit',sans-serif;font-size:16px;color:var(--text);outline:none;margin-bottom:12px;">
+
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:500;margin-bottom:6px;">Centro comercial de entrega</div>
+      <input id="reg-cc" type="text" placeholder="Ej: Centro Comercial Santafé" autocomplete="off"
+        style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;font-family:'Outfit',sans-serif;font-size:16px;color:var(--text);outline:none;margin-bottom:20px;">
+
+      <div id="reg-error" style="font-size:12px;color:var(--red);margin-bottom:10px;display:none;">Por favor completa todos los campos.</div>
+      <button onclick="submitRegistro()" style="width:100%;padding:14px;background:var(--gold);color:var(--ink);border:none;border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:15px;font-weight:500;cursor:pointer;">Registrarme y ver catálogo →</button>
+      <button onclick="showLanding()" style="width:100%;padding:11px;background:transparent;color:var(--text-dim);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;margin-top:8px;">← Volver</button>
+      <div style="font-size:12px;color:var(--text-dim);text-align:center;margin-top:8px;">Tus datos se guardan de forma segura y solo son usados por Davinchi.</div>
     </div>
-    <div style="width:100%;background:var(--surface);border-radius:24px 24px 0 0;padding:28px 24px 36px;display:flex;flex-direction:column;gap:12px;flex:1">
-      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:500">Nombre de tu joyería</div>
-      <input id="shop-input" style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;font-family:'Outfit',sans-serif;font-size:15px;color:var(--text);outline:none;" type="text" placeholder="Ej: Joyería Luna" autocomplete="off">
-      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:500;margin-top:2px">Tu nombre</div>
-      <input id="contact-input" style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;font-family:'Outfit',sans-serif;font-size:15px;color:var(--text);outline:none;" type="text" placeholder="Ej: María García" autocomplete="off">
-      <button onclick="enterApp()" style="width:100%;padding:14px;background:var(--gold);color:var(--ink);border:none;border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:15px;font-weight:500;cursor:pointer;margin-top:4px;">Ver catálogo →</button>
-      <button onclick="showLanding()" style="width:100%;padding:11px;background:transparent;color:var(--text-dim);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;">← Volver</button>
-      <div style="font-size:12px;color:var(--text-dim);text-align:center">Al continuar aceptas que tus pedidos sean procesados por Davinchi</div>
+
+    <!-- BIENVENIDA CLIENTE REGISTRADO -->
+    <div id="returning-form" style="display:none;flex-direction:column;gap:12px;">
+      <div style="font-size:28px;text-align:center;">👋</div>
+      <div id="returning-greeting" style="font-family:'Playfair Display',serif;font-size:20px;font-weight:500;color:var(--text);text-align:center;"></div>
+      <div id="returning-info" style="background:var(--surface2);border-radius:var(--radius-sm);padding:14px 16px;font-size:13px;color:var(--text-muted);line-height:1.8;"></div>
+      <button onclick="enterAppReturning()" style="width:100%;padding:14px;background:var(--gold);color:var(--ink);border:none;border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:15px;font-weight:500;cursor:pointer;">Ver catálogo →</button>
+      <button onclick="clearRegistro()" style="width:100%;padding:10px;background:transparent;color:var(--text-dim);border:none;font-family:'Outfit',sans-serif;font-size:12px;cursor:pointer;text-decoration:underline;">No soy yo, cambiar cuenta</button>
+      <button onclick="showLanding()" style="width:100%;padding:10px;background:transparent;color:var(--text-dim);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;">← Volver</button>
     </div>
+
   </div>
 </div>
 
@@ -453,7 +481,7 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
 <div class="toast" id="toast"></div>
 
 <script>
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbybY_Xn1L2TpnDUOgQ_HYxXASeIvLN0JSV5KQS2FZRedDpL1MeWwkrEYDgxJMPHkmCgZA/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbz3UQE_w-BEDwmKcU-TOWzaGO73wAQkljLl0Cs7JLnGoynhAha6iyYhGvfopO6XTIVQ_g/exec';
 const WA_NUMBER  = '573001234567';
 
 const CATALOG = [
@@ -492,11 +520,8 @@ function hideAll(){
 }
 function showLanding(){
   hideAll();
-  // Full reset
   cart2={}; chatHistory=[]; clientOrders=[]; pendingOrder=null;
   shopName=''; contactName='';
-  document.getElementById('shop-input').value='';
-  document.getElementById('contact-input').value='';
   document.getElementById('orders-badge').style.display='none';
   document.getElementById('cart-badge').style.display='none';
   document.getElementById('fab-cart').style.display='none';
@@ -505,9 +530,72 @@ function showLanding(){
 }
 function goClient(){
   hideAll();
-  const el=document.getElementById('screen-welcome');
-  el.classList.add('active'); el.style.display='flex';
   document.getElementById('client-header').style.display='flex';
+  const saved = getSavedClient();
+  const ws = document.getElementById('screen-welcome');
+  ws.classList.add('active'); ws.style.display='flex';
+  if(saved){
+    document.getElementById('registro-form').style.display='none';
+    document.getElementById('returning-form').style.display='flex';
+    document.getElementById('welcome-sub').textContent='Bienvenido de nuevo';
+    document.getElementById('returning-greeting').textContent=`Hola, ${saved.contact} 👋`;
+    document.getElementById('returning-info').innerHTML=
+      `<b>Joyería:</b> ${saved.shop}<br><b>Contacto:</b> ${saved.contact}<br><b>Teléfono:</b> ${saved.phone}<br><b>CC entrega:</b> ${saved.cc}`;
+  } else {
+    document.getElementById('registro-form').style.display='block';
+    document.getElementById('returning-form').style.display='none';
+    document.getElementById('welcome-sub').textContent='Completa tu registro para empezar';
+  }
+}
+
+function getSavedClient(){
+  try{ return JSON.parse(localStorage.getItem('dav_client')||'null'); }catch(e){return null;}
+}
+
+function submitRegistro(){
+  const shop    = document.getElementById('reg-shop').value.trim();
+  const contact = document.getElementById('reg-contact').value.trim();
+  const phone   = document.getElementById('reg-phone').value.trim();
+  const cc      = document.getElementById('reg-cc').value.trim();
+  if(!shop||!contact||!phone||!cc){
+    document.getElementById('reg-error').style.display='block'; return;
+  }
+  document.getElementById('reg-error').style.display='none';
+  const client = { shop, contact, phone, cc, date: dateStr() };
+  localStorage.setItem('dav_client', JSON.stringify(client));
+  fetch(SHEETS_URL, {
+    method:'POST',
+    body: JSON.stringify({ tipo:'cliente', joyeria:shop, contacto:contact, telefono:phone, cc, fecha:dateStr() })
+  }).catch(()=>{});
+  loadClientAndEnter(client);
+}
+
+function enterAppReturning(){
+  const saved = getSavedClient();
+  if(saved) loadClientAndEnter(saved);
+}
+
+function loadClientAndEnter(client){
+  shopName    = client.shop;
+  contactName = client.contact;
+  document.getElementById('client-chip').textContent = shopName;
+  document.getElementById('banner-shop').textContent = shopName;
+  hideAll();
+  document.getElementById('client-header').style.display='flex';
+  document.getElementById('client-nav').style.display='flex';
+  renderCatalog();
+  initChat();
+  const cat = document.getElementById('screen-catalog');
+  cat.classList.add('active'); cat.style.display='flex';
+  document.getElementById('nav-catalog').classList.add('active');
+}
+
+function clearRegistro(){
+  localStorage.removeItem('dav_client');
+  document.getElementById('registro-form').style.display='block';
+  document.getElementById('returning-form').style.display='none';
+  document.getElementById('welcome-sub').textContent='Completa tu registro para empezar';
+  ['reg-shop','reg-contact','reg-phone','reg-cc'].forEach(id=>document.getElementById(id).value='');
 }
 function goVendor(){
   hideAll();
@@ -664,32 +752,8 @@ function parseMoney(s){
 }
 
 // ── CLIENT ──
-function enterApp(){
-  shopName=document.getElementById('shop-input').value.trim();
-  contactName=document.getElementById('contact-input').value.trim();
-  if(!shopName){document.getElementById('shop-input').focus();return;}
-  if(!contactName){document.getElementById('contact-input').focus();return;}
+// enterApp is now handled by loadClientAndEnter and submitRegistro
 
-  // Reset everything for new session
-  cart2={};
-  chatHistory=[];
-  clientOrders=[];
-  pendingOrder=null;
-  document.getElementById('orders-badge').style.display='none';
-  document.getElementById('cart-badge').style.display='none';
-  document.getElementById('fab-cart').style.display='none';
-
-  document.getElementById('client-chip').textContent=shopName;
-  document.getElementById('banner-shop').textContent=shopName;
-  hideAll();
-  document.getElementById('client-header').style.display='flex';
-  document.getElementById('client-nav').style.display='flex';
-  renderCatalog();
-  initChat();
-  const cat=document.getElementById('screen-catalog');
-  cat.classList.add('active'); cat.style.display='flex';
-  document.getElementById('nav-catalog').classList.add('active');
-}
 
 // ── CART ──
 let cart2={};
@@ -1044,8 +1108,11 @@ function showToast(msg){
 // API key lives securely on Vercel server
 document.getElementById('screen-apikey').style.display='none';
 
-document.getElementById('shop-input').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('contact-input').focus();});
-document.getElementById('contact-input').addEventListener('keydown',e=>{if(e.key==='Enter')enterApp();});
+// Enter key shortcuts on registration form
+document.getElementById('reg-shop').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('reg-contact').focus();});
+document.getElementById('reg-contact').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('reg-phone').focus();});
+document.getElementById('reg-phone').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('reg-cc').focus();});
+document.getElementById('reg-cc').addEventListener('keydown',e=>{if(e.key==='Enter')submitRegistro();});
 document.getElementById('login-user').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('login-pass').focus();});
 </script>
 </div>
