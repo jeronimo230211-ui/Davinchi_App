@@ -583,6 +583,12 @@ function loadClientAndEnter(client){
   contactName = client.contact;
   document.getElementById('client-chip').textContent = shopName;
   document.getElementById('banner-shop').textContent = shopName;
+  // Load saved orders for this client
+  try{
+    const saved = JSON.parse(localStorage.getItem('dav_orders_'+shopName)||'[]');
+    clientOrders = saved;
+  }catch(e){ clientOrders=[]; }
+  updateOrdersBadge();
   hideAll();
   document.getElementById('client-header').style.display='flex';
   document.getElementById('client-nav').style.display='flex';
@@ -1018,6 +1024,8 @@ async function confirmOrder(){
     date:dateStr(),time:timeStr(),status:'Nuevo'
   };
   clientOrders.unshift(saved);
+  // Persist orders in localStorage
+  try{ localStorage.setItem('dav_orders_'+shopName, JSON.stringify(clientOrders)); }catch(e){}
   pendingOrder=null;
   updateOrdersBadge();
   renderMyOrders();
