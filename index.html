@@ -492,6 +492,14 @@ function hideAll(){
 }
 function showLanding(){
   hideAll();
+  // Full reset
+  cart2={}; chatHistory=[]; clientOrders=[]; pendingOrder=null;
+  shopName=''; contactName='';
+  document.getElementById('shop-input').value='';
+  document.getElementById('contact-input').value='';
+  document.getElementById('orders-badge').style.display='none';
+  document.getElementById('cart-badge').style.display='none';
+  document.getElementById('fab-cart').style.display='none';
   const el=document.getElementById('screen-landing');
   el.classList.add('active'); el.style.display='flex';
 }
@@ -661,6 +669,16 @@ function enterApp(){
   contactName=document.getElementById('contact-input').value.trim();
   if(!shopName){document.getElementById('shop-input').focus();return;}
   if(!contactName){document.getElementById('contact-input').focus();return;}
+
+  // Reset everything for new session
+  cart2={};
+  chatHistory=[];
+  clientOrders=[];
+  pendingOrder=null;
+  document.getElementById('orders-badge').style.display='none';
+  document.getElementById('cart-badge').style.display='none';
+  document.getElementById('fab-cart').style.display='none';
+
   document.getElementById('client-chip').textContent=shopName;
   document.getElementById('banner-shop').textContent=shopName;
   hideAll();
