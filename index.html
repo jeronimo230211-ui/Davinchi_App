@@ -723,24 +723,58 @@ function statusPill(s){
   return map[s]||`<span class="status-pill st-new">${s}</span>`;
 }
 
+let vendorFilter = 'todos';
+
 function renderVendorOrders(){
   const content=document.getElementById('vendor-content');
   if(!allOrders.length){
-    content.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>No hay pedidos aún.<br>Cuando los clientes hagan pedidos aparecerán aquí.</p></div>';
+    content.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>No hay pedidos aún.</p></div>';
     return;
   }
-  const nuevos=allOrders.filter(o=>o.Estado==='Nuevo');
-  const otros=allOrders.filter(o=>o.Estado!=='Nuevo');
 
-  let html='';
-  if(nuevos.length){
-    html+=`<div class="section-label">🔴 Nuevos (${nuevos.length})</div>`;
-    html+=nuevos.map(o=>orderCard(o)).join('');
+  const nuevos   = allOrders.filter(o=>o.Estado==='Nuevo');
+  const enProceso= allOrders.filter(o=>o.Estado==='En proceso');
+  const parciales = allOrders.filter(o=>o.Estado&&o.Estado.startsWith('Parcial'));
+  const entregados= allOrders.filter(o=>o.Estado==='Entregado');
+
+  let filtered;
+  if(vendorFilter==='nuevos')    filtered=nuevos;
+  else if(vendorFilter==='proceso') filtered=enProceso;
+  else if(vendorFilter==='parciales') filtered=parciales;
+  else if(vendorFilter==='entregados') filtered=entregados;
+  else filtered=allOrders;
+
+  // Filter pills
+  const pills = [
+    {key:'todos',     label:`Todos`,           count:allOrders.length},
+    {key:'nuevos',    label:`🔴 Nuevos`,        count:nuevos.length},
+    {key:'proceso',   label:`🔵 En proceso`,    count:enProceso.length},
+    {key:'parciales', label:`⚠️ Parciales`,     count:parciales.length},
+    {key:'entregados',label:`✅ Entregados`,    count:entregados.length},
+  ];
+
+  const pillsHtml = `
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
+      ${pills.map(p=>`
+        <button onclick="vendorFilter='${p.key}';renderVendorOrders();" style="
+          padding:6px 12px;border-radius:20px;font-size:12px;font-weight:500;
+          cursor:pointer;font-family:'Outfit',sans-serif;border:1.5px solid;
+          background:${vendorFilter===p.key?'#1C1A14':'#fff'};
+          color:${vendorFilter===p.key?'#C8A45A':'#7A7060'};
+          border-color:${vendorFilter===p.key?'#C8A45A':'rgba(120,90,30,0.2)'};
+          transition:all .15s;white-space:nowrap;">
+          ${p.label} ${p.count>0?`<span style="opacity:.7">(${p.count})</span>`:''}
+        </button>`).join('')}
+    </div>`;
+
+  let html = pillsHtml;
+
+  if(!filtered.length){
+    html += `<div style="text-align:center;padding:30px;color:#AEA898;font-size:14px;">No hay pedidos en esta categoría</div>`;
+  } else {
+    html += filtered.map(o=>orderCard(o)).join('');
   }
-  if(otros.length){
-    html+=`<div class="section-label" style="margin-top:8px">Anteriores</div>`;
-    html+=otros.map(o=>orderCard(o)).join('');
-  }
+
   content.innerHTML=html;
 }
 
