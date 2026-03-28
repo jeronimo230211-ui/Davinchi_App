@@ -485,7 +485,7 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
 <div class="toast" id="toast"></div>
 
 <script>
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbz_9b3mIhUJh2VncCEHF4xn3INzqMPrBeWOAsjavwIQIvoyvLz8J2qHy1OUMoPcpLsVew/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzwZl19Kr6dUjP5eG_o8mY0-LqGOAL4Ydq_K_cnMD2_aMQQ0Pu9qVZXDUClJ1x8Z3N0OQ/exec';
 const WA_NUMBER  = '573001234567';
 
 const CATALOG = [
@@ -796,7 +796,10 @@ function fmtTotal(t){
 }
 
 function orderCard(o){
-  const waMsg=encodeURIComponent(`Hola ${o.Contacto}, te escribimos de Davinchi sobre tu pedido ${o.ID}. Total: ${o.Total}. Entrega: ${fmtFecha(o.Entrega)}. ¿Tienes alguna consulta?`);
+  // Get phone — field may come as Teléfono, Telefono or phone
+  const tel = (o['Teléfono']||o.Telefono||o.telefono||'').toString().replace(/[^0-9]/g,'');
+  const waPhone = tel.startsWith('57') ? tel : tel ? '57'+tel : '';
+  const waMsg = encodeURIComponent(`Hola ${o.Contacto} 👋, te escribimos de *Davinchi*.\n\nSobre tu pedido *${o.ID}*:\n📦 ${o.Productos}\n💰 Total: ${fmtTotal(o.Total)}\n📅 Entrega: ${fmtFecha(o.Entrega)}\n💳 Pago: ${o.Pago}\n\n¿Tienes alguna consulta?`);
   return `
   <div class="vendor-order" id="vo-${o.ID}" onclick="showOrderDetail('${o.ID}')" style="cursor:pointer;">
     <div class="vo-header">
@@ -815,7 +818,10 @@ function orderCard(o){
     <div class="vo-actions" onclick="event.stopPropagation()">
       ${o.Estado!=='En proceso'&&o.Estado!=='Entregado'?`<button class="btn-status btn-s-process" onclick="updateStatus('${o.ID}','En proceso')">En proceso</button>`:''}
       ${o.Estado!=='Entregado'?`<button class="btn-status btn-s-done" onclick="updateStatus('${o.ID}','Entregado')">Entregado ✓</button>`:''}
-      <button class="btn-wa-small" onclick="window.open('https://wa.me/57${o.Telefono||''}?text=${waMsg}','_blank')">WhatsApp</button>
+      ${waPhone
+        ? `<button class="btn-wa-small" onclick="event.stopPropagation();window.open('https://wa.me/${waPhone}?text=${waMsg}','_blank')">WhatsApp</button>`
+        : `<button class="btn-wa-small" style="opacity:.5;cursor:not-allowed;" title="Sin número registrado">Sin tel.</button>`
+      }
     </div>
   </div>`;
 }
@@ -1381,7 +1387,8 @@ async function confirmOrder(){
         joyeria:saved.shop,contacto:saved.contact,
         productos:saved.products.map(p=>`${p.qty}x ${p.name}`).join(' | '),
         total:fmt(saved.total),pago:saved.payMethod,
-        entrega:saved.deliveryDate,notas:saved.notes
+        entrega:saved.deliveryDate,notas:saved.notes,
+        telefono: getSavedClient()?.phone||''
       })
     });
   }catch(e){}
