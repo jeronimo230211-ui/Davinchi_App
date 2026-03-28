@@ -485,7 +485,7 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
 <div class="toast" id="toast"></div>
 
 <script>
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycby2Qk1NPwegS0doOr-EcFBHGwUb0N4y3n49DKPnf44MGHxNTg2lEhc-e4Zpjetb5rWtUg/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbz_9b3mIhUJh2VncCEHF4xn3INzqMPrBeWOAsjavwIQIvoyvLz8J2qHy1OUMoPcpLsVew/exec';
 const WA_NUMBER  = '573001234567';
 
 const CATALOG = [
@@ -811,6 +811,7 @@ function orderCard(o){
       <div class="vo-total">${fmtTotal(o.Total)}</div>
       <div class="vo-pago">${o.Pago} · Entrega: ${fmtFecha(o.Entrega)}</div>
     </div>
+    ${o.Vendedor?`<div style="font-size:11px;color:#7A7060;margin-top:4px;">👨‍💼 Gestionado por: <b>${o.Vendedor}</b></div>`:''}
     <div class="vo-actions" onclick="event.stopPropagation()">
       ${o.Estado!=='En proceso'&&o.Estado!=='Entregado'?`<button class="btn-status btn-s-process" onclick="updateStatus('${o.ID}','En proceso')">En proceso</button>`:''}
       ${o.Estado!=='Entregado'?`<button class="btn-status btn-s-done" onclick="updateStatus('${o.ID}','Entregado')">Entregado ✓</button>`:''}
@@ -949,12 +950,18 @@ async function updateStatus(id, newStatus){
   const order=allOrders.find(o=>o.ID===id);
   if(!order) return;
   order.Estado=newStatus;
+  order.Vendedor=currentVendor?.name||'';
   showToast(`Pedido marcado como "${newStatus}"`);
   renderVendorOrders();
   try{
     const res = await fetch(SHEETS_URL, {
       method: 'POST',
-      body: JSON.stringify({ tipo:'updateStatus', id, status:newStatus })
+      body: JSON.stringify({
+        tipo:'updateStatus',
+        id,
+        status:newStatus,
+        vendedor: currentVendor?.name||''
+      })
     });
     const data = await res.json();
     if(!data.success) console.error('Error actualizando estado:', data);
@@ -1092,6 +1099,47 @@ function renderVendorResumen(){
               <div style="flex:1;font-size:13px;color:#2A2618;">${name}</div>
               <div style="font-size:12px;font-weight:500;color:#7A6030;background:#F9F5EE;padding:3px 10px;border-radius:20px;">${count} pedido${count!==1?'s':''}</div>
             </div>`).join('');
+      })()}
+    </div>
+
+    <!-- Ranking vendedores -->
+    <div style="background:#fff;border:1px solid rgba(120,90,30,0.1);border-radius:12px;padding:16px;">
+      <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#AEA898;font-weight:500;margin-bottom:12px;">👨‍💼 Rendimiento por vendedor</div>
+      ${(()=>{
+        const stats={};
+        allOrders.forEach(o=>{
+          const v = o.Vendedor||'Sin asignar';
+          if(!stats[v]) stats[v]={entregas:0,parciales:0,valor:0};
+          if(o.Estado==='Entregado') stats[v].entregas++;
+          if(o.Estado&&o.Estado.startsWith('Parcial')) stats[v].parciales++;
+          stats[v].valor += parseMoney(o.Total);
+        });
+        const sorted = Object.entries(stats).sort((a,b)=>b[1].entregas-a[1].entregas);
+        if(!sorted.length) return '<div style="text-align:center;color:#AEA898;font-size:13px;padding:12px;">Aún no hay entregas registradas</div>';
+        return sorted.map(([name,s],i)=>{
+          const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+          return `
+          <div style="padding:12px;background:${i===0?'#F9F5EE':'#fff'};border-radius:10px;margin-bottom:8px;border:1px solid rgba(120,90,30,${i===0?'0.15':'0.08'});">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <div style="font-size:14px;font-weight:500;color:#2A2618;">${medal} ${name}</div>
+              <div style="font-size:12px;color:#7A6030;font-weight:500;">${fmt(s.valor)}</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;text-align:center;">
+              <div style="background:#EBF5F0;border-radius:8px;padding:7px 4px;">
+                <div style="font-size:16px;font-weight:700;color:#3D8A5A;">${s.entregas}</div>
+                <div style="font-size:10px;color:#3D8A5A;margin-top:1px;">Entregados</div>
+              </div>
+              <div style="background:${s.parciales>0?'#FEF3DC':'#F9F5EE'};border-radius:8px;padding:7px 4px;">
+                <div style="font-size:16px;font-weight:700;color:${s.parciales>0?'#8A6010':'#AEA898'};">${s.parciales}</div>
+                <div style="font-size:10px;color:${s.parciales>0?'#8A6010':'#AEA898'};margin-top:1px;">Parciales</div>
+              </div>
+              <div style="background:#F9F5EE;border-radius:8px;padding:7px 4px;">
+                <div style="font-size:16px;font-weight:700;color:#7A6030;">${s.entregas+s.parciales}</div>
+                <div style="font-size:10px;color:#7A6030;margin-top:1px;">Total gestión</div>
+              </div>
+            </div>
+          </div>`;
+        }).join('');
       })()}
     </div>
   `;
