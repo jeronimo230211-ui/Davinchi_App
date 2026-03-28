@@ -741,39 +741,61 @@ function renderVendorOrders(){
   content.innerHTML=html;
 }
 
+function fmtFecha(f){
+  if(!f) return '—';
+  // Handle ISO dates like 2026-03-26T07:00:00.000Z
+  try{
+    const d = new Date(f);
+    if(isNaN(d)) return f;
+    return d.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'});
+  }catch(e){ return f; }
+}
+
+function fmtTotal(t){
+  if(!t) return '—';
+  const n = parseInt(String(t).replace(/[^0-9]/g,''));
+  if(isNaN(n)) return t;
+  return fmt(n);
+}
+
 function orderCard(o){
-  const waMsg=encodeURIComponent(`Hola ${o.Contacto}, te escribimos de Davinchi sobre tu pedido ${o.ID}. Total: ${o.Total}. Entrega: ${o['Entrega']}. ¿Tienes alguna consulta?`);
+  const waMsg=encodeURIComponent(`Hola ${o.Contacto}, te escribimos de Davinchi sobre tu pedido ${o.ID}. Total: ${o.Total}. Entrega: ${fmtFecha(o.Entrega)}. ¿Tienes alguna consulta?`);
   return `
   <div class="vendor-order" id="vo-${o.ID}">
     <div class="vo-header">
       <div>
-        <div class="vo-shop">${o['Joyería']}</div>
-        <div class="vo-contact">${o.Contacto} · ${o.Fecha} ${o.Hora}</div>
+        <div class="vo-shop">${o['Joyería']||o.Joyeria||'—'}</div>
+        <div class="vo-contact">${o.Contacto} · ${fmtFecha(o.Fecha)} ${o.Hora||''}</div>
       </div>
       ${statusPill(o.Estado)}
     </div>
     <div class="vo-products">${o.Productos}</div>
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <div class="vo-total">${o.Total}</div>
-      <div class="vo-pago">${o.Pago} · Entrega: ${o.Entrega}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;">
+      <div class="vo-total">${fmtTotal(o.Total)}</div>
+      <div class="vo-pago">${o.Pago} · Entrega: ${fmtFecha(o.Entrega)}</div>
     </div>
     <div class="vo-actions">
       ${o.Estado!=='En proceso'&&o.Estado!=='Entregado'?`<button class="btn-status btn-s-process" onclick="updateStatus('${o.ID}','En proceso')">En proceso</button>`:''}
-      ${o.Estado!=='Entregado'?`<button class="btn-status btn-s-done" onclick="updateStatus('${o.ID}','Entregado')">Entregado</button>`:''}
-      <button class="btn-wa-small" onclick="window.open('https://wa.me/${WA_NUMBER.replace('+','')}?text=${waMsg}','_blank')">WhatsApp</button>
+      ${o.Estado!=='Entregado'?`<button class="btn-status btn-s-done" onclick="updateStatus('${o.ID}','Entregado')">Entregado ✓</button>`:''}
+      <button class="btn-wa-small" onclick="window.open('https://wa.me/57${o.Telefono||''}?text=${waMsg}','_blank')">WhatsApp</button>
     </div>
   </div>`;
 }
 
 async function updateStatus(id, newStatus){
   const order=allOrders.find(o=>o.ID===id);
-  if(!order)return;
+  if(!order) return;
   order.Estado=newStatus;
   showToast(`Pedido marcado como "${newStatus}"`);
   renderVendorOrders();
   try{
-    await fetch(SHEETS_URL+'?action=updateStatus&id='+encodeURIComponent(id)+'&status='+encodeURIComponent(newStatus));
-  }catch(e){}
+    const res = await fetch(SHEETS_URL, {
+      method: 'POST',
+      body: JSON.stringify({ tipo:'updateStatus', id, status:newStatus })
+    });
+    const data = await res.json();
+    if(!data.success) console.error('Error actualizando estado:', data);
+  }catch(e){ console.error('Error:', e); }
 }
 
 function renderVendorResumen(){
