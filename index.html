@@ -963,28 +963,137 @@ async function updateStatus(id, newStatus){
 
 function renderVendorResumen(){
   const content=document.getElementById('vendor-content');
+  const isCEO = currentVendor?.user === 'admin';
   const today=dateStr();
   const todayOrders=allOrders.filter(o=>o.Fecha===today);
-  const totalHoy=todayOrders.reduce((s,o)=>s+parseMoney(o.Total),0);
   const totalGeneral=allOrders.reduce((s,o)=>s+parseMoney(o.Total),0);
-  const nuevos=allOrders.filter(o=>o.Estado==='Nuevo').length;
+  const totalHoy=todayOrders.reduce((s,o)=>s+parseMoney(o.Total),0);
+  const entregados=allOrders.filter(o=>o.Estado==='Entregado');
+  const parciales=allOrders.filter(o=>o.Estado&&o.Estado.startsWith('Parcial'));
+  const pendientes=allOrders.filter(o=>o.Estado==='Nuevo'||o.Estado==='En proceso');
 
+  // OTIF: pedidos entregados completos (no parciales) sobre total cerrados
+  const cerrados = entregados.length + parciales.length;
+  const otif = cerrados > 0 ? Math.round((entregados.length/cerrados)*100) : 0;
+  const otifColor = otif>=90?'#3D8A5A':otif>=70?'#BA7517':'#C0442A';
+  const otifBg = otif>=90?'#EBF5F0':otif>=70?'#FEF3DC':'#FAEAE6';
+
+  if(!isCEO){
+    // Vendedor — resumen simple
+    content.innerHTML=`
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-num">${allOrders.length}</div><div class="stat-lbl">Total pedidos</div></div>
+        <div class="stat-card"><div class="stat-num">${pendientes.length}</div><div class="stat-lbl">Pendientes</div></div>
+        <div class="stat-card"><div class="stat-num">${entregados.length}</div><div class="stat-lbl">Entregados</div></div>
+      </div>
+      <div class="stat-card" style="text-align:center">
+        <div class="stat-num" style="font-size:18px">${fmt(totalGeneral)}</div>
+        <div class="stat-lbl">Valor total vendido</div>
+      </div>
+      <div class="section-label" style="margin-top:8px">Pedidos de hoy</div>
+      ${todayOrders.length?todayOrders.map(o=>orderCard(o)).join(''):'<div style="text-align:center;padding:20px;color:#AEA898;font-size:13px">No hay pedidos hoy</div>'}
+    `;
+    return;
+  }
+
+  // CEO — panel completo de KPIs
   content.innerHTML=`
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-num">${allOrders.length}</div><div class="stat-lbl">Total pedidos</div></div>
-      <div class="stat-card"><div class="stat-num">${nuevos}</div><div class="stat-lbl">Pendientes</div></div>
-      <div class="stat-card"><div class="stat-num">${todayOrders.length}</div><div class="stat-lbl">Hoy</div></div>
+    <!-- Título CEO -->
+    <div style="background:#1C1A14;border-radius:12px;padding:16px 18px;margin-bottom:4px;display:flex;align-items:center;gap:12px;">
+      <div style="font-size:22px;">👑</div>
+      <div>
+        <div style="font-family:'Playfair Display',serif;font-size:16px;color:#E2C07E;font-weight:500;">Panel CEO — Davinchi</div>
+        <div style="font-size:12px;color:#5A5448;margin-top:2px;">KPIs en tiempo real · ${today}</div>
+      </div>
     </div>
-    <div class="stat-card" style="text-align:center;margin-bottom:4px">
-      <div class="stat-num" style="font-size:18px">${fmt(totalHoy)}</div>
-      <div class="stat-lbl">Ventas de hoy</div>
+
+    <!-- KPI 1 y 2: Entregas y Pendientes -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="background:#fff;border:1px solid rgba(120,90,30,0.1);border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#AEA898;font-weight:500;margin-bottom:8px;">Entregas totales</div>
+        <div style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:#3D8A5A;">${entregados.length}</div>
+        <div style="font-size:11px;color:#7A7060;margin-top:4px;">de ${allOrders.length} pedidos</div>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(120,90,30,0.1);border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#AEA898;font-weight:500;margin-bottom:8px;">Pedidos pendientes</div>
+        <div style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:${pendientes.length>0?'#C0442A':'#3D8A5A'};">${pendientes.length}</div>
+        <div style="font-size:11px;color:#7A7060;margin-top:4px;">por entregar</div>
+      </div>
     </div>
-    <div class="stat-card" style="text-align:center">
-      <div class="stat-num" style="font-size:18px">${fmt(totalGeneral)}</div>
-      <div class="stat-lbl">Ventas totales</div>
+
+    <!-- KPI 3: OTIF -->
+    <div style="background:#fff;border:1px solid rgba(120,90,30,0.1);border-radius:12px;padding:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div>
+          <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#AEA898;font-weight:500;">OTIF — Entregas completas</div>
+          <div style="font-size:11px;color:#AEA898;margin-top:2px;">Pedidos entregados sin faltantes</div>
+        </div>
+        <div style="background:${otifBg};color:${otifColor};font-family:'Playfair Display',serif;font-size:28px;font-weight:700;padding:8px 16px;border-radius:10px;">${otif}%</div>
+      </div>
+      <!-- Barra de progreso -->
+      <div style="background:#F0EAD8;border-radius:4px;height:8px;overflow:hidden;">
+        <div style="background:${otifColor};width:${otif}%;height:100%;border-radius:4px;transition:width .5s;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:#AEA898;">
+        <span>✅ ${entregados.length} completos</span>
+        <span>⚠️ ${parciales.length} parciales</span>
+      </div>
+      <div style="margin-top:8px;font-size:11px;padding:6px 10px;border-radius:6px;background:${otifBg};color:${otifColor};">
+        ${otif>=90?'🟢 Excelente — por encima del objetivo':otif>=70?'🟡 Regular — hay entregas parciales por resolver':'🔴 Crítico — muchas entregas incompletas'}
+      </div>
     </div>
-    <div class="section-label" style="margin-top:8px">Pedidos de hoy</div>
-    ${todayOrders.length?todayOrders.map(o=>orderCard(o)).join(''):'<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">No hay pedidos hoy aún</div>'}
+
+    <!-- KPI 4: Valor vendido -->
+    <div style="background:#1C1A14;border-radius:12px;padding:18px 20px;">
+      <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#5A5448;font-weight:500;margin-bottom:6px;">Valor vendido total</div>
+      <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:#E2C07E;">${fmt(totalGeneral)}</div>
+      <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(200,164,90,0.15);">
+        <div style="text-align:center;">
+          <div style="font-size:13px;color:#C8A45A;font-weight:500;">${fmt(totalHoy)}</div>
+          <div style="font-size:10px;color:#5A5448;margin-top:2px;">Hoy</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:13px;color:#C8A45A;font-weight:500;">${allOrders.length>0?fmt(Math.round(totalGeneral/allOrders.length)):'$0'}</div>
+          <div style="font-size:10px;color:#5A5448;margin-top:2px;">Ticket promedio</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:13px;color:#C8A45A;font-weight:500;">${todayOrders.length}</div>
+          <div style="font-size:10px;color:#5A5448;margin-top:2px;">Pedidos hoy</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI 5: Entregas parciales -->
+    ${parciales.length>0?`
+    <div style="background:#FEF3DC;border:1px solid #FCD34D;border-radius:12px;padding:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8A6010;font-weight:500;">⚠️ Entregas parciales</div>
+        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#8A6010;">${parciales.length}</div>
+      </div>
+      ${parciales.map(o=>`
+        <div style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:6px;border:1px solid rgba(180,120,10,0.15);">
+          <div style="font-size:13px;font-weight:500;color:#2A2618;margin-bottom:2px;">${o['Joyería']||o.Joyeria||'—'}</div>
+          <div style="font-size:11px;color:#8A6010;">${o.Estado}</div>
+        </div>`).join('')}
+    </div>`:''}
+
+    <!-- Top clientes -->
+    <div style="background:#fff;border:1px solid rgba(120,90,30,0.1);border-radius:12px;padding:16px;">
+      <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#AEA898;font-weight:500;margin-bottom:12px;">🏆 Clientes más activos</div>
+      ${(()=>{
+        const counts={};
+        allOrders.forEach(o=>{const j=o['Joyería']||o.Joyeria||'—';counts[j]=(counts[j]||0)+1;});
+        return Object.entries(counts)
+          .sort((a,b)=>b[1]-a[1])
+          .slice(0,5)
+          .map(([name,count],i)=>`
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(120,90,30,0.06);">
+              <div style="width:24px;height:24px;border-radius:50%;background:#1C1A14;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#C8A45A;flex-shrink:0;">${i+1}</div>
+              <div style="flex:1;font-size:13px;color:#2A2618;">${name}</div>
+              <div style="font-size:12px;font-weight:500;color:#7A6030;background:#F9F5EE;padding:3px 10px;border-radius:20px;">${count} pedido${count!==1?'s':''}</div>
+            </div>`).join('');
+      })()}
+    </div>
   `;
 }
 
