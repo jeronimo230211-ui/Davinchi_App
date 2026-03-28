@@ -476,6 +476,8 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
   <div class="vendor-tabs">
     <div class="vtab active" id="vtab-pedidos" onclick="switchVTab('pedidos')">Pedidos</div>
     <div class="vtab" id="vtab-resumen" onclick="switchVTab('resumen')">Resumen</div>
+    <!-- Tab de catálogo: solo visible para el CEO, se muestra en doLogin() -->
+    <div class="vtab" id="vtab-catalogo" onclick="switchVTab('catalogo')" style="display:none;">Catálogo</div>
   </div>
   <div class="vendor-content" id="vendor-content">
     <div class="loading-orders">Cargando pedidos...</div>
@@ -488,15 +490,36 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzwZl19Kr6dUjP5eG_o8mY0-LqGOAL4Ydq_K_cnMD2_aMQQ0Pu9qVZXDUClJ1x8Z3N0OQ/exec';
 const WA_NUMBER  = '573001234567';
 
-const CATALOG = [
-  {id:'VG3P', name:'Vitrina Giratoria 3P',    price:450000,stock:4, img:'Foto1',desc:'Vitrina giratoria de 3 pisos. Ideal para anillos y aretes.'},
-  {id:'ETN',  name:'Estuche Terciopelo Negro', price:85000, stock:18,img:'Foto2',desc:'Estuche forrado en terciopelo negro, cierre magnético.'},
-  {id:'ETR',  name:'Estuche Terciopelo Rojo',  price:75000, stock:2, img:'Foto3',desc:'Estuche en terciopelo rojo intenso. Últimas unidades.'},
-  {id:'EA360',name:'Exhibidor Acrílico 360°',  price:220000,stock:3, img:'Foto4',desc:'Exhibidor giratorio en acrílico transparente.'},
-  {id:'CMP',  name:'Caja Madera Premium',       price:680000,stock:12,img:'Foto5',desc:'Caja artesanal en madera con interior acolchado.'},
-  {id:'SBJ',  name:'Soporte Busto Joyería',    price:95000, stock:20,img:'Foto6',desc:'Busto exhibidor de terciopelo para collares.'},
-  {id:'BO',   name:'Bandeja Organizadora',      price:65000, stock:7, img:'',desc:'Bandeja con compartimentos para organizar joyería.'},
+// Catálogo dinámico — se carga desde Sheets al iniciar sesión
+let CATALOG = [];
+
+// Fallback offline con los productos base (se usa si Sheets no responde)
+const CATALOG_FALLBACK = [
+  {id:'VG3P', name:'Vitrina Giratoria 3P',    price:450000,stock:4, img:'Foto1',desc:'Vitrina giratoria de 3 pisos. Ideal para anillos y aretes.',    activo:true},
+  {id:'ETN',  name:'Estuche Terciopelo Negro', price:85000, stock:18,img:'Foto2',desc:'Estuche forrado en terciopelo negro, cierre magnético.',         activo:true},
+  {id:'ETR',  name:'Estuche Terciopelo Rojo',  price:75000, stock:2, img:'Foto3',desc:'Estuche en terciopelo rojo intenso. Últimas unidades.',          activo:true},
+  {id:'EA360',name:'Exhibidor Acrílico 360°',  price:220000,stock:3, img:'Foto4',desc:'Exhibidor giratorio en acrílico transparente.',                 activo:true},
+  {id:'CMP',  name:'Caja Madera Premium',       price:680000,stock:12,img:'Foto5',desc:'Caja artesanal en madera con interior acolchado.',              activo:true},
+  {id:'SBJ',  name:'Soporte Busto Joyería',    price:95000, stock:20,img:'Foto6',desc:'Busto exhibidor de terciopelo para collares.',                   activo:true},
+  {id:'BO',   name:'Bandeja Organizadora',      price:65000, stock:7, img:'',   desc:'Bandeja con compartimentos para organizar joyería.',              activo:true},
 ];
+
+// Carga el catálogo desde Sheets. Si falla, usa el fallback para no bloquear al usuario
+async function loadCatalog() {
+  try {
+    const res = await fetch(SHEETS_URL + '?action=getCatalogo&t=' + Date.now());
+    const data = await res.json();
+    if (data.productos && data.productos.length > 0) {
+      CATALOG = data.productos;
+    } else {
+      CATALOG = CATALOG_FALLBACK;
+    }
+  } catch(e) {
+    // Sin conexión a Sheets — el catálogo sigue funcionando con datos locales
+    CATALOG = CATALOG_FALLBACK;
+  }
+  renderCatalog();
+}
 
 const VENDORS = [
   {user:'admin',    pass:'davinchi2025',  name:'Administrador',          role:'CEO'},
@@ -628,8 +651,12 @@ function doLogin(){
   document.getElementById('vendor-role-label').textContent=v.role;
   const vs=document.getElementById('screen-vendor');
   vs.classList.add('active'); vs.style.display='flex';
+  // El tab de catálogo solo es visible para el CEO
+  const tabCat = document.getElementById('vtab-catalogo');
+  if (tabCat) tabCat.style.display = v.role === 'CEO' ? 'block' : 'none';
   lastKnownOrderCount=0;
   loadVendorOrders();
+  loadCatalog(); // carga catálogo dinámico desde Sheets al iniciar sesión
   startVendorRefresh();
 }
 function doLogout(){
@@ -708,8 +735,9 @@ function stopVendorRefresh(){
 }
 
 function renderVendorContent(){
-  if(vendorTab==='pedidos') renderVendorOrders();
-  else renderVendorResumen();
+  if(vendorTab==='pedidos')        renderVendorOrders();
+  else if(vendorTab==='resumen')   renderVendorResumen();
+  else if(vendorTab==='catalogo')  renderAdminCatalogo();
 }
 
 function statusPill(s){
@@ -1154,6 +1182,193 @@ function renderVendorResumen(){
 function parseMoney(s){
   if(!s)return 0;
   return parseInt(String(s).replace(/[^0-9]/g,''))||0;
+}
+
+// ── ADMIN CATÁLOGO ──
+
+// Renderiza el panel de administración de catálogo (solo CEO)
+function renderAdminCatalogo() {
+  const content = document.getElementById('vendor-content');
+  content.innerHTML = `
+    <div style="padding:16px;">
+
+      <!-- Encabezado con botón de nuevo producto -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div style="font-family:'Playfair Display',serif;font-size:18px;color:#2A2618;">Catálogo de Productos</div>
+        <button onclick="abrirModalProducto(null)"
+          style="background:#1C1A14;color:#C8A45A;border:none;border-radius:20px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap;">
+          + Nuevo
+        </button>
+      </div>
+
+      <!-- Lista dinámica de productos -->
+      <div id="admin-catalog-list"></div>
+
+    </div>
+
+    <!-- Modal para editar o crear un producto -->
+    <div id="modal-producto"
+      style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:500;align-items:flex-end;justify-content:center;">
+      <div style="background:#F9F5EE;border-radius:20px 20px 0 0;width:100%;max-width:440px;padding:24px 20px 36px;max-height:88vh;overflow-y:auto;">
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <div id="modal-titulo" style="font-family:'Playfair Display',serif;font-size:17px;color:#2A2618;">Nuevo producto</div>
+          <button onclick="cerrarModalProducto()"
+            style="background:transparent;border:none;font-size:20px;color:#AEA898;cursor:pointer;padding:4px 8px;">✕</button>
+        </div>
+
+        <!-- ID oculto — vacío para producto nuevo, relleno para edición -->
+        <input type="hidden" id="prod-id">
+
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div>
+            <label style="font-size:12px;color:#7A7060;display:block;margin-bottom:4px;">Nombre</label>
+            <input id="prod-nombre" type="text" placeholder="Ej: Vitrina Giratoria 3P"
+              style="width:100%;border:1.5px solid rgba(120,90,30,0.2);border-radius:10px;padding:12px 14px;font-family:'Outfit',sans-serif;font-size:15px;background:#fff;color:#2A2618;outline:none;">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+              <label style="font-size:12px;color:#7A7060;display:block;margin-bottom:4px;">Precio (COP)</label>
+              <input id="prod-precio" type="number" placeholder="85000" min="0"
+                style="width:100%;border:1.5px solid rgba(120,90,30,0.2);border-radius:10px;padding:12px 14px;font-family:'Outfit',sans-serif;font-size:15px;background:#fff;color:#2A2618;outline:none;">
+            </div>
+            <div>
+              <label style="font-size:12px;color:#7A7060;display:block;margin-bottom:4px;">Stock</label>
+              <input id="prod-stock" type="number" placeholder="10" min="0"
+                style="width:100%;border:1.5px solid rgba(120,90,30,0.2);border-radius:10px;padding:12px 14px;font-family:'Outfit',sans-serif;font-size:15px;background:#fff;color:#2A2618;outline:none;">
+            </div>
+          </div>
+          <div>
+            <label style="font-size:12px;color:#7A7060;display:block;margin-bottom:4px;">Descripción</label>
+            <textarea id="prod-desc" placeholder="Descripción del producto..." rows="2"
+              style="width:100%;border:1.5px solid rgba(120,90,30,0.2);border-radius:10px;padding:12px 14px;font-family:'Outfit',sans-serif;font-size:15px;background:#fff;color:#2A2618;outline:none;resize:none;"></textarea>
+          </div>
+          <div>
+            <label style="font-size:12px;color:#7A7060;display:block;margin-bottom:4px;">Imagen (nombre de archivo o URL)</label>
+            <input id="prod-img" type="text" placeholder="Ej: Foto1 o https://..."
+              style="width:100%;border:1.5px solid rgba(120,90,30,0.2);border-radius:10px;padding:12px 14px;font-family:'Outfit',sans-serif;font-size:15px;background:#fff;color:#2A2618;outline:none;">
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:12px 0 4px;">
+            <label style="font-size:14px;color:#2A2618;flex:1;">Producto activo</label>
+            <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer;">
+              <input type="checkbox" id="prod-activo" style="opacity:0;width:0;height:0;position:absolute;">
+              <span id="toggle-track" style="position:absolute;inset:0;background:#DDD;border-radius:12px;transition:background .2s;"
+                onclick="document.getElementById('prod-activo').checked=!document.getElementById('prod-activo').checked;document.getElementById('toggle-track').style.background=document.getElementById('prod-activo').checked?'#3D8A5A':'#DDD';document.getElementById('toggle-thumb').style.left=document.getElementById('prod-activo').checked?'22px':'2px';">
+              </span>
+              <span id="toggle-thumb" style="position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);pointer-events:none;"></span>
+            </label>
+          </div>
+        </div>
+
+        <button onclick="guardarProducto()"
+          style="width:100%;margin-top:20px;padding:14px;background:#1C1A14;color:#C8A45A;border:none;border-radius:12px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:500;cursor:pointer;">
+          Guardar producto
+        </button>
+
+      </div>
+    </div>
+  `;
+  renderAdminProductList();
+}
+
+// Renderiza la lista de productos en el panel admin
+function renderAdminProductList() {
+  const list = document.getElementById('admin-catalog-list');
+  if (!list) return;
+
+  if (!CATALOG.length) {
+    list.innerHTML = '<div style="text-align:center;padding:32px;color:#AEA898;font-size:14px;">No hay productos en el catálogo.<br>Agrega el primero con el botón + Nuevo.</div>';
+    return;
+  }
+
+  list.innerHTML = CATALOG.map(p => {
+    const activo = p.activo !== false;
+    return `
+      <div style="background:#fff;border:1px solid rgba(120,90,30,0.14);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:500;color:#2A2618;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
+          <div style="font-size:13px;color:#7A7060;margin-top:2px;">${fmt(p.price)} · Stock: ${p.stock}</div>
+        </div>
+        <span style="font-size:11px;padding:3px 8px;border-radius:10px;flex-shrink:0;
+          background:${activo?'#EBF5F0':'#FAEAE6'};
+          color:${activo?'#2E7D5E':'#C0392B'};">${activo?'Activo':'Inactivo'}</span>
+        <button onclick="abrirModalProducto('${p.id}')"
+          style="padding:6px 12px;border:1px solid rgba(120,90,30,0.2);border-radius:8px;background:transparent;color:#7A7060;font-size:12px;cursor:pointer;flex-shrink:0;font-family:'Outfit',sans-serif;">
+          Editar
+        </button>
+      </div>
+    `;
+  }).join('');
+}
+
+// Abre el modal prellenado si se edita, o en blanco si es producto nuevo
+function abrirModalProducto(id) {
+  const p = id ? CATALOG.find(x => x.id === id) : null;
+  const modal = document.getElementById('modal-producto');
+
+  document.getElementById('modal-titulo').textContent = p ? 'Editar producto' : 'Nuevo producto';
+  document.getElementById('prod-id').value     = p ? p.id    : '';
+  document.getElementById('prod-nombre').value = p ? p.name  : '';
+  document.getElementById('prod-precio').value = p ? p.price : '';
+  document.getElementById('prod-stock').value  = p ? p.stock : '';
+  document.getElementById('prod-desc').value   = p ? p.desc  : '';
+  document.getElementById('prod-img').value    = p ? p.img   : '';
+
+  // Sincronizar toggle visual con el estado del producto
+  const activo = p ? p.activo !== false : true;
+  const checkbox = document.getElementById('prod-activo');
+  const track    = document.getElementById('toggle-track');
+  const thumb    = document.getElementById('toggle-thumb');
+  checkbox.checked    = activo;
+  track.style.background = activo ? '#3D8A5A' : '#DDD';
+  thumb.style.left       = activo ? '22px'    : '2px';
+
+  modal.style.display = 'flex';
+}
+
+function cerrarModalProducto() {
+  document.getElementById('modal-producto').style.display = 'none';
+}
+
+// Guarda un producto nuevo o actualiza uno existente via el serverless /api/catalog
+async function guardarProducto() {
+  const id     = document.getElementById('prod-id').value.trim();
+  const nombre = document.getElementById('prod-nombre').value.trim();
+  const precio = parseInt(document.getElementById('prod-precio').value);
+  const stock  = parseInt(document.getElementById('prod-stock').value);
+  const desc   = document.getElementById('prod-desc').value.trim();
+  const img    = document.getElementById('prod-img').value.trim();
+  const activo = document.getElementById('prod-activo').checked;
+
+  // Validación básica antes de enviar
+  if (!nombre) { showToast('El nombre es obligatorio'); return; }
+  if (isNaN(precio) || precio < 0) { showToast('Precio inválido'); return; }
+  if (isNaN(stock)  || stock  < 0) { showToast('Stock inválido');  return; }
+
+  const producto = {
+    id:     id || Date.now().toString(36).toUpperCase(), // genera ID si es nuevo
+    nombre, precio, stock, desc, img, activo
+  };
+
+  try {
+    const action = id ? 'updateProducto' : 'createProducto';
+    const res = await fetch('/api/catalog', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, producto })
+    });
+    const result = await res.json();
+    if (result.ok) {
+      cerrarModalProducto();
+      await loadCatalog();      // recarga desde Sheets para reflejar el cambio
+      renderAdminProductList(); // actualiza la lista sin re-render completo del panel
+      showToast(id ? 'Producto actualizado' : 'Producto creado');
+    } else {
+      showToast('Error al guardar: ' + (result.error || 'intenta de nuevo'));
+    }
+  } catch(e) {
+    showToast('Error de conexión');
+  }
 }
 
 // ── CLIENT ──
