@@ -1873,33 +1873,33 @@ const OB2_LEGACY_KEYS = {
 function ob2Steps_client() {
   const shop = (JSON.parse(localStorage.getItem('dav_client') || '{}').shop || '');
   return [
-    { selector: null,       position: 'center', title: 'Bienvenida a Davinchi', desc: `Hola ${shop ? shop : 'bienvenida'}, en un minuto te mostramos cómo funciona la app para que hagas tus pedidos sin llamadas ni mensajes.` },
-    { selector: '#catalog-grid > div:first-child', position: 'bottom', title: 'Explora el Catálogo', desc: 'Aquí encuentras todos nuestros productos con precio y stock disponible. Desplázate para ver más.' },
-    { selector: '#catalog-grid > div:first-child button', position: 'bottom', title: 'Agrega al Carrito', desc: 'Toca "Agregar" para poner un producto en tu carrito. Puedes ajustar la cantidad antes de confirmar.' },
-    { selector: '#nav-chat',     position: 'top', title: 'Pide con el Asistente IA', desc: 'También puedes escribirle al asistente en lenguaje natural. Él arma el pedido por ti y te pide fecha de entrega y forma de pago.' },
-    { selector: '#nav-myorders', position: 'top', title: 'Sigue tus Pedidos', desc: 'Aquí ves el estado de cada pedido: Nuevo, En proceso, Parcial o Entregado. Davinchi lo actualiza en tiempo real.' },
-    { selector: '#ob-wa-banner', position: 'top', beforeShow: () => switchScreen('myorders'), title: '¿Necesitas ayuda?', desc: 'Si tienes dudas, toca WhatsApp para hablar directamente con un asesor de Davinchi en horario laboral.' }
+    { selector: null,           position: 'center', title: 'Bienvenida a Davinchi', desc: `Hola ${shop ? shop : 'bienvenida'}, esta app te permite explorar el catálogo, hacer pedidos y seguir tus entregas en tiempo real.` },
+    { selector: '#catalog-grid > div:first-child', position: 'bottom', title: 'Catálogo', desc: 'Explora nuestros productos con precio y stock. Toca cualquier tarjeta para ver el detalle.' },
+    { selector: '#nav-cart',     position: 'top',    title: 'Tu Carrito', desc: 'Aquí se acumulan los productos que agregas. Cuando estés listo, confirma tu pedido.' },
+    { selector: '#nav-chat',     position: 'top',    title: 'Asistente IA', desc: 'Escríbele en lenguaje natural y él arma el pedido por ti.' },
+    { selector: '#nav-myorders', position: 'top',    title: 'Mis Pedidos', desc: 'Consulta el estado de tus pedidos: Nuevo, En proceso, Parcial o Entregado.' },
+    { selector: '#ob-wa-banner', position: 'top', beforeShow: () => switchScreen('myorders'), title: '¿Necesitas ayuda?', desc: 'Contacta a un asesor Davinchi directamente por WhatsApp.' }
   ];
 }
 
 function ob2Steps_vendor() {
   const name = (typeof currentVendor !== 'undefined' && currentVendor) ? currentVendor.name : '';
   return [
-    { selector: '.vendor-header', position: 'bottom', title: 'Tu Panel de Trabajo', desc: `Bienvenido${name ? ', ' + name : ''}. Aquí gestionas todos los pedidos de los clientes — sin Excel, sin llamadas.` },
-    { selector: '#vendor-filter-pills', position: 'bottom', title: 'Filtra por Estado', desc: 'Usa estos filtros para ver solo los pedidos que necesitas atender. Los marcados en rojo son nuevos y urgentes.' },
-    { selector: '#vendor-content .vendor-order:first-child', position: 'bottom', fallbackCenter: true, title: 'Gestiona un Pedido', desc: 'Toca cualquier pedido para ver el detalle: productos, cliente, fecha de entrega y forma de pago.', fallbackDesc: 'Los pedidos nuevos aparecen aquí. Cuando entre uno, lo verás de inmediato con una alerta visual.' },
-    { selector: '#vtab-resumen', position: 'bottom', title: 'Tu Resumen del Día', desc: 'En esta pestaña ves cuántos pedidos gestionaste hoy y el valor total. Una vista rápida de tu rendimiento.' },
-    { selector: '#btn-refresh-orders', position: 'bottom', title: 'Actualización en Tiempo Real', desc: 'Los pedidos se actualizan solos cada 30 s, pero si quieres los más recientes ya, toca este botón.' }
+    { selector: '.vendor-header', position: 'bottom', title: 'Panel de Vendedor', desc: `${name ? name + ', aquí' : 'Aquí'} gestionas todos los pedidos de tus clientes.` },
+    { selector: '#vendor-filter-pills', position: 'bottom', title: 'Filtros', desc: 'Filtra pedidos por estado. Los rojos son nuevos y requieren atención.' },
+    { selector: '#vendor-content .vendor-order:first-child', position: 'bottom', fallbackCenter: true, title: 'Pedidos', desc: 'Toca un pedido para ver detalle, cliente y fecha de entrega.', fallbackDesc: 'Los pedidos nuevos aparecen aquí en tiempo real.' },
+    { selector: '#vtab-resumen', position: 'bottom', title: 'Resumen del Día', desc: 'Pedidos gestionados y valor total de tus ventas del día.' },
+    { selector: '#btn-refresh-orders', position: 'bottom', title: 'Actualizar', desc: 'Se actualiza cada 30 s automáticamente. Toca para ver datos ahora.' }
   ];
 }
 
 function ob2Steps_ceo() {
   return [
-    { selector: '.vendor-header', position: 'bottom', title: 'Tu Panel Completo', desc: 'Tienes acceso exclusivo a los KPIs de ventas y la administración del catálogo. Los vendedores no ven esto.' },
-    { selector: '#vtab-resumen',  position: 'bottom', beforeShow: () => switchVTab('resumen'),  title: 'Dashboard de KPIs', desc: 'Aquí vives el pulso del negocio: entregas del día, pedidos pendientes y valor vendido en tiempo real.' },
-    { selector: '#ceo-kpi-otif',  position: 'bottom', title: 'El Indicador OTIF', desc: 'OTIF mide qué % de pedidos se entregaron completos y a tiempo. Verde ≥ 90 %, Amarillo 70-89 %, Rojo = crítico.' },
-    { selector: '#ceo-ranking-vendedores', position: 'top', title: 'Ranking de Vendedores', desc: 'Compara quién entregó más, cuántos parciales tuvo y el valor gestionado. Úsalo para dar feedback real.' },
-    { selector: '#vtab-catalogo', position: 'bottom', beforeShow: () => switchVTab('catalogo'), title: 'Administra el Catálogo', desc: 'Solo tú ves esta pestaña. Edita precios, actualiza stock y desactiva productos sin tocar código.' },
+    { selector: '.vendor-header', position: 'bottom', title: 'Panel CEO', desc: 'Acceso exclusivo a KPIs y administración del catálogo.' },
+    { selector: '#vtab-resumen',  position: 'bottom', beforeShow: () => switchVTab('resumen'),  title: 'Dashboard', desc: 'Entregas del día, pedidos pendientes y valor vendido en tiempo real.' },
+    { selector: '#ceo-kpi-otif',  position: 'bottom', title: 'OTIF', desc: 'Mide entregas completas y a tiempo. Verde ≥ 90 %, Amarillo 70-89 %, Rojo = crítico.' },
+    { selector: '#ceo-ranking-vendedores', position: 'top', title: 'Ranking Vendedores', desc: 'Compara rendimiento por vendedor: pedidos, parciales y valor gestionado.' },
+    { selector: '#vtab-catalogo', position: 'bottom', beforeShow: () => switchVTab('catalogo'), title: 'Catálogo', desc: 'Edita precios, stock y activa o desactiva productos.' },
     { selector: '#btn-nuevo-producto', position: 'top', title: 'Agrega Productos', desc: 'Toca aquí para crear un producto nuevo. Los cambios se reflejan de inmediato en el catálogo de los clientes.' }
   ];
 }
@@ -1979,7 +1979,7 @@ function ob2RenderBubble(step, el, index, total) {
       <div style="display:flex;gap:8px;align-items:center">
         <span class="ob2-progress">${index + 1} / ${total}</span>
         ${index > 0 ? '<button class="ob2-btn-prev" onclick="ob2Prev()">← Ant</button>' : ''}
-        <button class="ob2-btn-next" onclick="ob2Next()">${index === total - 1 ? 'Finalizar' : 'Siguiente →'}</button>
+        <button class="ob2-btn-next" onclick="ob2Next()">${index === total - 1 ? 'Finalizar' : index === 0 ? 'Iniciemos el recorrido' : 'Siguiente →'}</button>
       </div>
     </div>
   `;
