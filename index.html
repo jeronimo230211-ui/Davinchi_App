@@ -1718,25 +1718,47 @@ function updateOrdersBadge(){
   b.textContent=clientOrders.length;
   b.style.display=clientOrders.length?'flex':'none';
 }
-function renderMyOrders(){
-  const list=document.getElementById('my-orders-list');
-  document.getElementById('my-orders-sub').textContent=`${clientOrders.length} pedido${clientOrders.length!==1?'s':''}`;
-  if(!clientOrders.length){
-    list.innerHTML='<div class="empty-state"><div class="icon">📋</div><p>Aún no tienes pedidos.</p><button class="btn-goto" onclick="switchScreen(\'chat\')">Hacer un pedido</button></div>';
+// Renderiza las tarjetas de pedidos del cliente con el statusMap de Sheets.
+// statusMap = { 'PED-xxx': 'En proceso', ... } — vacío muestra estado local como fallback.
+function renderMyOrdersList(statusMap) {
+  const list = document.getElementById('my-orders-list');
+  if (!list) return;
+  list.innerHTML = clientOrders.map(o => {
+    const estado = statusMap[o.id] || o.status || 'Nuevo';
+    return `
+      <div style="background:#fff;border:1px solid rgba(120,90,30,0.14);border-radius:10px;padding:14px;box-shadow:0 2px 16px rgba(60,40,0,0.08);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-size:11px;color:#AEA898;letter-spacing:.05em;">${o.id}</span>
+          ${statusPill(estado)}
+        </div>
+        <div style="font-size:13px;color:#2A2618;margin-bottom:6px;line-height:1.5;">${o.products?.map(p=>`${p.qty}× ${p.name}`).join(' · ')}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:11px;color:#AEA898;">${o.date} · ${o.time} · ${o.payMethod}</span>
+          <span style="font-size:13px;font-weight:500;color:#7A6030;">${fmt(o.total)}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function renderMyOrders() {
+  const list = document.getElementById('my-orders-list');
+  document.getElementById('my-orders-sub').textContent = `${clientOrders.length} pedido${clientOrders.length!==1?'s':''}`;
+  if (!clientOrders.length) {
+    list.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>Aún no tienes pedidos.</p><button class="btn-goto" onclick="switchScreen(\'chat\')">Hacer un pedido</button></div>';
     return;
   }
-  list.innerHTML=clientOrders.map(o=>`
-    <div style="background:#fff;border:1px solid rgba(120,90,30,0.14);border-radius:10px;padding:14px;box-shadow:0 2px 16px rgba(60,40,0,0.08);">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-        <span style="font-size:11px;color:#AEA898;letter-spacing:.05em;">${o.id}</span>
-        <span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;background:#FEF3DC;color:#8A6010;">Enviado ✓</span>
-      </div>
-      <div style="font-size:13px;color:#2A2618;margin-bottom:5px;line-height:1.45;">${o.products?.map(p=>`${p.qty}× ${p.name}`).join(' · ')}</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span style="font-size:11px;color:#AEA898;">${o.date} · ${o.time} · ${o.payMethod}</span>
-        <span style="font-size:13px;font-weight:500;color:#7A6030;">${fmt(o.total)}</span>
-      </div>
-    </div>`).join('');
+  // Render inmediato con estado local (sin esperar a Sheets)
+  renderMyOrdersList({});
+  // Actualiza estados desde Sheets en background
+  try {
+    const res  = await fetch(SHEETS_URL + '?t=' + Date.now());
+    const data = await res.json();
+    const statusMap = {};
+    (data.pedidos || []).forEach(p => { if (p.ID) statusMap[p.ID] = p.Estado; });
+    renderMyOrdersList(statusMap);
+  } catch(e) {
+    // Red fallida — los estados locales ya están visibles, no bloquea al usuario
+  }
 }
 
 // ── NAV ──
