@@ -1383,8 +1383,9 @@ function cartCount(){return Object.values(cart2).reduce((s,q)=>s+q,0);}
 function renderCatalog(){
   document.getElementById('catalog-grid').innerHTML=CATALOG.map(p=>{
     const q=cart2[p.id]||0;
-    const visual = p.img
-      ? `<img src="${encodeURI(p.img)}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentNode.innerHTML='<div style=\\'font-size:38px;display:flex;align-items:center;justify-content:center;height:100%\\'>📦</div>'">`
+    const imgSrc = p.img ? (p.img.startsWith('http') ? p.img : `${encodeURI(p.img)}.jpeg`) : '';
+    const visual = imgSrc
+      ? `<img src="${imgSrc}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentNode.innerHTML='<div style=\\'font-size:38px;display:flex;align-items:center;justify-content:center;height:100%\\'>📦</div>'">`
       : `<div style="font-size:38px;display:flex;align-items:center;justify-content:center;height:100%;">📦</div>`;
     return `<div style="background:#fff;border:1px solid rgba(120,90,30,0.14);border-radius:16px;box-shadow:0 2px 16px rgba(60,40,0,0.08);width:100%;">
       <div style="height:160px;background:#F0EAD8;position:relative;width:100%;border-radius:16px 16px 0 0;overflow:hidden;">
@@ -1459,8 +1460,9 @@ function renderCartScreen(){
   }
   list.innerHTML=items.map(([id,q])=>{
     const p=CATALOG.find(x=>x.id===id);
-    const thumb = p.img
-      ? `<img src="${p.img}" style="width:52px;height:52px;object-fit:cover;border-radius:8px;flex-shrink:0;" onerror="this.style.display='none'">`
+    const thumbSrc = p.img ? (p.img.startsWith('http') ? p.img : `${p.img}.jpeg`) : '';
+    const thumb = thumbSrc
+      ? `<img src="${thumbSrc}" style="width:52px;height:52px;object-fit:cover;border-radius:8px;flex-shrink:0;" onerror="this.style.display='none'">`
       : `<div style="width:52px;height:52px;background:#F0EAD8;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">📦</div>`;
     return `<div class="cart-item">
       ${thumb}
