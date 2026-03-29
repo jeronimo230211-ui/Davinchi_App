@@ -257,21 +257,21 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
 .product-img-wrap img{transition:transform .35s ease;}
 .product-img-wrap:hover img{transform:scale(1.06);}
 
-/* ── ONBOARDING BOTTOM-SHEET ── */
-/* z-index 600 — por encima de todos los modales internos (max 500) */
-.ob-overlay{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;}
-.ob-sheet{width:100%;max-width:440px;background:#1C1A14;border-radius:24px 24px 0 0;padding:32px 24px 40px;max-height:85vh;position:relative;animation:slideup .35s cubic-bezier(.22,.61,.36,1) both;}
-.ob-skip{position:absolute;top:20px;right:20px;background:transparent;border:none;color:#3A3830;font-size:13px;font-family:'Outfit',sans-serif;cursor:pointer;padding:4px 8px;}
-.ob-slide-content{text-align:center;transition:opacity .2s ease;}
-.ob-slide-content.ob-fade{opacity:0;}
-.ob-icon{font-size:52px;margin-bottom:20px;display:block;}
-.ob-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#F0EAD8;margin-bottom:12px;}
-.ob-desc{font-family:'Outfit',sans-serif;font-size:15px;color:#7A7060;line-height:1.7;max-width:280px;margin:0 auto;}
-.ob-dots{display:flex;justify-content:center;gap:8px;margin:28px 0 24px;}
-.ob-dot{width:8px;height:8px;border-radius:50%;background:rgba(200,164,90,0.25);transition:background .2s;}
-.ob-dot.active{background:#C8A45A;}
-.ob-btn-next{width:100%;padding:15px;background:#C8A45A;color:#1C1A14;border:none;border-radius:12px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:opacity .15s;}
-.ob-btn-next:hover{opacity:.88;}
+/* ── ONBOARDING v2 — Tour guiado con spotlight ── */
+/* z-index 800 — por encima de todos los modales internos (max 500) */
+.ob2-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:800;transition:opacity 200ms;opacity:0;display:none;}
+.ob2-bubble{position:fixed;z-index:802;background:#1A1A1A;border:1.5px solid #C8A45A;border-radius:14px;padding:18px 20px;max-width:min(320px,calc(100vw - 32px));box-shadow:0 8px 32px rgba(0,0,0,0.5);animation:ob2-in 220ms ease;}
+/* Flecha dorada — apunta hacia el elemento destacado */
+.ob2-bubble.bottom::before{content:'';position:absolute;top:-9px;left:50%;transform:translateX(-50%);border:0 solid transparent;border-left:9px solid transparent;border-right:9px solid transparent;border-bottom:9px solid #C8A45A;}
+.ob2-bubble.top::before{content:'';position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);border:0 solid transparent;border-left:9px solid transparent;border-right:9px solid transparent;border-top:9px solid #C8A45A;}
+.ob2-title{color:#C8A45A;font-weight:700;font-size:15px;margin-bottom:6px;}
+.ob2-desc{color:#E8E0D0;font-size:13px;line-height:1.5;}
+.ob2-footer{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:8px;}
+.ob2-progress{color:#888;font-size:12px;}
+.ob2-btn-skip{background:transparent;color:#888;font-size:12px;border:none;padding:6px;cursor:pointer;font-family:'Outfit',sans-serif;}
+.ob2-btn-prev,.ob2-btn-next{background:#C8A45A;color:#000;font-weight:700;border:none;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:'Outfit',sans-serif;}
+.ob2-btn-prev:disabled{opacity:0.3;}
+@keyframes ob2-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
@@ -452,7 +452,7 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
   <div id="my-orders-list" style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px;padding-bottom:20px;min-height:0;">
     <div class="empty-state"><div class="icon">📋</div><p>Aún no tienes pedidos.</p><button class="btn-goto" onclick="switchScreen('chat')">Hacer un pedido</button></div>
   </div>
-  <div style="margin:0 14px 14px;padding:14px 16px;background:var(--ink);border-radius:var(--radius-sm);display:flex;align-items:center;gap:12px;flex-shrink:0;">
+  <div id="ob-wa-banner" style="margin:0 14px 14px;padding:14px 16px;background:var(--ink);border-radius:var(--radius-sm);display:flex;align-items:center;gap:12px;flex-shrink:0;">
     <div style="font-size:22px;">💬</div>
     <div style="flex:1;">
       <strong style="color:#E2C07E;font-size:13px;display:block;">¿Necesitas un asesor?</strong>
@@ -516,7 +516,7 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
   <div class="vendor-header">
     <div class="vendor-header-left"><strong id="vendor-welcome">Panel Davinchi</strong><span id="vendor-role-label">—</span></div>
     <div style="display:flex;gap:8px;align-items:center;">
-      <button onclick="loadVendorOrders()" style="padding:5px 12px;border:1px solid rgba(200,164,90,0.2);border-radius:20px;background:transparent;color:#C8A45A;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif;">↻ Actualizar</button>
+      <button id="btn-refresh-orders" onclick="loadVendorOrders()" style="padding:5px 12px;border:1px solid rgba(200,164,90,0.2);border-radius:20px;background:transparent;color:#C8A45A;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif;">↻ Actualizar</button>
       <button class="btn-logout" onclick="doLogout()">Salir</button>
     </div>
   </div>
@@ -872,7 +872,7 @@ function renderVendorOrders(){
   ];
 
   const pillsHtml = `
-    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
+    <div id="vendor-filter-pills" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
       ${pills.map(p=>`
         <button onclick="vendorFilter='${p.key}';renderVendorOrders();" style="
           padding:6px 12px;border-radius:20px;font-size:12px;font-weight:500;
@@ -1153,7 +1153,7 @@ function renderVendorResumen(){
     </div>
 
     <!-- KPI 3: OTIF -->
-    <div style="background:#fff;border:1px solid rgba(120,90,30,0.1);border-radius:12px;padding:16px;">
+    <div id="ceo-kpi-otif" style="background:#fff;border:1px solid rgba(120,90,30,0.1);border-radius:12px;padding:16px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
         <div>
           <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#AEA898;font-weight:500;">OTIF — Entregas completas</div>
@@ -1227,7 +1227,7 @@ function renderVendorResumen(){
     </div>
 
     <!-- Ranking vendedores -->
-    <div style="background:#fff;border:1px solid rgba(120,90,30,0.1);border-radius:12px;padding:16px;">
+    <div id="ceo-ranking-vendedores" style="background:#fff;border:1px solid rgba(120,90,30,0.1);border-radius:12px;padding:16px;">
       <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#AEA898;font-weight:500;margin-bottom:12px;">👨‍💼 Rendimiento por vendedor</div>
       ${(()=>{
         const stats={};
@@ -1285,7 +1285,7 @@ function renderAdminCatalogo() {
       <!-- Encabezado con botón de nuevo producto -->
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
         <div style="font-family:'Playfair Display',serif;font-size:18px;color:#2A2618;">Catálogo de Productos</div>
-        <button onclick="abrirModalProducto(null)"
+        <button id="btn-nuevo-producto" onclick="abrirModalProducto(null)"
           style="background:#1C1A14;color:#C8A45A;border:none;border-radius:20px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap;">
           + Nuevo
         </button>
@@ -1850,116 +1850,234 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'),2600);
 }
 
-// ── ONBOARDING ──
-// Contenido de slides según tipo de usuario
-const OB_SLIDES = {
-  client: [
-    { icon:'💎', title:'Bienvenido a Davinchi',    desc:'Aquí encuentras todo lo que necesitas para exhibir tu joyería. Haz tu pedido en minutos.' },
-    { icon:'🛍️', title:'Explora el Catálogo',      desc:'Navega por nuestros productos y agrégalos al carrito. Ves disponibilidad en tiempo real.' },
-    { icon:'🤖', title:'Pide con el Asistente',    desc:'Nuestro chat con IA te ayuda a armar tu pedido. Solo escríbele qué necesitas.' },
-    { icon:'📋', title:'Sigue tus Pedidos',         desc:'En la pestaña Pedidos ves el estado de cada uno: en proceso, parcial o entregado.' },
-  ],
-  vendor: [
-    { icon:'📊', title:'Tu Panel de Trabajo',       desc:'Aquí llegan todos los pedidos de los clientes en tiempo real. Sin Excel, sin llamadas.' },
-    { icon:'🔔', title:'Alertas de Pedidos',        desc:'Cuando entra un pedido nuevo ves una alerta. Filtra por estado para gestionar más rápido.' },
-    { icon:'✅', title:'Actualiza el Estado',       desc:'Toca un pedido para ver el detalle y marcar los productos entregados uno por uno.' },
-    { icon:'📱', title:'WhatsApp Integrado',        desc:'Desde cada pedido puedes contactar al cliente directamente por WhatsApp con un toque.' },
-  ],
-  ceo: [
-    { icon:'👑', title:'Tu Panel Completo',         desc:'Tienes acceso a los KPIs de ventas y la administración del catálogo — exclusivo para ti.' },
-    { icon:'📈', title:'KPIs en Tiempo Real',       desc:'En Resumen ves ventas del día, rendimiento por vendedor y pedidos pendientes de gestión.' },
-    { icon:'🏷️', title:'Administra el Catálogo',   desc:'En la pestaña Catálogo editas precios, actualizas stock y agregas productos sin código.' },
-    { icon:'🔐', title:'Acceso Exclusivo',          desc:'Los vendedores no ven el catálogo ni los KPIs completos. Ese panel es solo tuyo.' },
-  ],
+// ── ONBOARDING v2 — Tour guiado con spotlight ─────────────────────────────
+
+let ob2Steps   = [];
+let ob2Index   = 0;
+let ob2Tipo    = '';
+let ob2HighEl  = null;
+
+const OB2_KEYS = {
+  client:  'dav_onboarding_cliente',
+  vendor:  'dav_onboarding_vendedor',
+  ceo:     'dav_onboarding_ceo'
 };
 
-// Clave localStorage por tipo — valor '1' cuando el usuario ya completó el onboarding
-const OB_KEYS = { client:'dav_ob_client', vendor:'dav_ob_vendor', ceo:'dav_ob_ceo' };
+// Migración: si el usuario ya completó el onboarding viejo, no mostrar el nuevo
+const OB2_LEGACY_KEYS = {
+  client: 'dav_ob_client',
+  vendor: 'dav_ob_vendor',
+  ceo:    'dav_ob_ceo'
+};
 
-let obSlides = [];
-let obIndex  = 0;
-
-function showOnboarding(tipo) {
-  // Si el usuario ya vio el onboarding de este tipo, no mostrar de nuevo
-  if (localStorage.getItem(OB_KEYS[tipo]) === '1') return;
-
-  obSlides = OB_SLIDES[tipo] || [];
-  if (!obSlides.length) return;
-  obIndex = 0;
-
-  // Crear el overlay y el sheet dinámicamente — se remueven al cerrar
-  const overlay = document.createElement('div');
-  overlay.id = 'ob-overlay';
-  overlay.className = 'ob-overlay';
-
-  overlay.innerHTML = `
-    <div class="ob-sheet" id="ob-sheet">
-      <button class="ob-skip" onclick="obSkip()">Saltar</button>
-      <div class="ob-slide-content" id="ob-content">
-        <span class="ob-icon" id="ob-icon"></span>
-        <div class="ob-title" id="ob-title"></div>
-        <div class="ob-desc"  id="ob-desc"></div>
-      </div>
-      <div class="ob-dots" id="ob-dots"></div>
-      <button class="ob-btn-next" id="ob-btn-next" onclick="obNext()">Siguiente →</button>
-    </div>`;
-
-  // Cerrar al tocar el overlay fuera del sheet
-  overlay.addEventListener('click', e => { if (e.target === overlay) obSkip(); });
-
-  document.querySelector('.app').appendChild(overlay);
-
-  // Renderizar el primer slide una vez el DOM está listo
-  renderObSlide(0);
+function ob2Steps_client() {
+  const shop = (JSON.parse(localStorage.getItem('dav_client') || '{}').shop || '');
+  return [
+    { selector: null,       position: 'center', title: 'Bienvenida a Davinchi', desc: `Hola ${shop ? shop : 'bienvenida'}, en un minuto te mostramos cómo funciona la app para que hagas tus pedidos sin llamadas ni mensajes.` },
+    { selector: '#catalog-grid > div:first-child', position: 'bottom', title: 'Explora el Catálogo', desc: 'Aquí encuentras todos nuestros productos con precio y stock disponible. Desplázate para ver más.' },
+    { selector: '#catalog-grid > div:first-child button', position: 'bottom', title: 'Agrega al Carrito', desc: 'Toca "Agregar" para poner un producto en tu carrito. Puedes ajustar la cantidad antes de confirmar.' },
+    { selector: '#nav-chat',     position: 'top', title: 'Pide con el Asistente IA', desc: 'También puedes escribirle al asistente en lenguaje natural. Él arma el pedido por ti y te pide fecha de entrega y forma de pago.' },
+    { selector: '#nav-myorders', position: 'top', title: 'Sigue tus Pedidos', desc: 'Aquí ves el estado de cada pedido: Nuevo, En proceso, Parcial o Entregado. Davinchi lo actualiza en tiempo real.' },
+    { selector: '#ob-wa-banner', position: 'top', beforeShow: () => switchScreen('myorders'), title: '¿Necesitas ayuda?', desc: 'Si tienes dudas, toca WhatsApp para hablar directamente con un asesor de Davinchi en horario laboral.' }
+  ];
 }
 
-function renderObSlide(index) {
-  const slide   = obSlides[index];
-  const content = document.getElementById('ob-content');
-  const esUltimo = index === obSlides.length - 1;
+function ob2Steps_vendor() {
+  const name = (typeof currentVendor !== 'undefined' && currentVendor) ? currentVendor.name : '';
+  return [
+    { selector: '.vendor-header', position: 'bottom', title: 'Tu Panel de Trabajo', desc: `Bienvenido${name ? ', ' + name : ''}. Aquí gestionas todos los pedidos de los clientes — sin Excel, sin llamadas.` },
+    { selector: '#vendor-filter-pills', position: 'bottom', title: 'Filtra por Estado', desc: 'Usa estos filtros para ver solo los pedidos que necesitas atender. Los marcados en rojo son nuevos y urgentes.' },
+    { selector: '#vendor-content .vendor-order:first-child', position: 'bottom', fallbackCenter: true, title: 'Gestiona un Pedido', desc: 'Toca cualquier pedido para ver el detalle: productos, cliente, fecha de entrega y forma de pago.', fallbackDesc: 'Los pedidos nuevos aparecen aquí. Cuando entre uno, lo verás de inmediato con una alerta visual.' },
+    { selector: '#vtab-resumen', position: 'bottom', title: 'Tu Resumen del Día', desc: 'En esta pestaña ves cuántos pedidos gestionaste hoy y el valor total. Una vista rápida de tu rendimiento.' },
+    { selector: '#btn-refresh-orders', position: 'bottom', title: 'Actualización en Tiempo Real', desc: 'Los pedidos se actualizan solos cada 30 s, pero si quieres los más recientes ya, toca este botón.' }
+  ];
+}
 
-  // Fade out → actualizar contenido → fade in
-  content.classList.add('ob-fade');
+function ob2Steps_ceo() {
+  return [
+    { selector: '.vendor-header', position: 'bottom', title: 'Tu Panel Completo', desc: 'Tienes acceso exclusivo a los KPIs de ventas y la administración del catálogo. Los vendedores no ven esto.' },
+    { selector: '#vtab-resumen',  position: 'bottom', beforeShow: () => switchVTab('resumen'),  title: 'Dashboard de KPIs', desc: 'Aquí vives el pulso del negocio: entregas del día, pedidos pendientes y valor vendido en tiempo real.' },
+    { selector: '#ceo-kpi-otif',  position: 'bottom', title: 'El Indicador OTIF', desc: 'OTIF mide qué % de pedidos se entregaron completos y a tiempo. Verde ≥ 90 %, Amarillo 70-89 %, Rojo = crítico.' },
+    { selector: '#ceo-ranking-vendedores', position: 'top', title: 'Ranking de Vendedores', desc: 'Compara quién entregó más, cuántos parciales tuvo y el valor gestionado. Úsalo para dar feedback real.' },
+    { selector: '#vtab-catalogo', position: 'bottom', beforeShow: () => switchVTab('catalogo'), title: 'Administra el Catálogo', desc: 'Solo tú ves esta pestaña. Edita precios, actualiza stock y desactiva productos sin tocar código.' },
+    { selector: '#btn-nuevo-producto', position: 'top', title: 'Agrega Productos', desc: 'Toca aquí para crear un producto nuevo. Los cambios se reflejan de inmediato en el catálogo de los clientes.' }
+  ];
+}
 
+function showOnboarding(tipo) {
+  // No mostrar si ya completó el nuevo onboarding
+  const newKey = OB2_KEYS[tipo];
+  if (!newKey) return;
+  if (localStorage.getItem(newKey)) return;
+  // Migración: si completó el viejo, marcar el nuevo como hecho también
+  const legacyKey = OB2_LEGACY_KEYS[tipo];
+  if (legacyKey && localStorage.getItem(legacyKey)) {
+    localStorage.setItem(newKey, '1');
+    return;
+  }
+
+  ob2Tipo  = tipo;
+  ob2Index = 0;
+  ob2Steps = tipo === 'client' ? ob2Steps_client()
+           : tipo === 'vendor' ? ob2Steps_vendor()
+           : ob2Steps_ceo();
+
+  // Crear overlay si no existe
+  let overlay = document.getElementById('ob2-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'ob2-overlay';
+    overlay.className = 'ob2-overlay';
+    document.body.appendChild(overlay);
+  }
+  overlay.style.display = 'block';
+  setTimeout(() => overlay.style.opacity = '1', 10);
+
+  ob2ShowStep(0);
+}
+
+function ob2ShowStep(index) {
+  ob2ClearHighlight();
+
+  const steps = ob2Steps;
+  if (index < 0 || index >= steps.length) { ob2Finish(); return; }
+  ob2Index = index;
+
+  const step = steps[index];
+
+  // Ejecutar beforeShow si existe (p.ej. navegar al tab correcto)
+  if (step.beforeShow) step.beforeShow();
+
+  // Scroll + posicionar después de un tick para que el DOM esté actualizado
   setTimeout(() => {
-    document.getElementById('ob-icon').textContent  = slide.icon;
-    document.getElementById('ob-title').textContent = slide.title;
-    document.getElementById('ob-desc').textContent  = slide.desc;
+    let el = step.selector ? document.querySelector(step.selector) : null;
 
-    // Reconstruir dots según el slide activo
-    const dotsEl = document.getElementById('ob-dots');
-    dotsEl.innerHTML = obSlides.map((_, i) =>
-      `<div class="ob-dot${i === index ? ' active' : ''}"></div>`
-    ).join('');
+    // Fallback: si el elemento no existe y hay fallbackCenter, usar burbuja centrada
+    if (!el && step.fallbackCenter) el = null;
 
-    // Cambiar texto del botón en el último slide
-    document.getElementById('ob-btn-next').textContent = esUltimo ? '¡Empezar!' : 'Siguiente →';
-
-    content.classList.remove('ob-fade');
+    ob2RenderBubble(step, el, index, steps.length);
+    if (el) ob2Highlight(el);
   }, 200);
 }
 
-function obNext() {
-  if (obIndex < obSlides.length - 1) {
-    obIndex++;
-    renderObSlide(obIndex);
+function ob2RenderBubble(step, el, index, total) {
+  // Remover burbuja anterior
+  const old = document.getElementById('ob2-bubble');
+  if (old) old.remove();
+
+  const bubble = document.createElement('div');
+  bubble.id = 'ob2-bubble';
+  bubble.className = 'ob2-bubble';
+
+  const desc = (!el && step.fallbackDesc) ? step.fallbackDesc : step.desc;
+
+  bubble.innerHTML = `
+    <div class="ob2-title">${step.title}</div>
+    <div class="ob2-desc">${desc}</div>
+    <div class="ob2-footer">
+      <button class="ob2-btn-skip" onclick="ob2Skip()">Saltar</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="ob2-progress">${index + 1} / ${total}</span>
+        ${index > 0 ? '<button class="ob2-btn-prev" onclick="ob2Prev()">← Ant</button>' : ''}
+        <button class="ob2-btn-next" onclick="ob2Next()">${index === total - 1 ? 'Finalizar' : 'Siguiente →'}</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(bubble);
+
+  // Posicionar la burbuja relativa al elemento o centrada
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => ob2PositionBubble(bubble, el, step.position), 250);
   } else {
-    // Último slide — cerrar y marcar como visto
-    obClose();
+    // Centrado en pantalla cuando no hay elemento objetivo
+    bubble.style.top  = '50%';
+    bubble.style.left = '50%';
+    bubble.style.transform = 'translate(-50%, -50%)';
   }
 }
 
-function obSkip() {
-  obClose();
+function ob2PositionBubble(bubble, el, preferredPosition) {
+  const rect   = el.getBoundingClientRect();
+  const vw     = window.innerWidth;
+  const vh     = window.innerHeight;
+  const bw     = bubble.offsetWidth  || 320;
+  const bh     = bubble.offsetHeight || 140;
+  const margin = 12;
+  const safeH  = 16; // margen lateral mínimo
+
+  // Decidir si va arriba o abajo según espacio disponible
+  const spaceBelow = vh - rect.bottom;
+  const spaceAbove = rect.top;
+  let position = preferredPosition;
+  if (position === 'bottom' && spaceBelow < bh + margin + 20) position = 'top';
+  if (position === 'top'    && spaceAbove < bh + margin + 20) position = 'bottom';
+
+  // Centrar horizontalmente respecto al elemento, con límites de pantalla
+  let left = rect.left + rect.width / 2 - bw / 2;
+  left = Math.max(safeH, Math.min(left, vw - bw - safeH));
+
+  if (position === 'bottom') {
+    bubble.style.top  = (rect.bottom + margin) + 'px';
+    bubble.className  = 'ob2-bubble bottom';
+  } else {
+    bubble.style.top  = (rect.top - bh - margin) + 'px';
+    bubble.className  = 'ob2-bubble top';
+  }
+  bubble.style.left      = left + 'px';
+  bubble.style.transform = 'none';
 }
 
-function obClose() {
-  // Determinar qué clave corresponde al slide actual y marcarla
-  const tipo = Object.keys(OB_SLIDES).find(k => OB_SLIDES[k] === obSlides);
-  if (tipo) localStorage.setItem(OB_KEYS[tipo], '1');
+function ob2Highlight(el) {
+  ob2HighEl = el;
+  el.style.position = el.style.position || 'relative';
+  el.style.zIndex   = '801';
+  el.style.boxShadow = '0 0 0 9999px rgba(0,0,0,0.55), 0 0 0 3px #C8A45A';
+  el.style.borderRadius = el.style.borderRadius || '8px';
+}
 
-  const overlay = document.getElementById('ob-overlay');
-  if (overlay) overlay.remove();
+function ob2ClearHighlight() {
+  if (ob2HighEl) {
+    ob2HighEl.style.zIndex    = '';
+    ob2HighEl.style.boxShadow = '';
+    ob2HighEl.style.borderRadius = '';
+    ob2HighEl = null;
+  }
+}
+
+function ob2Next() {
+  ob2ShowStep(ob2Index + 1);
+}
+
+function ob2Prev() {
+  ob2ShowStep(ob2Index - 1);
+}
+
+function ob2Skip() {
+  ob2Finish();
+}
+
+function ob2Finish() {
+  ob2ClearHighlight();
+
+  const bubble = document.getElementById('ob2-bubble');
+  if (bubble) bubble.remove();
+
+  const overlay = document.getElementById('ob2-overlay');
+  if (overlay) {
+    overlay.style.opacity = '0';
+    setTimeout(() => { overlay.style.display = 'none'; }, 200);
+  }
+
+  // Persistir que el usuario ya completó este onboarding
+  if (ob2Tipo && OB2_KEYS[ob2Tipo]) {
+    localStorage.setItem(OB2_KEYS[ob2Tipo], '1');
+  }
+
+  ob2Steps = [];
+  ob2Index = 0;
+  ob2Tipo  = '';
 }
 
 // API key lives securely on Vercel server
