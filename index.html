@@ -222,11 +222,11 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
 .vo-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:gap;}
 .vo-total{font-size:14px;font-weight:500;color:var(--gold-dim);}
 .vo-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px;}
-.btn-status{padding:5px 11px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:none;font-family:'Outfit',sans-serif;transition:opacity .2s;}
+.btn-status{padding:10px 14px;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:'Outfit',sans-serif;transition:opacity .2s;}
 .btn-status:hover{opacity:.82;}
 .btn-s-process{background:var(--blue-bg);color:var(--blue);border:1px solid #BFDBFE;}
 .btn-s-done{background:var(--green-bg);color:var(--green);border:1px solid #BBF7D0;}
-.btn-wa-small{padding:5px 11px;background:#25D366;color:#fff;border:none;border-radius:20px;font-size:11px;cursor:pointer;font-family:'Outfit',sans-serif;}
+.btn-wa-small{padding:10px 14px;background:#25D366;color:#fff;border:none;border-radius:20px;font-size:13px;cursor:pointer;font-family:'Outfit',sans-serif;}
 .vo-pago{font-size:11px;color:var(--text-muted);}
 .status-pill{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;}
 .loading-orders{text-align:center;padding:40px;color:var(--text-muted);font-size:14px;}
@@ -244,6 +244,18 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
 .toast.show{opacity:1;}
 ::-webkit-scrollbar{width:3px;}
 ::-webkit-scrollbar-thumb{background:var(--border-mid);border-radius:2px;}
+
+/* ── SKELETON LOADER ── */
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+.sk-shimmer{background:linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%);background-size:400px 100%;animation:shimmer 1.4s infinite linear;}
+.sk-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+.sk-img{height:240px;}
+.sk-line{border-radius:4px;margin-bottom:8px;}
+
+/* ── PRODUCT IMAGE ZOOM ── */
+.product-img-wrap{overflow:hidden;}
+.product-img-wrap img{transition:transform .35s ease;width:100%;height:100%;object-fit:cover;display:block;}
+.product-img-wrap:hover img{transform:scale(1.06);}
 </style>
 </head>
 <body>
@@ -317,30 +329,49 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
   </div>
   <div style="width:100%;background:var(--surface);border-radius:24px 24px 0 0;padding:28px 24px 36px;display:flex;flex-direction:column;gap:12px;flex:1;">
 
-    <!-- REGISTRO (primer ingreso) -->
+    <!-- REGISTRO (primer ingreso) — 2 pasos -->
     <div id="registro-form">
-      <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:16px;">Solo lo pedimos una vez 👇</div>
 
-      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:500;margin-bottom:6px;">Nombre de tu joyería</div>
-      <input id="reg-shop" type="text" placeholder="Ej: Joyería Luna" autocomplete="off"
-        style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;font-family:'Outfit',sans-serif;font-size:16px;color:var(--text);outline:none;margin-bottom:12px;">
+      <!-- Indicador de progreso -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div style="font-size:13px;font-weight:500;color:var(--text);" id="reg-step-label">Paso 1 de 2 · Solo lo pedimos una vez</div>
+        <div style="display:flex;gap:5px;align-items:center;">
+          <div id="reg-prog-1" style="width:28px;height:4px;border-radius:2px;background:var(--gold);transition:background .3s;"></div>
+          <div id="reg-prog-2" style="width:28px;height:4px;border-radius:2px;background:var(--border-mid);transition:background .3s;"></div>
+        </div>
+      </div>
 
-      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:500;margin-bottom:6px;">Tu nombre</div>
-      <input id="reg-contact" type="text" placeholder="Ej: María García" autocomplete="off"
-        style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;font-family:'Outfit',sans-serif;font-size:16px;color:var(--text);outline:none;margin-bottom:12px;">
+      <!-- Paso 1: Joyería + Contacto -->
+      <div id="reg-step-1" style="display:flex;flex-direction:column;">
+        <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:500;margin-bottom:6px;">Nombre de tu joyería</div>
+        <input id="reg-shop" type="text" placeholder="Ej: Joyería Luna" autocomplete="off"
+          style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;font-family:'Outfit',sans-serif;font-size:16px;color:var(--text);outline:none;margin-bottom:12px;">
 
-      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:500;margin-bottom:6px;">Teléfono / WhatsApp</div>
-      <input id="reg-phone" type="tel" placeholder="Ej: 3001234567" autocomplete="off"
-        style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;font-family:'Outfit',sans-serif;font-size:16px;color:var(--text);outline:none;margin-bottom:12px;">
+        <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:500;margin-bottom:6px;">Tu nombre</div>
+        <input id="reg-contact" type="text" placeholder="Ej: María García" autocomplete="off"
+          style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;font-family:'Outfit',sans-serif;font-size:16px;color:var(--text);outline:none;margin-bottom:20px;">
 
-      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:500;margin-bottom:6px;">Centro comercial de entrega</div>
-      <input id="reg-cc" type="text" placeholder="Ej: Centro Comercial Santafé" autocomplete="off"
-        style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;font-family:'Outfit',sans-serif;font-size:16px;color:var(--text);outline:none;margin-bottom:20px;">
+        <div id="reg-error-1" style="font-size:12px;color:var(--red);margin-bottom:10px;display:none;">Por favor completa los dos campos.</div>
+        <button onclick="nextRegStep()" style="width:100%;padding:14px;background:var(--gold);color:var(--ink);border:none;border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:15px;font-weight:500;cursor:pointer;">Siguiente →</button>
+        <button onclick="showLanding()" style="width:100%;padding:11px;background:transparent;color:var(--text-dim);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;margin-top:8px;">← Volver</button>
+      </div>
 
-      <div id="reg-error" style="font-size:12px;color:var(--red);margin-bottom:10px;display:none;">Por favor completa todos los campos.</div>
-      <button onclick="submitRegistro()" style="width:100%;padding:14px;background:var(--gold);color:var(--ink);border:none;border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:15px;font-weight:500;cursor:pointer;">Registrarme y ver catálogo →</button>
-      <button onclick="showLanding()" style="width:100%;padding:11px;background:transparent;color:var(--text-dim);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;margin-top:8px;">← Volver</button>
-      <div style="font-size:12px;color:var(--text-dim);text-align:center;margin-top:8px;">Tus datos se guardan de forma segura y solo son usados por Davinchi.</div>
+      <!-- Paso 2: Teléfono + Centro comercial -->
+      <div id="reg-step-2" style="display:none;flex-direction:column;">
+        <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:500;margin-bottom:6px;">Teléfono / WhatsApp</div>
+        <input id="reg-phone" type="tel" placeholder="Ej: 3001234567" autocomplete="off"
+          style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;font-family:'Outfit',sans-serif;font-size:16px;color:var(--text);outline:none;margin-bottom:12px;">
+
+        <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:500;margin-bottom:6px;">¿Dónde te entregamos?</div>
+        <input id="reg-cc" type="text" placeholder="Ej: C.C. Santafé, Local 214" autocomplete="off"
+          style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;font-family:'Outfit',sans-serif;font-size:16px;color:var(--text);outline:none;margin-bottom:20px;">
+
+        <div id="reg-error" style="font-size:12px;color:var(--red);margin-bottom:10px;display:none;">Por favor completa los dos campos.</div>
+        <button onclick="submitRegistro()" style="width:100%;padding:14px;background:var(--gold);color:var(--ink);border:none;border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:15px;font-weight:500;cursor:pointer;">Registrarme y ver catálogo →</button>
+        <button onclick="prevRegStep()" style="width:100%;padding:11px;background:transparent;color:var(--text-dim);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;margin-top:8px;">← Atrás</button>
+        <div style="font-size:12px;color:var(--text-dim);text-align:center;margin-top:10px;">Tus datos se guardan de forma segura y solo son usados por Davinchi.</div>
+      </div>
+
     </div>
 
     <!-- BIENVENIDA CLIENTE REGISTRADO -->
@@ -506,6 +537,19 @@ const CATALOG_FALLBACK = [
 
 // Carga el catálogo desde Sheets. Si falla, usa el fallback para no bloquear al usuario
 async function loadCatalog() {
+  // Mostrar skeleton mientras carga — evita pantalla en blanco en conexiones lentas
+  const grid = document.getElementById('catalog-grid');
+  if (grid) {
+    grid.innerHTML = [1,2,3].map(() => `
+      <div class="sk-card">
+        <div class="sk-img sk-shimmer"></div>
+        <div style="padding:14px 16px 16px;">
+          <div class="sk-line sk-shimmer" style="width:65%;height:14px;"></div>
+          <div class="sk-line sk-shimmer" style="width:45%;height:12px;"></div>
+          <div class="sk-line sk-shimmer" style="width:35%;height:16px;margin-top:4px;margin-bottom:0;"></div>
+        </div>
+      </div>`).join('');
+  }
   try {
     const res = await fetch(SHEETS_URL + '?action=getCatalogo&t=' + Date.now());
     const data = await res.json();
@@ -577,6 +621,27 @@ function goClient(){
 
 function getSavedClient(){
   try{ return JSON.parse(localStorage.getItem('dav_client')||'null'); }catch(e){return null;}
+}
+
+function nextRegStep(){
+  const shop    = document.getElementById('reg-shop').value.trim();
+  const contact = document.getElementById('reg-contact').value.trim();
+  if(!shop||!contact){
+    document.getElementById('reg-error-1').style.display='block'; return;
+  }
+  document.getElementById('reg-error-1').style.display='none';
+  document.getElementById('reg-step-1').style.display='none';
+  document.getElementById('reg-step-2').style.display='flex';
+  document.getElementById('reg-prog-2').style.background='var(--gold)';
+  document.getElementById('reg-step-label').textContent='Paso 2 de 2 · Ya casi terminamos';
+  document.getElementById('reg-phone').focus();
+}
+
+function prevRegStep(){
+  document.getElementById('reg-step-2').style.display='none';
+  document.getElementById('reg-step-1').style.display='flex';
+  document.getElementById('reg-prog-2').style.background='var(--border-mid)';
+  document.getElementById('reg-step-label').textContent='Paso 1 de 2 · Solo lo pedimos una vez';
 }
 
 function submitRegistro(){
@@ -1385,10 +1450,10 @@ function renderCatalog(){
     const q=cart2[p.id]||0;
     const imgSrc = p.img ? (p.img.startsWith('http') ? p.img : `${encodeURI(p.img)}.jpeg`) : '';
     const visual = imgSrc
-      ? `<img src="${imgSrc}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentNode.innerHTML='<div style=\\'font-size:38px;display:flex;align-items:center;justify-content:center;height:100%\\'>📦</div>'">`
-      : `<div style="font-size:38px;display:flex;align-items:center;justify-content:center;height:100%;">📦</div>`;
+      ? `<img src="${imgSrc}" alt="${p.name}" onerror="this.parentNode.innerHTML='<div style=\\'font-size:48px;display:flex;align-items:center;justify-content:center;height:100%\\'>📦</div>'">`
+      : `<div style="font-size:48px;display:flex;align-items:center;justify-content:center;height:100%;">📦</div>`;
     return `<div style="background:#fff;border:1px solid rgba(120,90,30,0.14);border-radius:16px;box-shadow:0 2px 16px rgba(60,40,0,0.08);width:100%;">
-      <div style="height:160px;background:#F0EAD8;position:relative;width:100%;border-radius:16px 16px 0 0;overflow:hidden;">
+      <div class="product-img-wrap" style="height:240px;background:#F0EAD8;position:relative;width:100%;border-radius:16px 16px 0 0;">
         ${visual}
         <span style="position:absolute;top:8px;right:8px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:500;background:${p.stock<=3?'#FAEAE6':'#EBF5F0'};color:${p.stock<=3?'#C0442A':'#3D8A5A'};">${p.stock<=3?`Solo ${p.stock} uds`:'Disponible'}</span>
       </div>
@@ -1486,9 +1551,12 @@ function sendCartToChat(){
   const items=Object.entries(cart2).filter(([,q])=>q>0);
   if(!items.length)return;
   const lines=items.map(([id,q])=>{const p=CATALOG.find(x=>x.id===id);return `${q} ${p.name}`;});
-  switchScreen('chat');
-  document.getElementById('chat-in').value=`Quiero pedir: ${lines.join(', ')}`;
-  sendMsg();
+  showToast('Enviando pedido al asistente...');
+  setTimeout(()=>{
+    switchScreen('chat');
+    document.getElementById('chat-in').value=`Quiero pedir: ${lines.join(', ')}`;
+    sendMsg();
+  }, 900);
 }
 
 // ── CHAT ──
@@ -1740,7 +1808,7 @@ document.getElementById('screen-apikey').style.display='none';
 
 // Enter key shortcuts on registration form
 document.getElementById('reg-shop').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('reg-contact').focus();});
-document.getElementById('reg-contact').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('reg-phone').focus();});
+document.getElementById('reg-contact').addEventListener('keydown',e=>{if(e.key==='Enter')nextRegStep();});
 document.getElementById('reg-phone').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('reg-cc').focus();});
 document.getElementById('reg-cc').addEventListener('keydown',e=>{if(e.key==='Enter')submitRegistro();});
 document.getElementById('login-user').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('login-pass').focus();});
