@@ -616,7 +616,7 @@ function loadClientAndEnter(client){
   hideAll();
   document.getElementById('client-header').style.display='flex';
   document.getElementById('client-nav').style.display='flex';
-  renderCatalog();
+  loadCatalog(); // carga catálogo dinámico desde Sheets (renderCatalog se llama al terminar)
   initChat();
   const cat = document.getElementById('screen-catalog');
   cat.classList.add('active'); cat.style.display='flex';
