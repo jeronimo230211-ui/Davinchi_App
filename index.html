@@ -272,6 +272,17 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
 .ob2-btn-prev,.ob2-btn-next{background:#C8A45A;color:#000;font-weight:700;border:none;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:'Outfit',sans-serif;}
 .ob2-btn-prev:disabled{opacity:0.3;}
 @keyframes ob2-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── MODAL DETALLE PRODUCTO ── */
+#modal-product-sheet { -webkit-overflow-scrolling: touch; }
+#modal-product-sheet.open { transform: translateY(0) !important; }
+.color-chip {
+  width:36px;height:36px;border-radius:50%;
+  border:2.5px solid transparent;cursor:pointer;
+  transition:border-color .15s, transform .15s;flex-shrink:0;
+}
+.color-chip.selected { border-color:#C8A45A;transform:scale(1.15); }
+.color-chip:focus { outline:2px solid #C8A45A;outline-offset:2px; }
 </style>
 </head>
 <body>
@@ -542,13 +553,13 @@ let CATALOG = [];
 
 // Fallback offline con los productos base (se usa si Sheets no responde)
 const CATALOG_FALLBACK = [
-  {id:'VG3P', name:'Vitrina Giratoria 3P',    price:450000,stock:4, img:'Foto1',desc:'Vitrina giratoria de 3 pisos. Ideal para anillos y aretes.',    activo:true},
-  {id:'ETN',  name:'Estuche Terciopelo Negro', price:85000, stock:18,img:'Foto2',desc:'Estuche forrado en terciopelo negro, cierre magnético.',         activo:true},
-  {id:'ETR',  name:'Estuche Terciopelo Rojo',  price:75000, stock:2, img:'Foto3',desc:'Estuche en terciopelo rojo intenso. Últimas unidades.',          activo:true},
-  {id:'EA360',name:'Exhibidor Acrílico 360°',  price:220000,stock:3, img:'Foto4',desc:'Exhibidor giratorio en acrílico transparente.',                 activo:true},
-  {id:'CMP',  name:'Caja Madera Premium',       price:680000,stock:12,img:'Foto5',desc:'Caja artesanal en madera con interior acolchado.',              activo:true},
-  {id:'SBJ',  name:'Soporte Busto Joyería',    price:95000, stock:20,img:'Foto6',desc:'Busto exhibidor de terciopelo para collares.',                   activo:true},
-  {id:'BO',   name:'Bandeja Organizadora',      price:65000, stock:7, img:'',   desc:'Bandeja con compartimentos para organizar joyería.',              activo:true},
+  {id:'VG3P', name:'Vitrina Giratoria 3P',    price:450000,stock:4, img:'Foto1',desc:'Vitrina giratoria de 3 pisos. Ideal para anillos y aretes.',    activo:true, colors:[]},
+  {id:'ETN',  name:'Estuche Terciopelo Negro', price:85000, stock:18,img:'Foto2',desc:'Estuche forrado en terciopelo negro, cierre magnético.',         activo:true, colors:[]},
+  {id:'ETR',  name:'Estuche Terciopelo Rojo',  price:75000, stock:2, img:'Foto3',desc:'Estuche en terciopelo rojo intenso. Últimas unidades.',          activo:true, colors:[]},
+  {id:'EA360',name:'Exhibidor Acrílico 360°',  price:220000,stock:3, img:'Foto4',desc:'Exhibidor giratorio en acrílico transparente.',                 activo:true, colors:[]},
+  {id:'CMP',  name:'Caja Madera Premium',       price:680000,stock:12,img:'Foto5',desc:'Caja artesanal en madera con interior acolchado.',              activo:true, colors:[]},
+  {id:'SBJ',  name:'Soporte Busto Joyería',    price:95000, stock:20,img:'Foto6',desc:'Busto exhibidor de terciopelo para collares.',                   activo:true, colors:[]},
+  {id:'BO',   name:'Bandeja Organizadora',      price:65000, stock:7, img:'',   desc:'Bandeja con compartimentos para organizar joyería.',              activo:true, colors:[]},
 ];
 
 // Carga el catálogo desde Sheets. Si falla, usa el fallback para no bloquear al usuario
@@ -574,6 +585,11 @@ async function loadCatalog() {
     } else {
       CATALOG = CATALOG_FALLBACK;
     }
+    // Parsear colores desde JSON string (campo 'colores' de Sheets) a array de objetos
+    CATALOG = CATALOG.map(p => ({
+      ...p,
+      colors: (() => { try { return p.colores ? JSON.parse(p.colores) : []; } catch(e) { return []; } })()
+    }));
   } catch(e) {
     // Sin conexión a Sheets — el catálogo sigue funcionando con datos locales
     CATALOG = CATALOG_FALLBACK;
@@ -1475,10 +1491,10 @@ function renderCatalog(){
     const q=cart2[p.id]||0;
     const imgSrc = p.img ? (p.img.startsWith('http') ? p.img : encodeURI(p.img)) : '';
     const visual = imgSrc
-      ? `<img src="${imgSrc}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentNode.innerHTML='<div style=\\'font-size:48px;display:flex;align-items:center;justify-content:center;height:100%\\'>📦</div>'">`
+      ? `<img src="${imgSrc}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:16px 16px 0 0;" onerror="this.parentNode.innerHTML='<div style=\\'font-size:48px;display:flex;align-items:center;justify-content:center;height:100%\\'>📦</div>'">`
       : `<div style="font-size:48px;display:flex;align-items:center;justify-content:center;height:100%;">📦</div>`;
-    return `<div style="background:#fff;border:1px solid rgba(120,90,30,0.14);border-radius:16px;box-shadow:0 2px 16px rgba(60,40,0,0.08);width:100%;">
-      <div class="product-img-wrap" style="height:240px;background:#F0EAD8;position:relative;width:100%;border-radius:16px 16px 0 0;">
+    return `<div onclick="openProductModal('${p.id}')" style="cursor:pointer;background:#fff;border:1px solid rgba(120,90,30,0.14);border-radius:16px;box-shadow:0 2px 16px rgba(60,40,0,0.08);width:100%;">
+      <div class="product-img-wrap" style="height:240px;overflow:hidden;background:#F0EAD8;position:relative;width:100%;border-radius:16px 16px 0 0;">
         ${visual}
         <span style="position:absolute;top:8px;right:8px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:500;background:${p.stock<=3?'#FAEAE6':'#EBF5F0'};color:${p.stock<=3?'#C0442A':'#3D8A5A'};">${p.stock<=3?`Solo ${p.stock} uds`:'Disponible'}</span>
       </div>
@@ -1489,11 +1505,11 @@ function renderCatalog(){
           <span style="font-size:16px;font-weight:500;color:#7A6030;">${fmt(p.price)}</span>
           <div style="display:flex;align-items:center;gap:7px;">
             <div id="qctl-${p.id}" style="display:${q>0?'flex':'none'};align-items:center;border:1.5px solid rgba(120,90,30,0.28);border-radius:20px;background:#fff;">
-              <button onclick="chQty('${p.id}',-1)" style="width:30px;height:30px;border:none;background:transparent;font-size:17px;cursor:pointer;color:#7A7060;line-height:1;">−</button>
+              <button onclick="event.stopPropagation();chQty('${p.id}',-1)" style="width:30px;height:30px;border:none;background:transparent;font-size:17px;cursor:pointer;color:#7A7060;line-height:1;">−</button>
               <span id="qn-${p.id}" style="min-width:26px;text-align:center;font-size:13px;font-weight:500;color:#2A2618;">${q}</span>
-              <button onclick="chQty('${p.id}',1)" style="width:30px;height:30px;border:none;background:transparent;font-size:17px;cursor:pointer;color:#7A7060;line-height:1;">+</button>
+              <button onclick="event.stopPropagation();chQty('${p.id}',1)" style="width:30px;height:30px;border:none;background:transparent;font-size:17px;cursor:pointer;color:#7A7060;line-height:1;">+</button>
             </div>
-            <button id="badd-${p.id}" onclick="addCart('${p.id}')" style="padding:7px 13px;background:${q>0?'#3D8A5A':'#1C1A14'};color:${q>0?'#fff':'#E2C07E'};border:none;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Outfit',sans-serif;">
+            <button id="badd-${p.id}" onclick="event.stopPropagation();addCart('${p.id}')" style="padding:7px 13px;background:${q>0?'#3D8A5A':'#1C1A14'};color:${q>0?'#fff':'#E2C07E'};border:none;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Outfit',sans-serif;">
               ${q>0?'✓ Agregado':'Agregar'}
             </button>
           </div>
@@ -2080,6 +2096,124 @@ function ob2Finish() {
   ob2Tipo  = '';
 }
 
+// ── MODAL DETALLE PRODUCTO ──────────────────────────────────────────────────
+
+let modalProductId   = null;
+let modalQty         = 1;
+let modalSelectedColor = null;
+
+function openProductModal(productId) {
+  const p = CATALOG.find(x => x.id === productId);
+  if (!p) return;
+
+  modalProductId = productId;
+  modalQty = cart2[productId] || 1;
+  modalSelectedColor = null;
+
+  // Imagen
+  const imgEl      = document.getElementById('mpd-img');
+  const fallbackEl = document.getElementById('mpd-img-fallback');
+  if (p.img) {
+    const src = p.img.startsWith('http') ? p.img : encodeURI(p.img);
+    imgEl.src = src;
+    imgEl.style.display = 'block';
+    fallbackEl.style.display = 'none';
+    imgEl.onerror = () => { imgEl.style.display='none'; fallbackEl.style.display='flex'; };
+  } else {
+    imgEl.style.display = 'none';
+    fallbackEl.style.display = 'flex';
+  }
+
+  // Badge stock
+  const badge = document.getElementById('mpd-stock-badge');
+  if (p.stock <= 3) {
+    badge.textContent = `Solo ${p.stock} uds`;
+    badge.style.cssText += ';background:#FAEAE6;color:#C0442A;';
+  } else {
+    badge.textContent = 'Disponible';
+    badge.style.cssText += ';background:#EBF5F0;color:#3D8A5A;';
+  }
+
+  // Nombre, precio, descripción
+  document.getElementById('mpd-name').textContent  = p.name  || p.nombre  || p.id;
+  document.getElementById('mpd-price').textContent = fmt ? fmt(p.price || p.precio || 0) : '$' + (p.price || p.precio || 0);
+  document.getElementById('mpd-desc').textContent  = p.desc  || p.descripcion || '';
+
+  // Cantidad
+  document.getElementById('mpd-qty').textContent = modalQty;
+
+  // Colores — condicional
+  const colorsSection = document.getElementById('mpd-colors-section');
+  const colorsList    = document.getElementById('mpd-colors-list');
+  const colorLabel    = document.getElementById('mpd-color-label');
+  const hasColors     = Array.isArray(p.colors) && p.colors.length > 0;
+
+  if (hasColors) {
+    colorsSection.style.display = 'block';
+    colorsList.innerHTML = p.colors.map(c => `
+      <button class="color-chip" style="background:${c.hex};" title="${c.name}"
+              onclick="selectModalColor('${c.name}','${c.hex}',this)"></button>
+    `).join('');
+    colorLabel.textContent = 'Selecciona un color';
+  } else {
+    colorsSection.style.display = 'none';
+    colorsList.innerHTML = '';
+    colorLabel.textContent = '';
+  }
+
+  // Botón
+  document.getElementById('mpd-btn-add').textContent = cart2[productId] ? 'Actualizar cantidad' : 'Agregar al carrito';
+
+  // Mostrar con animación
+  const overlay = document.getElementById('modal-product-detail');
+  const sheet   = document.getElementById('modal-product-sheet');
+  overlay.style.display = 'block';
+  sheet.getBoundingClientRect(); // fuerza reflow para que la transición CSS funcione
+  sheet.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeProductModal() {
+  const sheet   = document.getElementById('modal-product-sheet');
+  const overlay = document.getElementById('modal-product-detail');
+  sheet.classList.remove('open');
+  setTimeout(() => { overlay.style.display = 'none'; document.body.style.overflow = ''; }, 320);
+}
+
+function selectModalColor(name, hex, chipEl) {
+  document.querySelectorAll('#mpd-colors-list .color-chip').forEach(c => c.classList.remove('selected'));
+  chipEl.classList.add('selected');
+  modalSelectedColor = { name, hex };
+  document.getElementById('mpd-color-label').textContent = name;
+}
+
+function modalChQty(delta) {
+  const p = CATALOG.find(x => x.id === modalProductId);
+  if (!p) return;
+  const newQty = modalQty + delta;
+  if (newQty < 1) return;
+  if (newQty > (p.stock || p.Stock || 999)) { showToast(`Máximo ${p.stock || p.Stock} unidades`); return; }
+  modalQty = newQty;
+  document.getElementById('mpd-qty').textContent = modalQty;
+}
+
+function modalAddToCart() {
+  if (!modalProductId) return;
+  const p = CATALOG.find(x => x.id === modalProductId);
+  if (!p) return;
+  const hasColors = Array.isArray(p.colors) && p.colors.length > 0;
+  if (hasColors && !modalSelectedColor) { showToast('Selecciona un color primero'); return; }
+  cart2[modalProductId] = modalQty;
+  if (modalSelectedColor) {
+    if (!window.cartColors) window.cartColors = {};
+    window.cartColors[modalProductId] = modalSelectedColor;
+  }
+  updateCartUI();
+  renderCatalog();
+  closeProductModal();
+  showToast('Agregado al carrito ✓');
+}
+
 // API key lives securely on Vercel server
 document.getElementById('screen-apikey').style.display='none';
 
@@ -2090,6 +2224,43 @@ document.getElementById('reg-phone').addEventListener('keydown',e=>{if(e.key==='
 document.getElementById('reg-cc').addEventListener('keydown',e=>{if(e.key==='Enter')submitRegistro();});
 document.getElementById('login-user').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('login-pass').focus();});
 </script>
+</div>
+
+<!-- MODAL DETALLE PRODUCTO -->
+<div id="modal-product-detail" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(28,26,20,0.55);" onclick="closeProductModal()">
+  <div id="modal-product-sheet" onclick="event.stopPropagation()"
+       style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;max-height:88vh;overflow-y:auto;transform:translateY(100%);transition:transform .32s cubic-bezier(.25,.8,.25,1);">
+    <div id="mpd-img-wrap" style="width:100%;height:260px;background:#F0EAD8;border-radius:20px 20px 0 0;overflow:hidden;position:relative;flex-shrink:0;">
+      <img id="mpd-img" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:20px 20px 0 0;">
+      <div id="mpd-img-fallback" style="display:none;font-size:64px;width:100%;height:100%;align-items:center;justify-content:center;">📦</div>
+      <span id="mpd-stock-badge" style="position:absolute;top:12px;right:12px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:500;"></span>
+      <button onclick="closeProductModal()" style="position:absolute;top:12px;left:12px;width:32px;height:32px;border-radius:50%;background:rgba(28,26,20,0.45);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
+    </div>
+    <div style="padding:18px 20px 32px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px;">
+        <h2 id="mpd-name" style="font-family:'Playfair Display',serif;font-size:20px;font-weight:500;color:#2A2618;margin:0;line-height:1.3;flex:1;"></h2>
+        <span id="mpd-price" style="font-size:18px;font-weight:500;color:#7A6030;white-space:nowrap;flex-shrink:0;"></span>
+      </div>
+      <p id="mpd-desc" style="font-size:14px;color:#7A7060;line-height:1.6;margin:0 0 18px 0;"></p>
+      <div id="mpd-colors-section" style="display:none;margin-bottom:20px;">
+        <p style="font-size:12px;font-weight:500;color:#2A2618;margin:0 0 10px 0;text-transform:uppercase;letter-spacing:0.04em;">Color</p>
+        <div id="mpd-colors-list" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+        <p id="mpd-color-label" style="font-size:12px;color:#7A7060;margin:8px 0 0 0;min-height:16px;"></p>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <span style="font-size:13px;font-weight:500;color:#2A2618;">Cantidad</span>
+        <div style="display:flex;align-items:center;border:1.5px solid rgba(120,90,30,0.28);border-radius:24px;background:#fff;">
+          <button onclick="modalChQty(-1)" style="width:40px;height:40px;border:none;background:transparent;font-size:20px;cursor:pointer;color:#7A7060;line-height:1;">−</button>
+          <span id="mpd-qty" style="min-width:32px;text-align:center;font-size:15px;font-weight:500;color:#2A2618;">1</span>
+          <button onclick="modalChQty(1)" style="width:40px;height:40px;border:none;background:transparent;font-size:20px;cursor:pointer;color:#7A7060;line-height:1;">+</button>
+        </div>
+      </div>
+      <button id="mpd-btn-add" onclick="modalAddToCart()"
+              style="width:100%;padding:15px;background:#1C1A14;color:#E2C07E;border:none;border-radius:14px;font-size:15px;font-weight:500;cursor:pointer;font-family:'Outfit',sans-serif;">
+        Agregar al carrito
+      </button>
+    </div>
+  </div>
 </div>
 </body>
 </html>
