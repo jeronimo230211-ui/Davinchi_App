@@ -496,6 +496,66 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
   #catalog-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
+/* ── Modal detalle producto — layout desktop ── */
+@media (min-width: 768px) {
+  /* El overlay ya está fixed inset:0 — solo ajustamos el sheet */
+  #modal-product-sheet {
+    /* Dejar de ser bottom-sheet: pasar a modal centrado */
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    bottom: auto !important;
+    right: auto !important;
+    transform: translate(-50%, -60%) !important;
+    transition: transform .32s cubic-bezier(.25,.8,.25,1), opacity .32s ease !important;
+    opacity: 0;
+
+    width: min(820px, calc(100vw - 280px - 48px));
+    max-height: 88vh;
+    border-radius: 20px !important;
+
+    /* Layout 2 columnas: imagen izquierda, detalles derecha */
+    display: flex !important;
+    flex-direction: row !important;
+    overflow: hidden !important;
+  }
+
+  #modal-product-sheet.open {
+    transform: translate(-50%, -50%) !important;
+    opacity: 1 !important;
+  }
+
+  /* Columna izquierda — imagen */
+  #mpd-img-wrap {
+    width: 340px !important;
+    min-width: 340px !important;
+    height: auto !important;
+    min-height: 420px !important;
+    border-radius: 20px 0 0 20px !important;
+    flex-shrink: 0;
+  }
+
+  #mpd-img {
+    border-radius: 20px 0 0 20px !important;
+  }
+
+  /* Columna derecha — detalles */
+  #modal-product-sheet > div:last-child {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 28px !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* Nombre más grande en desktop */
+  #mpd-name { font-size: 24px !important; }
+
+  /* Precio más prominente */
+  #mpd-price { font-size: 22px !important; }
+}
+
 @media (min-width: 1280px) {
   #catalog-grid { padding: 24px; gap: 20px; }
   #chat-messages { padding: 24px 32px; }
