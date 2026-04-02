@@ -283,9 +283,268 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
 }
 .color-chip.selected { border-color:#C8A45A;transform:scale(1.15); }
 .color-chip:focus { outline:2px solid #C8A45A;outline-offset:2px; }
+
+/* ═══════════════════════════════════════════════════
+   LAYOUT DESKTOP — min-width: 768px
+   El móvil no se toca. Todo va dentro de @media.
+   ═══════════════════════════════════════════════════ */
+
+#desktop-sidebar { display: none; } /* Oculto en móvil */
+
+@media (min-width: 768px) {
+
+  /* ── Body y estructura general ── */
+  body {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: flex-start;
+    overflow: auto;
+    position: static;
+    height: 100vh;
+  }
+
+  /* ── Sidebar ── */
+  #desktop-sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 240px;
+    min-width: 240px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background: #1C1A14;
+    border-right: 1px solid rgba(200,164,90,0.15);
+    z-index: 100;
+    overflow-y: auto;
+  }
+
+  .dsb-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid rgba(200,164,90,0.15);
+  }
+  .dsb-logo-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: #C8A45A;
+    letter-spacing: 0.02em;
+  }
+  .dsb-logo-gem { color: #C8A45A; font-size: 14px; }
+
+  .dsb-user {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(200,164,90,0.12);
+  }
+  .dsb-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(200,164,90,0.2);
+    border: 1.5px solid rgba(200,164,90,0.4);
+    color: #C8A45A;
+    font-size: 15px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .dsb-user-name {
+    font-size: 13px; font-weight: 600;
+    color: #F0EAD8; line-height: 1.3;
+  }
+  .dsb-user-role {
+    font-size: 11px; color: #C8A45A;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+
+  .dsb-nav {
+    display: flex !important;
+    flex-direction: column;
+    padding: 12px 0;
+    flex: 1;
+  }
+  .dsb-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 20px;
+    height: 46px;
+    background: transparent;
+    border: none;
+    border-left: 3px solid transparent;
+    color: rgba(240,234,216,0.65);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: left;
+    transition: background .15s, color .15s, border-color .15s;
+    position: relative;
+    width: 100%;
+  }
+  .dsb-nav-item:hover {
+    background: rgba(200,164,90,0.08);
+    color: #F0EAD8;
+  }
+  .dsb-nav-item.active {
+    background: rgba(200,164,90,0.12);
+    border-left-color: #C8A45A;
+    color: #C8A45A;
+    font-weight: 500;
+  }
+  .dsb-nav-icon { font-size: 16px; width: 20px; text-align: center; }
+  .dsb-nav-badge {
+    margin-left: auto;
+    background: #C0442A;
+    color: #fff;
+    font-size: 10px; font-weight: 700;
+    min-width: 18px; height: 18px;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 4px;
+  }
+
+  .dsb-footer {
+    display: flex !important;
+    flex-direction: column;
+    border-top: 1px solid rgba(200,164,90,0.12);
+    padding: 8px 0;
+  }
+  .dsb-logout {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 20px; height: 44px;
+    background: transparent; border: none;
+    color: rgba(192,68,42,0.8);
+    font-family: 'Outfit', sans-serif; font-size: 13px;
+    cursor: pointer; width: 100%; text-align: left;
+    transition: color .15s, background .15s;
+  }
+  .dsb-logout:hover { color: #C0442A; background: rgba(192,68,42,0.08); }
+
+  /* ── App container — desplazada a la derecha del sidebar ── */
+  .app {
+    margin-left: 240px;
+    max-width: none;
+    width: calc(100vw - 240px);
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  /* ── Nav bottom — oculta en desktop ── */
+  .nav-bottom { display: none !important; }
+
+  /* ── FAB carrito — reposicionar ── */
+  #fab-cart { right: 24px; bottom: 24px; }
+
+  /* ── Catálogo — grid 2 columnas en desktop ── */
+  #catalog-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    padding: 16px;
+  }
+
+  /* ── Chat — burbujas con max-width razonable ── */
+  .bubble { max-width: 60%; }
+  #chat-messages { padding: 20px 24px; }
+  #chat-input-row { padding: 12px 24px; }
+
+  /* ── Pantallas de login/registro — centradas dentro del área ── */
+  #screen-login,
+  #screen-register,
+  #screen-apikey {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── Panel vendedor — tabla de pedidos ── */
+  #vendor-content .vendor-order {
+    display: grid;
+    grid-template-columns: 80px 1fr 120px 130px 100px;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-radius: 0;
+    border-bottom: 1px solid rgba(200,164,90,0.1);
+    margin: 0;
+  }
+  /* Header de tabla — insertar via JS o ocultar los labels individuales */
+  #vendor-content .vendor-order .order-id { font-size: 12px; color: #7A7060; }
+  #vendor-content .vendor-order .order-client { font-weight: 500; }
+  #vendor-content .vendor-order .order-total { font-weight: 600; color: #7A6030; }
+
+  /* ── CEO KPIs — en fila ── */
+  #vendor-resumen-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    padding: 20px;
+  }
+
+}
+
+/* ── 3 columnas en catálogo desde 1024px ── */
+@media (min-width: 1024px) {
+  #desktop-sidebar { width: 260px; }
+  .app { margin-left: 260px; width: calc(100vw - 260px); }
+  #catalog-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (min-width: 1280px) {
+  #catalog-grid { padding: 24px; gap: 20px; }
+  #chat-messages { padding: 24px 32px; }
+}
 </style>
 </head>
 <body>
+
+<!-- SIDEBAR DESKTOP — solo visible en >= 768px -->
+<aside id="desktop-sidebar">
+  <div class="dsb-logo">
+    <span class="dsb-logo-text">Davinchi</span>
+    <span class="dsb-logo-gem">✦</span>
+  </div>
+
+  <div class="dsb-user" id="dsb-user-info" style="display:none;">
+    <div class="dsb-avatar" id="dsb-avatar">D</div>
+    <div>
+      <div class="dsb-user-name" id="dsb-user-name">—</div>
+      <div class="dsb-user-role" id="dsb-user-role">—</div>
+    </div>
+  </div>
+
+  <nav class="dsb-nav" id="dsb-nav" style="display:none;">
+    <button class="dsb-nav-item" id="dsb-btn-catalog"  onclick="switchScreen('catalog')">
+      <span class="dsb-nav-icon">🛍</span><span>Catálogo</span>
+    </button>
+    <button class="dsb-nav-item" id="dsb-btn-cart"     onclick="switchScreen('cart')">
+      <span class="dsb-nav-icon">🛒</span><span>Carrito</span>
+      <span class="dsb-nav-badge" id="dsb-cart-badge" style="display:none;">0</span>
+    </button>
+    <button class="dsb-nav-item" id="dsb-btn-chat"     onclick="switchScreen('chat')">
+      <span class="dsb-nav-icon">💬</span><span>Chat IA</span>
+    </button>
+    <button class="dsb-nav-item" id="dsb-btn-myorders" onclick="switchScreen('myorders')">
+      <span class="dsb-nav-icon">📦</span><span>Mis Pedidos</span>
+    </button>
+    <button class="dsb-nav-item" id="dsb-btn-vendor"   onclick="switchScreen('vendor')" style="display:none;">
+      <span class="dsb-nav-icon">📊</span><span>Panel</span>
+    </button>
+  </nav>
+
+  <div class="dsb-footer" id="dsb-footer" style="display:none;">
+    <button class="dsb-logout" onclick="doLogout ? doLogout() : location.reload()">
+      <span>⬡</span> Cerrar sesión
+    </button>
+  </div>
+</aside>
+
 <div class="app">
 
 <input type="hidden" id="api-key-store" value="">
@@ -724,6 +983,8 @@ function loadClientAndEnter(client){
   const cat = document.getElementById('screen-catalog');
   cat.classList.add('active'); cat.style.display='flex';
   document.getElementById('nav-catalog').classList.add('active');
+  updateSidebarUser();
+  updateSidebarActive('catalog');
 }
 
 function clearRegistro(){
@@ -764,6 +1025,7 @@ function doLogin(){
   // Mostrar onboarding según rol — solo la primera vez (localStorage lo controla)
   if (v.role === 'Vendedor') showOnboarding('vendor');
   if (v.role === 'CEO')      showOnboarding('ceo');
+  updateSidebarUser();
 }
 function doLogout(){
   currentVendor=null;
@@ -1549,6 +1811,7 @@ function updateCartUI(){
     fab.style.display='none';
   }
   renderCartScreen();
+  updateSidebarCartBadge(c);
 }
 
 function fabCartAction(){
@@ -1820,6 +2083,7 @@ function switchScreen(name){
   if(fab){
     fab.style.display=(name==='catalog' && cartCount()>0)?'flex':'none';
   }
+  updateSidebarActive(name);
 }
 
 const VENDORS_WA = [
@@ -1864,6 +2128,79 @@ function showToast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+// ── Sidebar desktop — sincronización ────────────────────────────────────────
+
+function updateSidebarActive(screenId) {
+  // Marcar item activo en sidebar
+  document.querySelectorAll('.dsb-nav-item').forEach(btn => btn.classList.remove('active'));
+  const map = {
+    'catalog':  'dsb-btn-catalog',
+    'cart':     'dsb-btn-cart',
+    'chat':     'dsb-btn-chat',
+    'myorders': 'dsb-btn-myorders',
+    'vendor':   'dsb-btn-vendor'
+  };
+  const activeId = map[screenId];
+  if (activeId) {
+    const btn = document.getElementById(activeId);
+    if (btn) btn.classList.add('active');
+  }
+}
+
+function updateSidebarUser() {
+  // Poblar datos de usuario en el sidebar
+  const userInfo = document.getElementById('dsb-user-info');
+  const nav      = document.getElementById('dsb-nav');
+  const footer   = document.getElementById('dsb-footer');
+
+  if (!userInfo) return;
+
+  // Intentar desde currentVendor (panel vendedor/CEO)
+  if (typeof currentVendor !== 'undefined' && currentVendor) {
+    document.getElementById('dsb-avatar').textContent = currentVendor.name ? currentVendor.name[0].toUpperCase() : 'V';
+    document.getElementById('dsb-user-name').textContent = currentVendor.name || 'Usuario';
+    document.getElementById('dsb-user-role').textContent = currentVendor.role || 'Vendedor';
+    userInfo.style.display = 'flex';
+    nav.style.display      = 'flex';
+    footer.style.display   = 'flex';
+    // Mostrar tab Panel solo para vendedores/CEO
+    const vendorBtn = document.getElementById('dsb-btn-vendor');
+    if (vendorBtn) vendorBtn.style.display = 'flex';
+    // Ocultar tabs de cliente
+    const catalogBtn  = document.getElementById('dsb-btn-catalog');
+    const cartBtn     = document.getElementById('dsb-btn-cart');
+    const chatBtn     = document.getElementById('dsb-btn-chat');
+    const myordersBtn = document.getElementById('dsb-btn-myorders');
+    if (catalogBtn)  catalogBtn.style.display  = 'none';
+    if (cartBtn)     cartBtn.style.display     = 'none';
+    if (chatBtn)     chatBtn.style.display     = 'none';
+    if (myordersBtn) myordersBtn.style.display = 'none';
+    return;
+  }
+
+  // Intentar desde localStorage cliente
+  try {
+    const client = JSON.parse(localStorage.getItem('dav_client') || '{}');
+    if (client.shop) {
+      document.getElementById('dsb-avatar').textContent = client.contact ? client.contact[0].toUpperCase() : 'C';
+      document.getElementById('dsb-user-name').textContent = client.shop;
+      document.getElementById('dsb-user-role').textContent = 'Cliente';
+      userInfo.style.display = 'flex';
+      nav.style.display      = 'flex';
+      footer.style.display   = 'flex';
+      const vendorBtn = document.getElementById('dsb-btn-vendor');
+      if (vendorBtn) vendorBtn.style.display = 'none';
+    }
+  } catch(e) {}
+}
+
+function updateSidebarCartBadge(count) {
+  const badge = document.getElementById('dsb-cart-badge');
+  if (!badge) return;
+  if (count > 0) { badge.textContent = count; badge.style.display = 'flex'; }
+  else           { badge.style.display = 'none'; }
 }
 
 // ── ONBOARDING v2 — Tour guiado con spotlight ─────────────────────────────
