@@ -422,7 +422,7 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
   }
 
   /* ── Nav bottom — oculta en desktop ── */
-  .nav-bottom { display: none !important; }
+  #client-nav { display: none !important; }
 
   /* ── FAB carrito — reposicionar ── */
   #fab-cart { right: 24px; bottom: 24px; }
@@ -575,10 +575,10 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
       <span class="dsb-nav-badge" id="dsb-cart-badge" style="display:none;">0</span>
     </button>
     <button class="dsb-nav-item" id="dsb-btn-chat"     onclick="switchScreen('chat')">
-      <span class="dsb-nav-icon">💬</span><span>Chat IA</span>
+      <span class="dsb-nav-icon">💬</span><span>Pedir</span>
     </button>
     <button class="dsb-nav-item" id="dsb-btn-myorders" onclick="switchScreen('myorders')">
-      <span class="dsb-nav-icon">📦</span><span>Mis Pedidos</span>
+      <span class="dsb-nav-icon">📦</span><span>Seguimiento</span>
     </button>
     <button class="dsb-nav-item" id="dsb-btn-vendor"   onclick="switchScreen('vendor')" style="display:none;">
       <span class="dsb-nav-icon">📊</span><span>Panel</span>
@@ -749,7 +749,7 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
   </button>
   <button class="nav-btn" id="nav-myorders" onclick="switchScreen('myorders')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-    Pedidos
+    Seguimiento
     <span class="nav-badge" id="orders-badge" style="display:none">0</span>
   </button>
 </div>
