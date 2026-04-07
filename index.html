@@ -18,6 +18,7 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html{height:100%;height:-webkit-fill-available;}
 body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);display:flex;justify-content:center;align-items:flex-start;height:100vh;height:100dvh;overflow:hidden;position:fixed;width:100%;}
+body.auth-mode{justify-content:center;}
 .app{width:100%;max-width:440px;height:100vh;height:100dvh;background:var(--surface);display:flex;flex-direction:column;position:relative;overflow:hidden;}
 
 /* ── SCREENS — only .active is visible ── */
@@ -421,6 +422,15 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
     overflow-x: hidden;
   }
 
+  /* ── Modo auth (login / registro) — sidebar oculto, app centrada ── */
+  body.auth-mode #desktop-sidebar { display: none !important; }
+  body.auth-mode .app {
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    max-width: 440px;
+  }
+
   /* ── Nav bottom — oculta en desktop ── */
   #client-nav { display: none !important; }
 
@@ -549,7 +559,7 @@ body{font-family:'Outfit',sans-serif;background:#EDE6D6;color:var(--text);displa
 }
 </style>
 </head>
-<body>
+<body class="auth-mode">
 
 <!-- SIDEBAR DESKTOP — solo visible en >= 768px -->
 <aside id="desktop-sidebar">
@@ -885,6 +895,7 @@ function hideAll(){
 // Muestra la pantalla de login (entrada principal de la app)
 function showLanding(){
   hideAll();
+  document.body.classList.add('auth-mode');
   cart2={}; chatHistory=[]; clientOrders=[]; pendingOrder=null;
   shopName=''; contactName='';
   document.getElementById('orders-badge').style.display='none';
@@ -900,6 +911,7 @@ function showLanding(){
 // Muestra la pantalla de registro de nuevo cliente
 function showRegister(){
   hideAll();
+  document.body.classList.add('auth-mode');
   ['reg-shop','reg-contact','reg-phone','reg-cc','reg-usuario','reg-pass'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
@@ -986,6 +998,7 @@ function enterAppReturning(){
 }
 
 function loadClientAndEnter(client){
+  document.body.classList.remove('auth-mode');
   shopName    = client.shop;
   contactName = client.contact;
   document.getElementById('client-chip').textContent = shopName;
@@ -1054,6 +1067,7 @@ async function doLogin(){
 
 function enterVendorPanel(v){
   currentVendor=v;
+  document.body.classList.remove('auth-mode');
   document.getElementById('login-user').value='';
   document.getElementById('login-pass').value='';
   hideAll();
