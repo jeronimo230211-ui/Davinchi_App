@@ -265,17 +265,25 @@ body.auth-mode{justify-content:center;}
 #modal-product-sheet { -webkit-overflow-scrolling: touch; }
 #modal-product-sheet.open { transform: translateY(0) !important; }
 
-/* ── CAROUSEL DE VISTAS ── */
-.mpd-carousel { position:relative; width:100%; height:100%; overflow:hidden; }
-.mpd-carousel-track { display:flex; height:100%; transition:transform .3s ease; will-change:transform; }
-.mpd-carousel-slide { min-width:100%; height:100%; flex-shrink:0; }
-.mpd-carousel-slide img { width:100%; height:100%; object-fit:cover; display:block; }
-.mpd-carousel-btn { position:absolute; top:50%; transform:translateY(-50%); background:rgba(28,26,20,0.50); border:none; color:#fff; width:34px; height:34px; border-radius:50%; cursor:pointer; font-size:20px; display:flex; align-items:center; justify-content:center; z-index:3; line-height:1; transition:opacity .2s; }
-.mpd-carousel-btn.prev { left:10px; }
-.mpd-carousel-btn.next { right:10px; }
-.mpd-carousel-dots { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); display:flex; gap:5px; z-index:3; }
-.mpd-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,0.5); cursor:pointer; transition:background .2s, transform .2s; }
-.mpd-dot.active { background:#fff; transform:scale(1.35); }
+/* ── CAROUSEL DE VISTAS v2 ── */
+#mpd-img-wrap { display:flex; flex-direction:column; }
+#mpd-main-area { position:relative; flex:1; min-height:280px; background:#F8F4EE; overflow:hidden; }
+.mpd-carousel { position:absolute; inset:0; }
+.mpd-carousel-track { display:flex; height:100%; transition:transform .38s cubic-bezier(.25,.8,.25,1); will-change:transform; }
+.mpd-carousel-slide { min-width:100%; height:100%; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:#F8F4EE; }
+.mpd-carousel-slide img { max-width:100%; max-height:100%; width:auto; height:100%; object-fit:contain; display:block; pointer-events:none; }
+.mpd-carousel-btn { position:absolute; top:50%; transform:translateY(-50%); background:rgba(28,26,20,0.38); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); border:none; color:#fff; width:40px; height:40px; border-radius:50%; cursor:pointer; font-size:24px; display:flex; align-items:center; justify-content:center; z-index:4; line-height:1; transition:opacity .2s, background .2s; }
+.mpd-carousel-btn:hover { background:rgba(28,26,20,0.65); }
+.mpd-carousel-btn.prev { left:12px; }
+.mpd-carousel-btn.next { right:12px; }
+.mpd-counter { position:absolute; bottom:12px; right:12px; background:rgba(28,26,20,0.48); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); color:#fff; font-size:11px; font-weight:600; padding:3px 9px; border-radius:10px; z-index:4; font-family:'Outfit',sans-serif; letter-spacing:.03em; }
+/* Tira de miniaturas */
+#mpd-thumbs { display:flex; gap:7px; padding:10px 14px; overflow-x:auto; background:#EDE5D4; scrollbar-width:none; flex-shrink:0; }
+#mpd-thumbs::-webkit-scrollbar { display:none; }
+.mpd-thumb { width:60px; height:60px; border-radius:9px; overflow:hidden; flex-shrink:0; cursor:pointer; border:2.5px solid transparent; transition:border-color .18s, transform .18s, box-shadow .18s; background:#D8CFBC; }
+.mpd-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+.mpd-thumb.active { border-color:#C8A45A; transform:scale(1.08); box-shadow:0 2px 10px rgba(200,164,90,0.35); }
+.mpd-thumb:not(.active):hover { border-color:rgba(200,164,90,0.45); transform:scale(1.04); }
 
 .color-chip {
   width:36px;height:36px;border-radius:50%;
@@ -537,20 +545,16 @@ body.auth-mode{justify-content:center;}
 
   /* Columna izquierda — imagen */
   #mpd-img-wrap {
-    width: 340px !important;
-    min-width: 340px !important;
+    width: 360px !important;
+    min-width: 360px !important;
     height: auto !important;
-    min-height: 420px !important;
     border-radius: 20px 0 0 20px !important;
     flex-shrink: 0;
+    overflow: hidden;
   }
-
-  #mpd-img-wrap .mpd-carousel-slide img {
-    border-radius: 0 !important;
-  }
-  #mpd-img-wrap {
-    border-radius: 20px 0 0 20px !important;
-  }
+  #mpd-main-area { min-height: 400px !important; }
+  #mpd-thumbs { gap:9px; padding:12px 16px; }
+  .mpd-thumb { width:68px; height:68px; border-radius:10px; }
 
   /* Columna derecha — detalles */
   #modal-product-sheet > div:last-child {
@@ -1835,12 +1839,19 @@ let cart2={};
 function cartTotal(){return Object.entries(cart2).reduce((s,[id,q])=>{const p=CATALOG.find(x=>x.id===id);return s+(p?p.price*q:0);},0);}
 function cartCount(){return Object.values(cart2).reduce((s,q)=>s+q,0);}
 
+function getVista1(p) {
+  const name = p.name || p.nombre || '';
+  if (PRODUCT_VISTAS[name]) return `assets/vistas/${encodeURIComponent(name)}_vista1.jpg`;
+  if (p.img) return p.img.startsWith('http') ? p.img : encodeURI(p.img);
+  return '';
+}
+
 function renderCatalog(){
   document.getElementById('catalog-grid').innerHTML=CATALOG.map(p=>{
     const q=cart2[p.id]||0;
-    const imgSrc = p.img ? (p.img.startsWith('http') ? p.img : encodeURI(p.img)) : '';
+    const imgSrc = getVista1(p);
     const visual = imgSrc
-      ? `<img src="${imgSrc}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:16px 16px 0 0;" onerror="this.parentNode.innerHTML='<div style=\\'font-size:48px;display:flex;align-items:center;justify-content:center;height:100%\\'>📦</div>'">`
+      ? `<img src="${imgSrc}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:16px 16px 0 0;" onerror="this.src='${encodeURI(p.img||'')}';this.onerror=()=>{this.parentNode.innerHTML='<div style=\\'font-size:48px;display:flex;align-items:center;justify-content:center;height:100%\\'>📦</div>'}">`
       : `<div style="font-size:48px;display:flex;align-items:center;justify-content:center;height:100%;">📦</div>`;
     return `<div onclick="openProductModal('${p.id}')" style="cursor:pointer;background:#fff;border:1px solid rgba(120,90,30,0.14);border-radius:16px;box-shadow:0 2px 16px rgba(60,40,0,0.08);width:100%;">
       <div class="product-img-wrap" style="height:240px;overflow:hidden;background:#F0EAD8;position:relative;width:100%;border-radius:16px 16px 0 0;">
@@ -1916,7 +1927,7 @@ function renderCartScreen(){
   }
   list.innerHTML=items.map(([id,q])=>{
     const p=CATALOG.find(x=>x.id===id);
-    const thumbSrc = p.img ? (p.img.startsWith('http') ? p.img : p.img) : '';
+    const thumbSrc = getVista1(p);
     const thumb = thumbSrc
       ? `<img src="${thumbSrc}" style="width:52px;height:52px;object-fit:cover;border-radius:8px;flex-shrink:0;" onerror="this.style.display='none'">`
       : `<div style="width:52px;height:52px;background:#F0EAD8;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">📦</div>`;
@@ -2677,7 +2688,8 @@ function closeProductModal() {
 function buildCarousel(productName, fallbackImg) {
   const count   = PRODUCT_VISTAS[productName] || 0;
   const track   = document.getElementById('mpd-carousel-track');
-  const dotsEl  = document.getElementById('mpd-dots');
+  const thumbsEl= document.getElementById('mpd-thumbs');
+  const counter = document.getElementById('mpd-counter');
   const fallEl  = document.getElementById('mpd-img-fallback');
   const btnPrev = document.getElementById('mpd-btn-prev');
   const btnNext = document.getElementById('mpd-btn-next');
@@ -2695,7 +2707,9 @@ function buildCarousel(productName, fallbackImg) {
 
   if (modalVistas.length === 0) {
     track.innerHTML = '';
-    dotsEl.innerHTML = '';
+    thumbsEl.innerHTML = '';
+    thumbsEl.style.display = 'none';
+    counter.style.display = 'none';
     fallEl.style.display = 'flex';
     btnPrev.style.display = 'none';
     btnNext.style.display = 'none';
@@ -2703,30 +2717,36 @@ function buildCarousel(productName, fallbackImg) {
   }
 
   fallEl.style.display = 'none';
-  const errHTML = `<div style="font-size:48px;display:flex;align-items:center;justify-content:center;height:100%;background:#F0EAD8;">📦</div>`;
+
+  // Slides principales
   track.innerHTML = modalVistas.map(src =>
-    `<div class="mpd-carousel-slide"><img src="${src}" alt="" loading="lazy" onerror="this.parentNode.innerHTML='${errHTML.replace(/'/g,"\\'")}'" ></div>`
+    `<div class="mpd-carousel-slide"><img src="${src}" alt="" loading="lazy" onerror="this.style.display='none';this.parentNode.style.background='#F0EAD8'"></div>`
   ).join('');
 
+  // Miniaturas
   if (modalVistas.length > 1) {
-    dotsEl.innerHTML = modalVistas.map((_, i) =>
-      `<div class="mpd-dot${i===0?' active':''}" onclick="goVista(${i})"></div>`
+    thumbsEl.style.display = 'flex';
+    thumbsEl.innerHTML = modalVistas.map((src, i) =>
+      `<div class="mpd-thumb${i===0?' active':''}" onclick="goVista(${i})">
+        <img src="${src}" alt="" loading="lazy" onerror="this.style.display='none'">
+      </div>`
     ).join('');
     btnPrev.style.display = 'flex';
     btnNext.style.display = 'flex';
+    counter.style.display = 'block';
   } else {
-    dotsEl.innerHTML = '';
+    thumbsEl.style.display = 'none';
+    thumbsEl.innerHTML = '';
     btnPrev.style.display = 'none';
     btnNext.style.display = 'none';
+    counter.style.display = 'none';
   }
 
-  // Swipe touch en móvil
-  let touchStartX = 0;
-  track.ontouchstart = e => { touchStartX = e.touches[0].clientX; };
-  track.ontouchend   = e => {
-    const dx = e.changedTouches[0].clientX - touchStartX;
-    if (Math.abs(dx) > 40) { dx < 0 ? nextVista() : prevVista(); }
-  };
+  // Swipe en móvil
+  let txStart = 0, txMove = 0;
+  track.ontouchstart = e => { txStart = e.touches[0].clientX; txMove = 0; };
+  track.ontouchmove  = e => { txMove = e.touches[0].clientX - txStart; };
+  track.ontouchend   = () => { if (Math.abs(txMove) > 45) { txMove < 0 ? nextVista() : prevVista(); } };
 
   updateCarousel();
 }
@@ -2739,12 +2759,26 @@ function prevVista() { goVista(modalCurrentVista - 1); }
 function nextVista() { goVista(modalCurrentVista + 1); }
 
 function updateCarousel() {
-  document.getElementById('mpd-carousel-track').style.transform = `translateX(-${modalCurrentVista * 100}%)`;
-  document.querySelectorAll('.mpd-dot').forEach((d, i) => d.classList.toggle('active', i === modalCurrentVista));
+  const cur = modalCurrentVista;
+  const tot = modalVistas.length;
+  document.getElementById('mpd-carousel-track').style.transform = `translateX(-${cur * 100}%)`;
+
+  // Miniaturas — activa la seleccionada y hace scroll hacia ella
+  const thumbs = document.querySelectorAll('.mpd-thumb');
+  thumbs.forEach((t, i) => {
+    t.classList.toggle('active', i === cur);
+    if (i === cur) t.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
+  });
+
+  // Contador
+  const counter = document.getElementById('mpd-counter');
+  if (counter && tot > 1) counter.textContent = `${cur + 1} / ${tot}`;
+
+  // Opacidad flechas en extremos
   const btnP = document.getElementById('mpd-btn-prev');
   const btnN = document.getElementById('mpd-btn-next');
-  if (btnP) btnP.style.opacity = modalCurrentVista === 0 ? '0.3' : '1';
-  if (btnN) btnN.style.opacity = modalCurrentVista === modalVistas.length - 1 ? '0.3' : '1';
+  if (btnP) btnP.style.opacity = cur === 0 ? '0.25' : '1';
+  if (btnN) btnN.style.opacity = cur === tot - 1 ? '0.25' : '1';
 }
 
 function selectModalColor(name, hex, chipEl) {
@@ -2797,16 +2831,21 @@ document.getElementById('login-user').addEventListener('keydown',e=>{if(e.key===
 <div id="modal-product-detail" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(28,26,20,0.55);" onclick="closeProductModal()">
   <div id="modal-product-sheet" onclick="event.stopPropagation()"
        style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;max-height:88vh;overflow-y:auto;transform:translateY(100%);transition:transform .32s cubic-bezier(.25,.8,.25,1);">
-    <div id="mpd-img-wrap" style="width:100%;height:260px;background:#F0EAD8;border-radius:20px 20px 0 0;overflow:hidden;position:relative;flex-shrink:0;">
-      <div class="mpd-carousel">
-        <div id="mpd-carousel-track" class="mpd-carousel-track"></div>
-        <button class="mpd-carousel-btn prev" id="mpd-btn-prev" onclick="prevVista()">‹</button>
-        <button class="mpd-carousel-btn next" id="mpd-btn-next" onclick="nextVista()">›</button>
-        <div id="mpd-dots" class="mpd-carousel-dots"></div>
+    <div id="mpd-img-wrap" style="width:100%;background:#F8F4EE;border-radius:20px 20px 0 0;flex-shrink:0;">
+      <!-- Área imagen principal -->
+      <div id="mpd-main-area">
+        <div class="mpd-carousel">
+          <div id="mpd-carousel-track" class="mpd-carousel-track"></div>
+          <button class="mpd-carousel-btn prev" id="mpd-btn-prev" onclick="prevVista()">‹</button>
+          <button class="mpd-carousel-btn next" id="mpd-btn-next" onclick="nextVista()">›</button>
+          <div id="mpd-counter" class="mpd-counter" style="display:none;"></div>
+        </div>
+        <div id="mpd-img-fallback" style="display:none;font-size:64px;width:100%;height:100%;align-items:center;justify-content:center;position:absolute;top:0;left:0;background:#F8F4EE;">📦</div>
+        <span id="mpd-stock-badge" style="position:absolute;top:12px;right:12px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:500;z-index:5;"></span>
+        <button onclick="closeProductModal()" style="position:absolute;top:12px;left:12px;width:34px;height:34px;border-radius:50%;background:rgba(28,26,20,0.45);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;z-index:5;">✕</button>
       </div>
-      <div id="mpd-img-fallback" style="display:none;font-size:64px;width:100%;height:100%;align-items:center;justify-content:center;position:absolute;top:0;left:0;background:#F0EAD8;">📦</div>
-      <span id="mpd-stock-badge" style="position:absolute;top:12px;right:12px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:500;z-index:4;"></span>
-      <button onclick="closeProductModal()" style="position:absolute;top:12px;left:12px;width:32px;height:32px;border-radius:50%;background:rgba(28,26,20,0.45);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;z-index:4;">✕</button>
+      <!-- Tira de miniaturas -->
+      <div id="mpd-thumbs"></div>
     </div>
     <div style="padding:18px 20px 32px;">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px;">
