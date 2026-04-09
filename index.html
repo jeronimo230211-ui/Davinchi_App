@@ -264,6 +264,19 @@ body.auth-mode{justify-content:center;}
 /* ── MODAL DETALLE PRODUCTO ── */
 #modal-product-sheet { -webkit-overflow-scrolling: touch; }
 #modal-product-sheet.open { transform: translateY(0) !important; }
+
+/* ── CAROUSEL DE VISTAS ── */
+.mpd-carousel { position:relative; width:100%; height:100%; overflow:hidden; }
+.mpd-carousel-track { display:flex; height:100%; transition:transform .3s ease; will-change:transform; }
+.mpd-carousel-slide { min-width:100%; height:100%; flex-shrink:0; }
+.mpd-carousel-slide img { width:100%; height:100%; object-fit:cover; display:block; }
+.mpd-carousel-btn { position:absolute; top:50%; transform:translateY(-50%); background:rgba(28,26,20,0.50); border:none; color:#fff; width:34px; height:34px; border-radius:50%; cursor:pointer; font-size:20px; display:flex; align-items:center; justify-content:center; z-index:3; line-height:1; transition:opacity .2s; }
+.mpd-carousel-btn.prev { left:10px; }
+.mpd-carousel-btn.next { right:10px; }
+.mpd-carousel-dots { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); display:flex; gap:5px; z-index:3; }
+.mpd-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,0.5); cursor:pointer; transition:background .2s, transform .2s; }
+.mpd-dot.active { background:#fff; transform:scale(1.35); }
+
 .color-chip {
   width:36px;height:36px;border-radius:50%;
   border:2.5px solid transparent;cursor:pointer;
@@ -532,7 +545,10 @@ body.auth-mode{justify-content:center;}
     flex-shrink: 0;
   }
 
-  #mpd-img {
+  #mpd-img-wrap .mpd-carousel-slide img {
+    border-radius: 0 !important;
+  }
+  #mpd-img-wrap {
     border-radius: 20px 0 0 20px !important;
   }
 
@@ -2506,9 +2522,89 @@ function ob2Finish() {
 
 // ── MODAL DETALLE PRODUCTO ──────────────────────────────────────────────────
 
+// Número de vistas por producto — actualiza este objeto cuando agregues o quites fotos
+const PRODUCT_VISTAS = {
+  'Argolla': 4,
+  'Aro Cartier': 5,
+  'Cartier Argollas': 4,
+  'Cartier Solitario': 4,
+  'Economico': 8,
+  'Juego Cartier grande': 4,
+  'Juego Economico': 5,
+  'Juego Economico Cuadrado': 4,
+  'Juego Economico Plateado': 5,
+  'Juego cartier Pequeño': 5,
+  'N001': 4, 'N002': 4, 'N003': 4, 'N004': 4, 'N005': 4,
+  'N006': 6, 'N007': 5, 'N009': 4, 'N010': 4, 'N011': 4,
+  'N012': 4, 'N013': 4, 'N014': 4, 'N016': 4, 'N026': 4,
+  'N027': 8, 'N032': 4, 'N033': 6, 'N034': 6, 'N034.2': 4,
+  'N036': 6, 'N037': 5, 'N038': 7, 'N039': 8, 'N041': 8,
+  'N042': 5, 'N045': 5, 'N057': 4, 'N058': 6, 'N059': 6,
+  'N060': 6, 'N061': 4, 'N062': 4, 'N063': 4, 'N064': 4,
+  'N064.2': 4, 'N064.3': 4, 'N065': 4, 'N066': 4, 'N071': 4,
+  'N073': 8
+};
+
+// Descripciones por referencia — edita el texto de cada producto aquí
+const PRODUCT_DESCRIPTIONS = {
+  'Argolla': 'Argolla clásica en acero quirúrgico de alta pureza. Diseño liso y elegante, ideal para uso diario. Hipoalergénica, resistente al agua y de larga durabilidad.',
+  'Aro Cartier': 'Aro estilo Cartier con acabado liso y brillo duradero. Diseño icónico y versátil, disponible en talla única. Fabricado en acero inoxidable de alta calidad.',
+  'Cartier Argollas': 'Argollas inspiradas en el icónico diseño Cartier. Acabado premium con detalles refinados. Ideales para un look sofisticado o como regalo especial.',
+  'Cartier Solitario': 'Solitario estilo Cartier con piedra central brillante. Elegante y atemporal, perfecto para compromisos, aniversarios o cualquier ocasión especial.',
+  'Economico': 'Joya con excelente relación calidad-precio. Acabado brillante y diseño versátil que combina con todo. La opción ideal para regalar o para uso diario.',
+  'Juego Cartier grande': 'Juego completo inspirado en el estilo Cartier, talla grande. Incluye anillo y aretes coordinados. Conjunto elegante y armónico para una apariencia impecable.',
+  'Juego Economico': 'Juego completo a precio accesible. Incluye anillo y aretes a juego. Perfecto para completar un look especial o para regalar en cualquier ocasión.',
+  'Juego Economico Cuadrado': 'Juego económico con diseño geométrico cuadrado de corte moderno. Incluye anillo y aretes. Estilo contemporáneo y atrevido a un precio asequible.',
+  'Juego Economico Plateado': 'Juego en acabado plateado brillante con apariencia premium. Incluye anillo y aretes coordinados. Un conjunto elegante a precio accesible.',
+  'Juego cartier Pequeño': 'Juego estilo Cartier en talla pequeña, delicado y refinado. Incluye anillo y aretes. Perfecto para un look discreto y elegante o como regalo especial.',
+  'N001': 'Elegante joya en acero inoxidable con acabado brillante. Diseño moderno y atemporal, ideal para cualquier ocasión.',
+  'N002': 'Pieza de diseño refinado en acero de alta calidad. Versátil y duradera, perfecta para el uso diario o en ocasiones especiales.',
+  'N003': 'Joya de líneas elegantes con acabado pulido. Diseño sofisticado que complementa cualquier estilo.',
+  'N004': 'Accesorio de joyería en acero inoxidable. Acabado brillante y diseño cuidado para un look impecable.',
+  'N005': 'Pieza clásica con detalles finos y acabado de calidad. Ideal para regalar o para completar un look especial.',
+  'N006': 'Joya con diseño detallado y acabado premium. Elaborada en acero de alta pureza, resistente y duradera.',
+  'N007': 'Accesorio elegante con acabado pulido. Diseño atemporal que se adapta a cualquier ocasión.',
+  'N009': 'Pieza de joyería con acabado brillante y diseño moderno. Perfecta para uso diario o eventos especiales.',
+  'N010': 'Joya en acero inoxidable con diseño refinado. Acabado de alta calidad que conserva su brillo con el tiempo.',
+  'N011': 'Accesorio elegante con líneas limpias y acabado pulido. Ideal para complementar cualquier atuendo.',
+  'N012': 'Pieza de diseño clásico en acero de alta calidad. Versátil y resistente, perfecta para el día a día.',
+  'N013': 'Joya con acabado brillante y detalles cuidados. Un accesorio que no puede faltar en tu colección.',
+  'N014': 'Accesorio de joyería con diseño elegante y acabado premium. Perfecta para regalar o para uso personal.',
+  'N016': 'Pieza refinada en acero inoxidable con acabado pulido. Diseño atemporal que combina con todo estilo.',
+  'N026': 'Joya con detalles elaborados y acabado de alta calidad. Ideal para ocasiones especiales o como regalo.',
+  'N027': 'Accesorio de diseño sofisticado con múltiples acabados. Elaborado en acero premium para máxima durabilidad.',
+  'N032': 'Pieza de joyería con acabado brillante y diseño moderno. Versátil y elegante para cualquier ocasión.',
+  'N033': 'Joya con detalles finos y acabado pulido de alta calidad. Diseño que realza cualquier look.',
+  'N034': 'Accesorio elegante con diseño cuidado y acabado premium. Perfecta para complementar tu estilo diario.',
+  'N034.2': 'Variante de diseño refinado con acabado brillante. Complemento ideal para un look sofisticado.',
+  'N036': 'Pieza de joyería con líneas elegantes y acabado de calidad. Ideal para uso diario o eventos especiales.',
+  'N037': 'Joya en acero inoxidable con diseño moderno y atemporal. Acabado pulido que conserva su brillo.',
+  'N038': 'Accesorio con múltiples vistas y detalles elaborados. Diseño sofisticado en acero de alta pureza.',
+  'N039': 'Pieza de colección con diseño detallado y acabado premium. Una joya que destaca por su elegancia.',
+  'N041': 'Joya con diseño elaborado y múltiples acabados. Ideal para regalar o para ocasiones especiales.',
+  'N042': 'Accesorio elegante con detalles finos y acabado brillante. Perfecta para complementar cualquier atuendo.',
+  'N045': 'Pieza de diseño sofisticado en acero de alta calidad. Versátil y duradera para el uso diario.',
+  'N057': 'Joya con acabado pulido y diseño refinado. Ideal para uso diario o como regalo especial.',
+  'N058': 'Accesorio con detalles cuidados y acabado premium. Diseño atemporal que combina con todo.',
+  'N059': 'Pieza de joyería con acabado brillante y diseño moderno. Perfecta para destacar en cualquier ocasión.',
+  'N060': 'Joya con diseño elaborado y acabado de alta calidad. Un accesorio elegante para tu colección.',
+  'N061': 'Accesorio refinado con acabado pulido y diseño clásico. Ideal para uso diario o eventos especiales.',
+  'N062': 'Pieza en acero inoxidable con diseño moderno y versátil. Acabado brillante y de larga durabilidad.',
+  'N063': 'Joya con detalles finos y acabado premium. Diseño elegante que realza cualquier look.',
+  'N064': 'Accesorio con diseño sofisticado y acabado de alta calidad. Perfecta para ocasiones especiales.',
+  'N064.2': 'Variante con diseño refinado y acabado brillante. Complemento ideal para un look elegante.',
+  'N064.3': 'Pieza con detalles elaborados y acabado premium. Diseño atemporal para cualquier ocasión.',
+  'N065': 'Joya clásica con acabado pulido y diseño moderno. Ideal para regalar o para uso personal.',
+  'N066': 'Accesorio con diseño cuidado y acabado de alta calidad. Versátil y elegante para el día a día.',
+  'N071': 'Pieza de joyería refinada con acabado brillante. Diseño sofisticado para ocasiones especiales.',
+  'N073': 'Joya especial con diseño detallado y múltiples vistas. Acabado premium en acero de alta pureza. Ideal para regalo o para completar una colección.'
+};
+
 let modalProductId   = null;
 let modalQty         = 1;
 let modalSelectedColor = null;
+let modalCurrentVista  = 0;
+let modalVistas        = [];
 
 function openProductModal(productId) {
   const p = CATALOG.find(x => x.id === productId);
@@ -2518,19 +2614,8 @@ function openProductModal(productId) {
   modalQty = cart2[productId] || 1;
   modalSelectedColor = null;
 
-  // Imagen
-  const imgEl      = document.getElementById('mpd-img');
-  const fallbackEl = document.getElementById('mpd-img-fallback');
-  if (p.img) {
-    const src = p.img.startsWith('http') ? p.img : encodeURI(p.img);
-    imgEl.src = src;
-    imgEl.style.display = 'block';
-    fallbackEl.style.display = 'none';
-    imgEl.onerror = () => { imgEl.style.display='none'; fallbackEl.style.display='flex'; };
-  } else {
-    imgEl.style.display = 'none';
-    fallbackEl.style.display = 'flex';
-  }
+  // Galería de vistas
+  buildCarousel(p.name || p.nombre || '', p.img);
 
   // Badge stock
   const badge = document.getElementById('mpd-stock-badge');
@@ -2545,7 +2630,7 @@ function openProductModal(productId) {
   // Nombre, precio, descripción
   document.getElementById('mpd-name').textContent  = p.name  || p.nombre  || p.id;
   document.getElementById('mpd-price').textContent = fmt ? fmt(p.price || p.precio || 0) : '$' + (p.price || p.precio || 0);
-  document.getElementById('mpd-desc').textContent  = p.desc  || p.descripcion || '';
+  document.getElementById('mpd-desc').textContent  = p.desc  || p.descripcion || PRODUCT_DESCRIPTIONS[p.name || p.nombre] || '';
 
   // Cantidad
   document.getElementById('mpd-qty').textContent = modalQty;
@@ -2586,6 +2671,80 @@ function closeProductModal() {
   const overlay = document.getElementById('modal-product-detail');
   sheet.classList.remove('open');
   setTimeout(() => { overlay.style.display = 'none'; document.body.style.overflow = ''; }, 320);
+}
+
+// ── CAROUSEL FUNCIONES ──
+function buildCarousel(productName, fallbackImg) {
+  const count   = PRODUCT_VISTAS[productName] || 0;
+  const track   = document.getElementById('mpd-carousel-track');
+  const dotsEl  = document.getElementById('mpd-dots');
+  const fallEl  = document.getElementById('mpd-img-fallback');
+  const btnPrev = document.getElementById('mpd-btn-prev');
+  const btnNext = document.getElementById('mpd-btn-next');
+
+  modalVistas = [];
+  modalCurrentVista = 0;
+
+  if (count > 0) {
+    for (let i = 1; i <= count; i++) {
+      modalVistas.push(`assets/vistas/${encodeURIComponent(productName)}_vista${i}.jpg`);
+    }
+  } else if (fallbackImg) {
+    modalVistas.push(fallbackImg.startsWith('http') ? fallbackImg : encodeURI(fallbackImg));
+  }
+
+  if (modalVistas.length === 0) {
+    track.innerHTML = '';
+    dotsEl.innerHTML = '';
+    fallEl.style.display = 'flex';
+    btnPrev.style.display = 'none';
+    btnNext.style.display = 'none';
+    return;
+  }
+
+  fallEl.style.display = 'none';
+  const errHTML = `<div style="font-size:48px;display:flex;align-items:center;justify-content:center;height:100%;background:#F0EAD8;">📦</div>`;
+  track.innerHTML = modalVistas.map(src =>
+    `<div class="mpd-carousel-slide"><img src="${src}" alt="" loading="lazy" onerror="this.parentNode.innerHTML='${errHTML.replace(/'/g,"\\'")}'" ></div>`
+  ).join('');
+
+  if (modalVistas.length > 1) {
+    dotsEl.innerHTML = modalVistas.map((_, i) =>
+      `<div class="mpd-dot${i===0?' active':''}" onclick="goVista(${i})"></div>`
+    ).join('');
+    btnPrev.style.display = 'flex';
+    btnNext.style.display = 'flex';
+  } else {
+    dotsEl.innerHTML = '';
+    btnPrev.style.display = 'none';
+    btnNext.style.display = 'none';
+  }
+
+  // Swipe touch en móvil
+  let touchStartX = 0;
+  track.ontouchstart = e => { touchStartX = e.touches[0].clientX; };
+  track.ontouchend   = e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 40) { dx < 0 ? nextVista() : prevVista(); }
+  };
+
+  updateCarousel();
+}
+
+function goVista(n) {
+  modalCurrentVista = Math.max(0, Math.min(n, modalVistas.length - 1));
+  updateCarousel();
+}
+function prevVista() { goVista(modalCurrentVista - 1); }
+function nextVista() { goVista(modalCurrentVista + 1); }
+
+function updateCarousel() {
+  document.getElementById('mpd-carousel-track').style.transform = `translateX(-${modalCurrentVista * 100}%)`;
+  document.querySelectorAll('.mpd-dot').forEach((d, i) => d.classList.toggle('active', i === modalCurrentVista));
+  const btnP = document.getElementById('mpd-btn-prev');
+  const btnN = document.getElementById('mpd-btn-next');
+  if (btnP) btnP.style.opacity = modalCurrentVista === 0 ? '0.3' : '1';
+  if (btnN) btnN.style.opacity = modalCurrentVista === modalVistas.length - 1 ? '0.3' : '1';
 }
 
 function selectModalColor(name, hex, chipEl) {
@@ -2639,10 +2798,15 @@ document.getElementById('login-user').addEventListener('keydown',e=>{if(e.key===
   <div id="modal-product-sheet" onclick="event.stopPropagation()"
        style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;max-height:88vh;overflow-y:auto;transform:translateY(100%);transition:transform .32s cubic-bezier(.25,.8,.25,1);">
     <div id="mpd-img-wrap" style="width:100%;height:260px;background:#F0EAD8;border-radius:20px 20px 0 0;overflow:hidden;position:relative;flex-shrink:0;">
-      <img id="mpd-img" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:20px 20px 0 0;">
-      <div id="mpd-img-fallback" style="display:none;font-size:64px;width:100%;height:100%;align-items:center;justify-content:center;">📦</div>
-      <span id="mpd-stock-badge" style="position:absolute;top:12px;right:12px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:500;"></span>
-      <button onclick="closeProductModal()" style="position:absolute;top:12px;left:12px;width:32px;height:32px;border-radius:50%;background:rgba(28,26,20,0.45);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
+      <div class="mpd-carousel">
+        <div id="mpd-carousel-track" class="mpd-carousel-track"></div>
+        <button class="mpd-carousel-btn prev" id="mpd-btn-prev" onclick="prevVista()">‹</button>
+        <button class="mpd-carousel-btn next" id="mpd-btn-next" onclick="nextVista()">›</button>
+        <div id="mpd-dots" class="mpd-carousel-dots"></div>
+      </div>
+      <div id="mpd-img-fallback" style="display:none;font-size:64px;width:100%;height:100%;align-items:center;justify-content:center;position:absolute;top:0;left:0;background:#F0EAD8;">📦</div>
+      <span id="mpd-stock-badge" style="position:absolute;top:12px;right:12px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:500;z-index:4;"></span>
+      <button onclick="closeProductModal()" style="position:absolute;top:12px;left:12px;width:32px;height:32px;border-radius:50%;background:rgba(28,26,20,0.45);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;z-index:4;">✕</button>
     </div>
     <div style="padding:18px 20px 32px;">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px;">
