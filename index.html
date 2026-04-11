@@ -709,7 +709,7 @@ body.auth-mode{justify-content:center;}
     <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:#2A2618;">Catálogo</div>
     <div style="font-size:12px;color:#7A7060;margin-top:2px;">Toca un producto para agregarlo</div>
   </div>
-  <div id="catalog-grid" style="padding:14px;display:flex;flex-direction:column;gap:11px;overflow-y:auto;flex:1;padding-bottom:80px;"></div>
+  <div id="catalog-grid" style="padding:12px;display:grid;grid-template-columns:repeat(2,1fr);gap:10px;overflow-y:auto;flex:1;padding-bottom:80px;align-content:start;"></div>
 </div>
 
 <!-- CHAT -->
@@ -1860,16 +1860,16 @@ function renderCatalog(){
     const q=cart2[p.id]||0;
     const imgSrc = getVista1(p);
     const visual = imgSrc
-      ? `<img src="${imgSrc}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;border-radius:16px 16px 0 0;" onerror="this.src='${encodeURI(p.img||'')}';this.onerror=()=>{this.parentNode.innerHTML='<div style=\\'font-size:48px;display:flex;align-items:center;justify-content:center;height:100%\\'>📦</div>'}">`
+      ? `<img src="${imgSrc}" alt="${p.name}" style="width:100%;height:100%;object-fit:contain;object-position:center;display:block;border-radius:16px 16px 0 0;" onerror="this.src='${encodeURI(p.img||'')}';this.onerror=()=>{this.parentNode.innerHTML='<div style=\\'font-size:48px;display:flex;align-items:center;justify-content:center;height:100%\\'>📦</div>'}">`
       : `<div style="font-size:48px;display:flex;align-items:center;justify-content:center;height:100%;">📦</div>`;
     return `<div onclick="openProductModal('${p.id}')" style="cursor:pointer;background:#fff;border:1px solid rgba(120,90,30,0.14);border-radius:16px;box-shadow:0 2px 16px rgba(60,40,0,0.08);width:100%;">
-      <div class="product-img-wrap" style="height:240px;overflow:hidden;background:#F0EAD8;position:relative;width:100%;border-radius:16px 16px 0 0;">
+      <div class="product-img-wrap" style="aspect-ratio:9/16;overflow:hidden;background:#F0EAD8;position:relative;width:100%;border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:center;">
         ${visual}
         <span style="position:absolute;top:8px;right:8px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:500;background:${p.stock<=3?'#FAEAE6':'#EBF5F0'};color:${p.stock<=3?'#C0442A':'#3D8A5A'};">${p.stock<=3?`Solo ${p.stock} uds`:'Disponible'}</span>
       </div>
-      <div style="padding:12px 15px 14px;width:100%;border-radius:0 0 16px 16px;">
-        <p style="font-family:'Playfair Display',serif;font-size:14px;font-weight:500;margin:0 0 4px 0;color:#2A2618;">${p.name}</p>
-        <p style="font-size:12px;color:#7A7060;line-height:1.45;margin:0 0 10px 0;">${p.desc}</p>
+      <div style="padding:8px 10px 12px;width:100%;border-radius:0 0 16px 16px;">
+        <p style="font-family:'Playfair Display',serif;font-size:12px;font-weight:500;margin:0 0 3px 0;color:#2A2618;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</p>
+        <p style="font-size:11px;color:#7A7060;line-height:1.4;margin:0 0 8px 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${p.desc}</p>
         <div style="display:flex;align-items:center;justify-content:space-between;">
           <span style="font-size:16px;font-weight:500;color:#7A6030;">${fmt(p.price)}</span>
           <div style="display:flex;align-items:center;gap:7px;">
