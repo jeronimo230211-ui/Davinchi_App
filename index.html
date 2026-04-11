@@ -1839,9 +1839,18 @@ let cart2={};
 function cartTotal(){return Object.entries(cart2).reduce((s,[id,q])=>{const p=CATALOG.find(x=>x.id===id);return s+(p?p.price*q:0);},0);}
 function cartCount(){return Object.values(cart2).reduce((s,q)=>s+q,0);}
 
+function _normName(s) {
+  return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+}
+function _resolveVistasKey(name) {
+  if (PRODUCT_VISTAS[name] !== undefined) return name;
+  const n = _normName(name);
+  return Object.keys(PRODUCT_VISTAS).find(k => _normName(k) === n) || null;
+}
 function getVista1(p) {
   const name = p.name || p.nombre || '';
-  if (PRODUCT_VISTAS[name]) return `assets/vistas/${encodeURIComponent(name)}_vista1.jpg`;
+  const key = _resolveVistasKey(name);
+  if (key) return `assets/vistas/${encodeURIComponent(key)}_vista1.jpg`;
   if (p.img) return p.img.startsWith('http') ? p.img : encodeURI(p.img);
   return '';
 }
@@ -2548,12 +2557,13 @@ const PRODUCT_VISTAS = {
   'N001': 4, 'N002': 4, 'N003': 4, 'N004': 4, 'N005': 4,
   'N006': 4, 'N007': 4, 'N008': 4, 'N009': 4, 'N010': 4, 'N011': 4,
   'N012': 4, 'N013': 4, 'N014': 4, 'N016': 4,
-  'N020': 4, 'N021': 4, 'N022': 4, 'N023': 4, 'N024': 4, 'N025': 4,
-  'N026': 4, 'N027': 4, 'N032': 4, 'N033': 4, 'N034': 4, 'N034.2': 4,
+  'N020': 4, 'N020_2': 4, 'N021': 4, 'N022': 4, 'N023': 4, 'N024': 4, 'N025': 4,
+  'N026': 4, 'N027': 4, 'N032': 4, 'N033': 4, 'N034': 4, 'N034_1': 4,
   'N036': 4, 'N037': 3, 'N038': 4, 'N039': 3, 'N041': 4,
-  'N042': 4, 'N045': 4, 'N057': 4, 'N058': 4, 'N059': 4,
+  'N042': 4, 'N045': 4, 'N046': 4, 'N048': 4, 'N049': 4, 'N050': 4,
+  'N054': 4, 'N055': 4, 'N056': 4, 'N057': 4, 'N058': 4, 'N059': 4,
   'N060': 4, 'N061': 3, 'N062': 4, 'N063': 3, 'N064': 4,
-  'N064.2': 4, 'N064.3': 4, 'N065': 4, 'N066': 4, 'N071': 4,
+  'N064_2': 4, 'N064_3': 4, 'N065': 4, 'N066': 4, 'N071': 4,
   'N073': 3
 };
 
@@ -2687,7 +2697,8 @@ function closeProductModal() {
 
 // ── CAROUSEL FUNCIONES ──
 function buildCarousel(productName, fallbackImg) {
-  const count   = PRODUCT_VISTAS[productName] || 0;
+  const resolvedKey = _resolveVistasKey(productName);
+  const count   = resolvedKey ? PRODUCT_VISTAS[resolvedKey] : 0;
   const track   = document.getElementById('mpd-carousel-track');
   const thumbsEl= document.getElementById('mpd-thumbs');
   const counter = document.getElementById('mpd-counter');
@@ -2700,7 +2711,7 @@ function buildCarousel(productName, fallbackImg) {
 
   if (count > 0) {
     for (let i = 1; i <= count; i++) {
-      modalVistas.push(`assets/vistas/${encodeURIComponent(productName)}_vista${i}.jpg`);
+      modalVistas.push(`assets/vistas/${encodeURIComponent(resolvedKey)}_vista${i}.jpg`);
     }
   } else if (fallbackImg) {
     modalVistas.push(fallbackImg.startsWith('http') ? fallbackImg : encodeURI(fallbackImg));
