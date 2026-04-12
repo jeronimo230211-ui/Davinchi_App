@@ -737,6 +737,7 @@ body.auth-mode{justify-content:center;}
       <button id="catalog-search-clear" onclick="clearCatalogSearch()" style="display:none;position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#9A8A78;font-size:16px;line-height:1;padding:2px;">✕</button>
     </div>
   </div>
+  <div id="cat-chips-row" style="display:none;overflow-x:auto;padding:8px 12px 6px;gap:6px;flex-shrink:0;border-bottom:1px solid rgba(120,90,30,0.08);scrollbar-width:none;-webkit-overflow-scrolling:touch;white-space:nowrap;"></div>
   <div id="catalog-grid" style="padding:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;overflow-y:auto;flex:1;padding-bottom:80px;align-content:start;"></div>
 </div>
 
@@ -1930,10 +1931,17 @@ function toggleCategoriasMenu(forceOpen){
 }
 function filterByCategoria(cat){
   activeCategoria = cat;
-  // Resaltar categoría activa
+  // Resaltar en sidebar list
   document.querySelectorAll('.cat-item').forEach(b=>{
     b.style.fontWeight = (b.dataset.cat===(cat||'')) ? '700' : '400';
     b.style.color      = (b.dataset.cat===(cat||'')) ? '#C8A45A' : '#AEA898';
+  });
+  // Resaltar chip activo
+  document.querySelectorAll('.cat-chip').forEach(b=>{
+    const active = b.dataset.cat===(cat||'');
+    b.style.background   = active ? '#C8A45A' : 'transparent';
+    b.style.color        = active ? '#fff'     : '#7A6A50';
+    b.style.borderColor  = active ? '#C8A45A'  : 'rgba(120,90,30,0.25)';
   });
   switchScreen('catalog');
   renderCatalog();
@@ -1941,22 +1949,33 @@ function filterByCategoria(cat){
 function buildCategoriasMenu(){
   const list  = document.getElementById('dsb-categorias-list');
   const arrow = document.getElementById('cat-arrow');
+  const chipsRow = document.getElementById('cat-chips-row');
   if(!list) return;
   const cats = [...new Set(CATALOG.map(p=>(p.categoria||'').trim()).filter(Boolean))].sort();
   if(!cats.length){
     if(arrow) arrow.style.display='none';
     list.style.display='none';
+    if(chipsRow) chipsRow.style.display='none';
     return;
   }
+  // Sidebar list (desktop)
   if(arrow) arrow.style.display='inline';
   const btnStyle = `background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;text-align:left;padding:5px 8px;border-radius:6px;width:100%;`;
   list.innerHTML = [
     `<button class="cat-item" data-cat="" onclick="filterByCategoria(null)" style="${btnStyle}color:#C8A45A;font-weight:700;">Todas</button>`,
     ...cats.map(c=>`<button class="cat-item" data-cat="${c}" onclick="filterByCategoria('${c.replace(/'/g,"\\'")}')" style="${btnStyle}color:#AEA898;font-weight:400;">${c}</button>`)
   ].join('');
-  // Abrir automáticamente al cargar
   list.style.display='flex';
   if(arrow) arrow.textContent='▴';
+  // Chips row (mobile + desktop, below search bar)
+  if(chipsRow){
+    const chipBase = `display:inline-block;padding:5px 14px;border-radius:20px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid;white-space:nowrap;transition:background 0.15s,color 0.15s;`;
+    chipsRow.innerHTML = [
+      `<button class="cat-chip active-chip" data-cat="" onclick="filterByCategoria(null)" style="${chipBase}background:#C8A45A;color:#fff;border-color:#C8A45A;">Todas</button>`,
+      ...cats.map(c=>`<button class="cat-chip" data-cat="${c}" onclick="filterByCategoria('${c.replace(/'/g,"\\'")}')" style="${chipBase}background:transparent;color:#7A6A50;border-color:rgba(120,90,30,0.25);">${c}</button>`)
+    ].join('');
+    chipsRow.style.display='flex';
+  }
 }
 
 function renderCatalog(){
