@@ -423,15 +423,17 @@ body.auth-mode{justify-content:center;}
     padding: 8px 0;
   }
   .dsb-logout {
-    display: flex; align-items: center; gap: 10px;
-    padding: 0 20px; height: 44px;
-    background: transparent; border: none;
-    color: rgba(192,68,42,0.8);
-    font-family: 'Outfit', sans-serif; font-size: 13px;
-    cursor: pointer; width: 100%; text-align: left;
-    transition: color .15s, background .15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin: 4px 16px; padding: 9px 16px;
+    background: transparent;
+    border: 1px solid rgba(192,68,42,0.35);
+    border-radius: 8px;
+    color: rgba(192,68,42,0.85);
+    font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500;
+    cursor: pointer; width: calc(100% - 32px); text-align: center;
+    transition: color .15s, background .15s, border-color .15s;
   }
-  .dsb-logout:hover { color: #C0442A; background: rgba(192,68,42,0.08); }
+  .dsb-logout:hover { color: #C0442A; background: rgba(192,68,42,0.08); border-color: #C0442A; }
 
   /* ── App container — desplazada a la derecha del sidebar ── */
   .app {
@@ -613,7 +615,7 @@ body.auth-mode{justify-content:center;}
   </nav>
 
   <div class="dsb-footer" id="dsb-footer" style="display:none;">
-    <button class="dsb-logout" onclick="doLogoutClient ? doLogoutClient() : (doLogout ? doLogout() : location.reload())" style="margin-bottom:6px;font-size:11px;opacity:0.7;">
+    <button class="dsb-logout" onclick="doLogoutClient ? doLogoutClient() : (doLogout ? doLogout() : location.reload())">
       Salir
     </button>
     <button class="dsb-logout" onclick="doLogout ? doLogout() : location.reload()">
@@ -2294,10 +2296,7 @@ function updateSidebarUser() {
 }
 
 function updateSidebarCartBadge(count) {
-  const badge = document.getElementById('dsb-cart-badge');
-  if (!badge) return;
-  if (count > 0) { badge.textContent = count; badge.style.display = 'flex'; }
-  else           { badge.style.display = 'none'; }
+  // Badge del sidebar deshabilitado — se usa solo el FAB flotante
 }
 
 // ── ONBOARDING v2 — Tour guiado con spotlight ─────────────────────────────
