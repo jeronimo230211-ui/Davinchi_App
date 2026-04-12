@@ -1155,6 +1155,11 @@ function enterVendorPanel(v){
   vs.classList.add('active'); vs.style.display='flex';
   const tabCat=document.getElementById('vtab-catalogo');
   if(tabCat) tabCat.style.display = v.role==='CEO' ? 'block' : 'none';
+  // Ocultar categorías en sidebar (solo aplica en vista cliente)
+  const catList=document.getElementById('dsb-categorias-list');
+  const catArrow=document.getElementById('cat-arrow');
+  if(catList) catList.style.display='none';
+  if(catArrow) catArrow.style.display='none';
   lastKnownOrderCount=0;
   loadVendorOrders();
   loadCatalog();
@@ -1520,6 +1525,56 @@ async function updateStatus(id, newStatus){
   }catch(e){ console.error('Error:', e); }
 }
 
+// ── KPI helpers ──────────────────────────────────────────────────────────────
+function _kpiTopProductos(orders){
+  const conteo={};
+  orders.forEach(o=>{
+    const raw=o.Productos||'';
+    // Formato esperado: "3× N034, 1× N001" o "N034 (3), N001 (1)"
+    // Intenta parsear "Nx Nombre" o "Nombre (N)"
+    const matches=[...raw.matchAll(/(\d+)[×x]\s*([^,\n]+)/gi)];
+    if(matches.length){
+      matches.forEach(m=>{
+        const qty=parseInt(m[1])||1;
+        const name=m[2].trim();
+        conteo[name]=(conteo[name]||0)+qty;
+      });
+    } else {
+      // Fallback: cuenta apariciones por nombre
+      raw.split(',').forEach(part=>{
+        const name=part.trim();
+        if(name) conteo[name]=(conteo[name]||0)+1;
+      });
+    }
+  });
+  return Object.entries(conteo).sort((a,b)=>b[1]-a[1]).slice(0,8);
+}
+
+function _kpiBlock(id, html){ return `<div class="kpi-block" id="${id}">${html}</div>`; }
+
+function toggleKpi(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  const visible = el.style.display!=='none';
+  el.style.display = visible ? 'none' : 'block';
+  // Actualizar botón activo
+  document.querySelectorAll('.kpi-btn').forEach(b=>{
+    if(b.dataset.kpi===id){
+      b.style.background   = visible ? 'transparent' : '#1C1A14';
+      b.style.color        = visible ? '#7A6A50'      : '#E2C07E';
+      b.style.borderColor  = visible ? 'rgba(120,90,30,0.2)' : '#1C1A14';
+    }
+  });
+}
+function showAllKpis(){
+  document.querySelectorAll('.kpi-block').forEach(el=>el.style.display='block');
+  document.querySelectorAll('.kpi-btn').forEach(b=>{
+    b.style.background  = b.dataset.kpi==='all' ? '#1C1A14' : 'transparent';
+    b.style.color       = b.dataset.kpi==='all' ? '#E2C07E' : '#7A6A50';
+    b.style.borderColor = b.dataset.kpi==='all' ? '#1C1A14' : 'rgba(120,90,30,0.2)';
+  });
+}
+
 function renderVendorResumen(){
   const content=document.getElementById('vendor-content');
   const isCEO = currentVendor?.user === 'admin';
@@ -1530,35 +1585,85 @@ function renderVendorResumen(){
   const entregados=allOrders.filter(o=>o.Estado==='Entregado');
   const parciales=allOrders.filter(o=>o.Estado&&o.Estado.startsWith('Parcial'));
   const pendientes=allOrders.filter(o=>o.Estado==='Nuevo'||o.Estado==='En proceso');
+  const cerrados=entregados.length+parciales.length;
+  const otif=cerrados>0?Math.round((entregados.length/cerrados)*100):0;
+  const otifColor=otif>=90?'#3D8A5A':otif>=70?'#BA7517':'#C0442A';
+  const otifBg=otif>=90?'#EBF5F0':otif>=70?'#FEF3DC':'#FAEAE6';
+  const topProd=_kpiTopProductos(allOrders);
 
-  // OTIF: pedidos entregados completos (no parciales) sobre total cerrados
-  const cerrados = entregados.length + parciales.length;
-  const otif = cerrados > 0 ? Math.round((entregados.length/cerrados)*100) : 0;
-  const otifColor = otif>=90?'#3D8A5A':otif>=70?'#BA7517':'#C0442A';
-  const otifBg = otif>=90?'#EBF5F0':otif>=70?'#FEF3DC':'#FAEAE6';
+  // ── Botones de filtro KPI (comunes a vendedor y CEO) ──────────────────────
+  const btnStyle=`font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;padding:5px 13px;border-radius:20px;border:1.5px solid;cursor:pointer;transition:all .15s;white-space:nowrap;`;
+  const kpiBtns = isCEO ? `
+    <button class="kpi-btn" data-kpi="all"             onclick="showAllKpis()"              style="${btnStyle}background:#1C1A14;color:#E2C07E;border-color:#1C1A14;">Todos</button>
+    <button class="kpi-btn" data-kpi="kpi-entregas"    onclick="toggleKpi('kpi-entregas')"  style="${btnStyle}background:transparent;color:#7A6A50;border-color:rgba(120,90,30,0.2);">Entregas</button>
+    <button class="kpi-btn" data-kpi="kpi-otif"        onclick="toggleKpi('kpi-otif')"      style="${btnStyle}background:transparent;color:#7A6A50;border-color:rgba(120,90,30,0.2);">OTIF</button>
+    <button class="kpi-btn" data-kpi="kpi-ventas"      onclick="toggleKpi('kpi-ventas')"    style="${btnStyle}background:transparent;color:#7A6A50;border-color:rgba(120,90,30,0.2);">Ventas</button>
+    <button class="kpi-btn" data-kpi="kpi-parciales"   onclick="toggleKpi('kpi-parciales')" style="${btnStyle}background:transparent;color:#7A6A50;border-color:rgba(120,90,30,0.2);">Parciales</button>
+    <button class="kpi-btn" data-kpi="kpi-productos"   onclick="toggleKpi('kpi-productos')" style="${btnStyle}background:transparent;color:#7A6A50;border-color:rgba(120,90,30,0.2);">Top Refs</button>
+    <button class="kpi-btn" data-kpi="kpi-clientes"    onclick="toggleKpi('kpi-clientes')"  style="${btnStyle}background:transparent;color:#7A6A50;border-color:rgba(120,90,30,0.2);">Clientes</button>
+    <button class="kpi-btn" data-kpi="kpi-vendedores"  onclick="toggleKpi('kpi-vendedores')"style="${btnStyle}background:transparent;color:#7A6A50;border-color:rgba(120,90,30,0.2);">Vendedores</button>
+  ` : `
+    <button class="kpi-btn" data-kpi="all"             onclick="showAllKpis()"              style="${btnStyle}background:#1C1A14;color:#E2C07E;border-color:#1C1A14;">Todos</button>
+    <button class="kpi-btn" data-kpi="kpi-entregas"    onclick="toggleKpi('kpi-entregas')"  style="${btnStyle}background:transparent;color:#7A6A50;border-color:rgba(120,90,30,0.2);">Entregas</button>
+    <button class="kpi-btn" data-kpi="kpi-ventas"      onclick="toggleKpi('kpi-ventas')"    style="${btnStyle}background:transparent;color:#7A6A50;border-color:rgba(120,90,30,0.2);">Ventas</button>
+    <button class="kpi-btn" data-kpi="kpi-productos"   onclick="toggleKpi('kpi-productos')" style="${btnStyle}background:transparent;color:#7A6A50;border-color:rgba(120,90,30,0.2);">Top Refs</button>
+  `;
 
   if(!isCEO){
-    // Vendedor — resumen simple
+    // ── Vendedor ──────────────────────────────────────────────────────────
     content.innerHTML=`
-      <div class="stats-row">
-        <div class="stat-card"><div class="stat-num">${allOrders.length}</div><div class="stat-lbl">Total pedidos</div></div>
-        <div class="stat-card"><div class="stat-num">${pendientes.length}</div><div class="stat-lbl">Pendientes</div></div>
-        <div class="stat-card"><div class="stat-num">${entregados.length}</div><div class="stat-lbl">Entregados</div></div>
+      <!-- Filtros -->
+      <div style="display:flex;flex-wrap:wrap;gap:6px;padding:12px 14px 8px;border-bottom:1px solid rgba(120,90,30,0.1);">${kpiBtns}</div>
+
+      <div style="padding:12px;display:flex;flex-direction:column;gap:10px;">
+
+        ${_kpiBlock('kpi-entregas',`
+          <div class="stats-row">
+            <div class="stat-card"><div class="stat-num">${allOrders.length}</div><div class="stat-lbl">Total pedidos</div></div>
+            <div class="stat-card"><div class="stat-num">${pendientes.length}</div><div class="stat-lbl">Pendientes</div></div>
+            <div class="stat-card"><div class="stat-num">${entregados.length}</div><div class="stat-lbl">Entregados</div></div>
+          </div>
+        `)}
+
+        ${_kpiBlock('kpi-ventas',`
+          <div class="stat-card" style="text-align:center">
+            <div class="stat-num" style="font-size:18px">${fmt(totalGeneral)}</div>
+            <div class="stat-lbl">Valor total vendido</div>
+          </div>
+          <div style="height:8px;"></div>
+          <div class="section-label">Pedidos de hoy</div>
+          ${todayOrders.length?todayOrders.map(o=>orderCard(o)).join(''):'<div style="text-align:center;padding:16px;color:#AEA898;font-size:13px;">No hay pedidos hoy</div>'}
+        `)}
+
+        ${_kpiBlock('kpi-productos', `
+          <div style="background:#fff;border:1px solid rgba(120,90,30,0.1);border-radius:12px;padding:16px;">
+            <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#AEA898;font-weight:500;margin-bottom:12px;">🔥 Referencias que más rotan</div>
+            ${topProd.length ? topProd.map(([name,qty],i)=>{
+              const maxQty=topProd[0][1];
+              const pct=Math.round((qty/maxQty)*100);
+              const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+              return `<div style="margin-bottom:10px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                  <span style="font-size:12px;font-weight:500;color:#2A2618;">${medal} ${name}</span>
+                  <span style="font-size:11px;color:#7A6030;font-weight:600;background:#F9F5EE;padding:2px 9px;border-radius:10px;">${qty} uds</span>
+                </div>
+                <div style="background:#F0EAD8;border-radius:4px;height:6px;overflow:hidden;">
+                  <div style="background:${i===0?'#C8A45A':i===1?'#AEA898':'#D4C4A0'};width:${pct}%;height:100%;border-radius:4px;"></div>
+                </div>
+              </div>`;
+            }).join('') : '<div style="color:#AEA898;font-size:13px;text-align:center;padding:12px;">Sin datos suficientes</div>'}
+          </div>
+        `)}
+
       </div>
-      <div class="stat-card" style="text-align:center">
-        <div class="stat-num" style="font-size:18px">${fmt(totalGeneral)}</div>
-        <div class="stat-lbl">Valor total vendido</div>
-      </div>
-      <div class="section-label" style="margin-top:8px">Pedidos de hoy</div>
-      ${todayOrders.length?todayOrders.map(o=>orderCard(o)).join(''):'<div style="text-align:center;padding:20px;color:#AEA898;font-size:13px">No hay pedidos hoy</div>'}
     `;
     return;
   }
 
-  // CEO — panel completo de KPIs
+  // ── CEO — panel completo ──────────────────────────────────────────────────
   content.innerHTML=`
-    <!-- Título CEO -->
-    <div style="background:#1C1A14;border-radius:12px;padding:16px 18px;margin-bottom:4px;display:flex;align-items:center;gap:12px;">
+    <!-- Header CEO -->
+    <div style="background:#1C1A14;padding:16px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0;">
       <div style="font-size:22px;">👑</div>
       <div>
         <div style="font-family:'Playfair Display',serif;font-size:16px;color:#E2C07E;font-weight:500;">Panel CEO — Davinchi</div>
@@ -1566,133 +1671,142 @@ function renderVendorResumen(){
       </div>
     </div>
 
-    <!-- KPI 1 y 2: Entregas y Pendientes -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <div style="background:#fff;border:1px solid rgba(120,90,30,0.1);border-radius:12px;padding:16px;text-align:center;">
-        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#AEA898;font-weight:500;margin-bottom:8px;">Entregas totales</div>
-        <div style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:#3D8A5A;">${entregados.length}</div>
-        <div style="font-size:11px;color:#7A7060;margin-top:4px;">de ${allOrders.length} pedidos</div>
-      </div>
-      <div style="background:#fff;border:1px solid rgba(120,90,30,0.1);border-radius:12px;padding:16px;text-align:center;">
-        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#AEA898;font-weight:500;margin-bottom:8px;">Pedidos pendientes</div>
-        <div style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:${pendientes.length>0?'#C0442A':'#3D8A5A'};">${pendientes.length}</div>
-        <div style="font-size:11px;color:#7A7060;margin-top:4px;">por entregar</div>
-      </div>
-    </div>
+    <!-- Filtros KPI -->
+    <div style="display:flex;flex-wrap:wrap;gap:6px;padding:12px 14px 8px;border-bottom:1px solid rgba(120,90,30,0.1);">${kpiBtns}</div>
 
-    <!-- KPI 3: OTIF -->
-    <div id="ceo-kpi-otif" style="background:#fff;border:1px solid rgba(120,90,30,0.1);border-radius:12px;padding:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div>
-          <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#AEA898;font-weight:500;">OTIF — Entregas completas</div>
-          <div style="font-size:11px;color:#AEA898;margin-top:2px;">Pedidos entregados sin faltantes</div>
+    <div style="padding:12px;display:flex;flex-direction:column;gap:10px;">
+
+      ${_kpiBlock('kpi-entregas',`
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div style="background:#fff;border:1px solid rgba(120,90,30,0.1);border-radius:12px;padding:16px;text-align:center;">
+            <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#AEA898;font-weight:500;margin-bottom:8px;">Entregas totales</div>
+            <div style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:#3D8A5A;">${entregados.length}</div>
+            <div style="font-size:11px;color:#7A7060;margin-top:4px;">de ${allOrders.length} pedidos</div>
+          </div>
+          <div style="background:#fff;border:1px solid rgba(120,90,30,0.1);border-radius:12px;padding:16px;text-align:center;">
+            <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#AEA898;font-weight:500;margin-bottom:8px;">Pendientes</div>
+            <div style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:${pendientes.length>0?'#C0442A':'#3D8A5A'};">${pendientes.length}</div>
+            <div style="font-size:11px;color:#7A7060;margin-top:4px;">por entregar</div>
+          </div>
         </div>
-        <div style="background:${otifBg};color:${otifColor};font-family:'Playfair Display',serif;font-size:28px;font-weight:700;padding:8px 16px;border-radius:10px;">${otif}%</div>
-      </div>
-      <!-- Barra de progreso -->
-      <div style="background:#F0EAD8;border-radius:4px;height:8px;overflow:hidden;">
-        <div style="background:${otifColor};width:${otif}%;height:100%;border-radius:4px;transition:width .5s;"></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:#AEA898;">
-        <span>✅ ${entregados.length} completos</span>
-        <span>⚠️ ${parciales.length} parciales</span>
-      </div>
-      <div style="margin-top:8px;font-size:11px;padding:6px 10px;border-radius:6px;background:${otifBg};color:${otifColor};">
-        ${otif>=90?'🟢 Excelente — por encima del objetivo':otif>=70?'🟡 Regular — hay entregas parciales por resolver':'🔴 Crítico — muchas entregas incompletas'}
-      </div>
-    </div>
+      `)}
 
-    <!-- KPI 4: Valor vendido -->
-    <div style="background:#1C1A14;border-radius:12px;padding:18px 20px;">
-      <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#5A5448;font-weight:500;margin-bottom:6px;">Valor vendido total</div>
-      <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:#E2C07E;">${fmt(totalGeneral)}</div>
-      <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(200,164,90,0.15);">
-        <div style="text-align:center;">
-          <div style="font-size:13px;color:#C8A45A;font-weight:500;">${fmt(totalHoy)}</div>
-          <div style="font-size:10px;color:#5A5448;margin-top:2px;">Hoy</div>
-        </div>
-        <div style="text-align:center;">
-          <div style="font-size:13px;color:#C8A45A;font-weight:500;">${allOrders.length>0?fmt(Math.round(totalGeneral/allOrders.length)):'$0'}</div>
-          <div style="font-size:10px;color:#5A5448;margin-top:2px;">Ticket promedio</div>
-        </div>
-        <div style="text-align:center;">
-          <div style="font-size:13px;color:#C8A45A;font-weight:500;">${todayOrders.length}</div>
-          <div style="font-size:10px;color:#5A5448;margin-top:2px;">Pedidos hoy</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- KPI 5: Entregas parciales -->
-    ${parciales.length>0?`
-    <div style="background:#FEF3DC;border:1px solid #FCD34D;border-radius:12px;padding:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8A6010;font-weight:500;">⚠️ Entregas parciales</div>
-        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#8A6010;">${parciales.length}</div>
-      </div>
-      ${parciales.map(o=>`
-        <div style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:6px;border:1px solid rgba(180,120,10,0.15);">
-          <div style="font-size:13px;font-weight:500;color:#2A2618;margin-bottom:2px;">${o['Joyería']||o.Joyeria||'—'}</div>
-          <div style="font-size:11px;color:#8A6010;">${o.Estado}</div>
-        </div>`).join('')}
-    </div>`:''}
-
-    <!-- Top clientes -->
-    <div style="background:#fff;border:1px solid rgba(120,90,30,0.1);border-radius:12px;padding:16px;">
-      <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#AEA898;font-weight:500;margin-bottom:12px;">🏆 Clientes más activos</div>
-      ${(()=>{
-        const counts={};
-        allOrders.forEach(o=>{const j=o['Joyería']||o.Joyeria||'—';counts[j]=(counts[j]||0)+1;});
-        return Object.entries(counts)
-          .sort((a,b)=>b[1]-a[1])
-          .slice(0,5)
-          .map(([name,count],i)=>`
-            <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(120,90,30,0.06);">
-              <div style="width:24px;height:24px;border-radius:50%;background:#1C1A14;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#C8A45A;flex-shrink:0;">${i+1}</div>
-              <div style="flex:1;font-size:13px;color:#2A2618;">${name}</div>
-              <div style="font-size:12px;font-weight:500;color:#7A6030;background:#F9F5EE;padding:3px 10px;border-radius:20px;">${count} pedido${count!==1?'s':''}</div>
-            </div>`).join('');
-      })()}
-    </div>
-
-    <!-- Ranking vendedores -->
-    <div id="ceo-ranking-vendedores" style="background:#fff;border:1px solid rgba(120,90,30,0.1);border-radius:12px;padding:16px;">
-      <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#AEA898;font-weight:500;margin-bottom:12px;">👨‍💼 Rendimiento por vendedor</div>
-      ${(()=>{
-        const stats={};
-        allOrders.forEach(o=>{
-          const v = o.Vendedor||'Sin asignar';
-          if(!stats[v]) stats[v]={entregas:0,parciales:0,valor:0};
-          if(o.Estado==='Entregado') stats[v].entregas++;
-          if(o.Estado&&o.Estado.startsWith('Parcial')) stats[v].parciales++;
-          stats[v].valor += parseMoney(o.Total);
-        });
-        const sorted = Object.entries(stats).sort((a,b)=>b[1].entregas-a[1].entregas);
-        if(!sorted.length) return '<div style="text-align:center;color:#AEA898;font-size:13px;padding:12px;">Aún no hay entregas registradas</div>';
-        return sorted.map(([name,s],i)=>{
-          const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
-          return `
-          <div style="padding:12px;background:${i===0?'#F9F5EE':'#fff'};border-radius:10px;margin-bottom:8px;border:1px solid rgba(120,90,30,${i===0?'0.15':'0.08'});">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-              <div style="font-size:14px;font-weight:500;color:#2A2618;">${medal} ${name}</div>
-              <div style="font-size:12px;color:#7A6030;font-weight:500;">${fmt(s.valor)}</div>
+      ${_kpiBlock('kpi-otif',`
+        <div id="ceo-kpi-otif" style="background:#fff;border:1px solid rgba(120,90,30,0.1);border-radius:12px;padding:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <div>
+              <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#AEA898;font-weight:500;">OTIF — Entregas completas</div>
+              <div style="font-size:11px;color:#AEA898;margin-top:2px;">Pedidos entregados sin faltantes</div>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;text-align:center;">
-              <div style="background:#EBF5F0;border-radius:8px;padding:7px 4px;">
-                <div style="font-size:16px;font-weight:700;color:#3D8A5A;">${s.entregas}</div>
-                <div style="font-size:10px;color:#3D8A5A;margin-top:1px;">Entregados</div>
+            <div style="background:${otifBg};color:${otifColor};font-family:'Playfair Display',serif;font-size:28px;font-weight:700;padding:8px 16px;border-radius:10px;">${otif}%</div>
+          </div>
+          <div style="background:#F0EAD8;border-radius:4px;height:8px;overflow:hidden;">
+            <div style="background:${otifColor};width:${otif}%;height:100%;border-radius:4px;transition:width .5s;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:#AEA898;">
+            <span>✅ ${entregados.length} completos</span><span>⚠️ ${parciales.length} parciales</span>
+          </div>
+          <div style="margin-top:8px;font-size:11px;padding:6px 10px;border-radius:6px;background:${otifBg};color:${otifColor};">
+            ${otif>=90?'🟢 Excelente — por encima del objetivo':otif>=70?'🟡 Regular — hay entregas parciales por resolver':'🔴 Crítico — muchas entregas incompletas'}
+          </div>
+        </div>
+      `)}
+
+      ${_kpiBlock('kpi-ventas',`
+        <div style="background:#1C1A14;border-radius:12px;padding:18px 20px;">
+          <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#5A5448;font-weight:500;margin-bottom:6px;">Valor vendido total</div>
+          <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:#E2C07E;">${fmt(totalGeneral)}</div>
+          <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(200,164,90,0.15);">
+            <div style="text-align:center;"><div style="font-size:13px;color:#C8A45A;font-weight:500;">${fmt(totalHoy)}</div><div style="font-size:10px;color:#5A5448;margin-top:2px;">Hoy</div></div>
+            <div style="text-align:center;"><div style="font-size:13px;color:#C8A45A;font-weight:500;">${allOrders.length>0?fmt(Math.round(totalGeneral/allOrders.length)):'$0'}</div><div style="font-size:10px;color:#5A5448;margin-top:2px;">Ticket promedio</div></div>
+            <div style="text-align:center;"><div style="font-size:13px;color:#C8A45A;font-weight:500;">${todayOrders.length}</div><div style="font-size:10px;color:#5A5448;margin-top:2px;">Pedidos hoy</div></div>
+          </div>
+        </div>
+      `)}
+
+      ${_kpiBlock('kpi-parciales', parciales.length>0 ? `
+        <div style="background:#FEF3DC;border:1px solid #FCD34D;border-radius:12px;padding:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8A6010;font-weight:500;">⚠️ Entregas parciales</div>
+            <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#8A6010;">${parciales.length}</div>
+          </div>
+          ${parciales.map(o=>`
+            <div style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:6px;border:1px solid rgba(180,120,10,0.15);">
+              <div style="font-size:13px;font-weight:500;color:#2A2618;margin-bottom:2px;">${o['Joyería']||o.Joyeria||'—'}</div>
+              <div style="font-size:11px;color:#8A6010;">${o.Estado}</div>
+            </div>`).join('')}
+        </div>
+      ` : '<div style="text-align:center;padding:14px;color:#AEA898;font-size:12px;background:#fff;border-radius:12px;border:1px solid rgba(120,90,30,0.1);">Sin entregas parciales ✅</div>'
+      )}
+
+      ${_kpiBlock('kpi-productos',`
+        <div style="background:#fff;border:1px solid rgba(120,90,30,0.1);border-radius:12px;padding:16px;">
+          <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#AEA898;font-weight:500;margin-bottom:12px;">🔥 Referencias que más rotan</div>
+          ${topProd.length ? topProd.map(([name,qty],i)=>{
+            const maxQty=topProd[0][1];
+            const pct=Math.round((qty/maxQty)*100);
+            const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+            return `<div style="margin-bottom:10px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <span style="font-size:12px;font-weight:500;color:#2A2618;">${medal} ${name}</span>
+                <span style="font-size:11px;color:#7A6030;font-weight:600;background:#F9F5EE;padding:2px 9px;border-radius:10px;">${qty} uds</span>
               </div>
-              <div style="background:${s.parciales>0?'#FEF3DC':'#F9F5EE'};border-radius:8px;padding:7px 4px;">
-                <div style="font-size:16px;font-weight:700;color:${s.parciales>0?'#8A6010':'#AEA898'};">${s.parciales}</div>
-                <div style="font-size:10px;color:${s.parciales>0?'#8A6010':'#AEA898'};margin-top:1px;">Parciales</div>
+              <div style="background:#F0EAD8;border-radius:4px;height:6px;overflow:hidden;">
+                <div style="background:${i===0?'#C8A45A':i===1?'#AEA898':'#D4C4A0'};width:${pct}%;height:100%;border-radius:4px;"></div>
               </div>
-              <div style="background:#F9F5EE;border-radius:8px;padding:7px 4px;">
-                <div style="font-size:16px;font-weight:700;color:#7A6030;">${s.entregas+s.parciales}</div>
-                <div style="font-size:10px;color:#7A6030;margin-top:1px;">Total gestión</div>
-              </div>
-            </div>
-          </div>`;
-        }).join('');
-      })()}
+            </div>`;
+          }).join('') : '<div style="color:#AEA898;font-size:13px;text-align:center;padding:12px;">Sin datos suficientes</div>'}
+        </div>
+      `)}
+
+      ${_kpiBlock('kpi-clientes',`
+        <div style="background:#fff;border:1px solid rgba(120,90,30,0.1);border-radius:12px;padding:16px;">
+          <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#AEA898;font-weight:500;margin-bottom:12px;">🏆 Clientes más activos</div>
+          ${(()=>{
+            const counts={};
+            allOrders.forEach(o=>{const j=o['Joyería']||o.Joyeria||'—';counts[j]=(counts[j]||0)+1;});
+            return Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([name,count],i)=>`
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(120,90,30,0.06);">
+                <div style="width:24px;height:24px;border-radius:50%;background:#1C1A14;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#C8A45A;flex-shrink:0;">${i+1}</div>
+                <div style="flex:1;font-size:13px;color:#2A2618;">${name}</div>
+                <div style="font-size:12px;font-weight:500;color:#7A6030;background:#F9F5EE;padding:3px 10px;border-radius:20px;">${count} pedido${count!==1?'s':''}</div>
+              </div>`).join('');
+          })()}
+        </div>
+      `)}
+
+      ${_kpiBlock('kpi-vendedores',`
+        <div id="ceo-ranking-vendedores" style="background:#fff;border:1px solid rgba(120,90,30,0.1);border-radius:12px;padding:16px;">
+          <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#AEA898;font-weight:500;margin-bottom:12px;">👨‍💼 Rendimiento por vendedor</div>
+          ${(()=>{
+            const stats={};
+            allOrders.forEach(o=>{
+              const v=o.Vendedor||'Sin asignar';
+              if(!stats[v]) stats[v]={entregas:0,parciales:0,valor:0};
+              if(o.Estado==='Entregado') stats[v].entregas++;
+              if(o.Estado&&o.Estado.startsWith('Parcial')) stats[v].parciales++;
+              stats[v].valor+=parseMoney(o.Total);
+            });
+            const sorted=Object.entries(stats).sort((a,b)=>b[1].entregas-a[1].entregas);
+            if(!sorted.length) return '<div style="text-align:center;color:#AEA898;font-size:13px;padding:12px;">Aún no hay entregas registradas</div>';
+            return sorted.map(([name,s],i)=>{
+              const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+              return `<div style="padding:12px;background:${i===0?'#F9F5EE':'#fff'};border-radius:10px;margin-bottom:8px;border:1px solid rgba(120,90,30,${i===0?'0.15':'0.08'});">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                  <div style="font-size:14px;font-weight:500;color:#2A2618;">${medal} ${name}</div>
+                  <div style="font-size:12px;color:#7A6030;font-weight:500;">${fmt(s.valor)}</div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;text-align:center;">
+                  <div style="background:#EBF5F0;border-radius:8px;padding:7px 4px;"><div style="font-size:16px;font-weight:700;color:#3D8A5A;">${s.entregas}</div><div style="font-size:10px;color:#3D8A5A;margin-top:1px;">Entregados</div></div>
+                  <div style="background:${s.parciales>0?'#FEF3DC':'#F9F5EE'};border-radius:8px;padding:7px 4px;"><div style="font-size:16px;font-weight:700;color:${s.parciales>0?'#8A6010':'#AEA898'};">${s.parciales}</div><div style="font-size:10px;color:${s.parciales>0?'#8A6010':'#AEA898'};margin-top:1px;">Parciales</div></div>
+                  <div style="background:#F9F5EE;border-radius:8px;padding:7px 4px;"><div style="font-size:16px;font-weight:700;color:#7A6030;">${s.entregas+s.parciales}</div><div style="font-size:10px;color:#7A6030;margin-top:1px;">Total gestión</div></div>
+                </div>
+              </div>`;
+            }).join('');
+          })()}
+        </div>
+      `)}
+
     </div>
   `;
 }
