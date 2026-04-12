@@ -618,20 +618,17 @@ body.auth-mode{justify-content:center;}
   </div>
 
   <nav class="dsb-nav" id="dsb-nav" style="display:none;">
-    <button class="dsb-nav-item" id="dsb-btn-catalog" onclick="switchScreen('catalog')">
-      <span class="dsb-nav-icon">🛍</span><span>Catálogo</span>
-    </button>
-    <span class="dsb-nav-badge" id="dsb-cart-badge" style="display:none;">0</span>
 
-    <!-- Dropdown Productos / Categorías -->
-    <div id="dsb-productos-wrap" style="display:none;flex-direction:column;">
-      <button class="dsb-nav-item" onclick="toggleCategoriasMenu()" style="justify-content:space-between;">
-        <span style="display:flex;align-items:center;gap:10px;"><span class="dsb-nav-icon">🏷</span><span>Productos</span></span>
-        <span id="cat-arrow" style="font-size:11px;color:#C8A45A;margin-right:4px;">▾</span>
+    <!-- Catálogo con categorías desplegables -->
+    <div style="display:flex;flex-direction:column;">
+      <button class="dsb-nav-item" id="dsb-btn-catalog" onclick="switchScreen('catalog');toggleCategoriasMenu(true)" style="justify-content:space-between;">
+        <span style="display:flex;align-items:center;gap:10px;"><span class="dsb-nav-icon">🛍</span><span>Catálogo</span></span>
+        <span id="cat-arrow" style="font-size:11px;color:#C8A45A;margin-right:4px;display:none;">▾</span>
       </button>
-      <div id="dsb-categorias-list" style="display:none;flex-direction:column;padding:4px 0 4px 36px;gap:2px;"></div>
+      <div id="dsb-categorias-list" style="display:none;flex-direction:column;padding:2px 0 6px 44px;gap:1px;"></div>
     </div>
 
+    <span class="dsb-nav-badge" id="dsb-cart-badge" style="display:none;">0</span>
     <button class="dsb-nav-item" id="dsb-btn-chat" onclick="switchScreen('chat')">
       <span class="dsb-nav-icon">💬</span><span>Pedir</span>
     </button>
@@ -929,6 +926,8 @@ async function loadCatalog() {
     // Sin conexión a Sheets — el catálogo sigue funcionando con datos locales
     CATALOG = CATALOG_FALLBACK;
   }
+  // Debug temporal — ver campos que llegan de Sheets
+  if(CATALOG.length) console.log('[Davinchi] Campos del producto:', Object.keys(CATALOG[0]));
   buildCategoriasMenu();
   renderCatalog();
 }
@@ -1921,10 +1920,11 @@ function clearCatalogSearch(){
   document.getElementById('catalog-search').value='';
   filterCatalog();
 }
-function toggleCategoriasMenu(){
+function toggleCategoriasMenu(forceOpen){
   const list  = document.getElementById('dsb-categorias-list');
   const arrow = document.getElementById('cat-arrow');
-  const open  = list.style.display !== 'none';
+  if(!list || arrow.style.display==='none') return; // sin categorías, nada que abrir
+  const open = forceOpen === true ? false : list.style.display !== 'none';
   list.style.display = open ? 'none' : 'flex';
   arrow.textContent  = open ? '▾' : '▴';
 }
@@ -1939,16 +1939,24 @@ function filterByCategoria(cat){
   renderCatalog();
 }
 function buildCategoriasMenu(){
-  const wrap = document.getElementById('dsb-productos-wrap');
-  const list = document.getElementById('dsb-categorias-list');
+  const list  = document.getElementById('dsb-categorias-list');
+  const arrow = document.getElementById('cat-arrow');
   if(!list) return;
-  const cats = [...new Set(CATALOG.map(p=>p.categoria).filter(Boolean))].sort();
-  if(!cats.length){ if(wrap) wrap.style.display='none'; return; }
-  if(wrap) wrap.style.display='flex';
+  const cats = [...new Set(CATALOG.map(p=>(p.categoria||'').trim()).filter(Boolean))].sort();
+  if(!cats.length){
+    if(arrow) arrow.style.display='none';
+    list.style.display='none';
+    return;
+  }
+  if(arrow) arrow.style.display='inline';
+  const btnStyle = `background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;text-align:left;padding:5px 8px;border-radius:6px;width:100%;`;
   list.innerHTML = [
-    `<button class="cat-item" data-cat="" onclick="filterByCategoria(null)" style="background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;color:#C8A45A;font-weight:700;text-align:left;padding:5px 8px;border-radius:6px;">Todas</button>`,
-    ...cats.map(c=>`<button class="cat-item" data-cat="${c}" onclick="filterByCategoria('${c.replace(/'/g,"\\'")}')" style="background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;color:#AEA898;font-weight:400;text-align:left;padding:5px 8px;border-radius:6px;">${c}</button>`)
+    `<button class="cat-item" data-cat="" onclick="filterByCategoria(null)" style="${btnStyle}color:#C8A45A;font-weight:700;">Todas</button>`,
+    ...cats.map(c=>`<button class="cat-item" data-cat="${c}" onclick="filterByCategoria('${c.replace(/'/g,"\\'")}')" style="${btnStyle}color:#AEA898;font-weight:400;">${c}</button>`)
   ].join('');
+  // Abrir automáticamente al cargar
+  list.style.display='flex';
+  if(arrow) arrow.textContent='▴';
 }
 
 function renderCatalog(){
