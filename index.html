@@ -797,7 +797,6 @@ body.auth-mode{justify-content:center;}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
     Catálogo
   </button>
-  <span id="cart-badge" style="display:none">0</span>
   <button class="nav-btn" id="nav-chat" onclick="switchScreen('chat')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     Pedir
@@ -966,7 +965,6 @@ function showLanding(){
   cart2={}; chatHistory=[]; clientOrders=[]; pendingOrder=null;
   shopName=''; contactName='';
   document.getElementById('orders-badge').style.display='none';
-  document.getElementById('cart-badge').style.display='none';
   document.getElementById('fab-cart').style.display='none';
   document.getElementById('login-user').value='';
   document.getElementById('login-pass').value='';
@@ -2038,8 +2036,6 @@ function chQty(id,d){
 }
 function updateCartUI(){
   const c=cartCount();
-  const b=document.getElementById('cart-badge');
-  b.textContent=c; b.style.display=c>0?'flex':'none';
   // FAB button
   const fab=document.getElementById('fab-cart');
   const fabCount=document.getElementById('fab-count');
@@ -2363,10 +2359,10 @@ function switchScreen(name){
   document.getElementById('nav-'+name)?.classList.add('active');
   if(name==='myorders')renderMyOrders();
   if(name==='cart'){target.style.display='flex';renderCartScreen();}
-  // Show FAB on all screens except cart (when items in cart)
+  // FAB visible solo en catálogo (no en chat ni carrito)
   const fab=document.getElementById('fab-cart');
   if(fab){
-    fab.style.display=(name!=='cart' && cartCount()>0)?'flex':'none';
+    fab.style.display=(name!=='cart' && name!=='chat' && cartCount()>0)?'flex':'none';
   }
   updateSidebarActive(name);
 }
