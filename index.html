@@ -230,8 +230,11 @@ body.auth-mode{justify-content:center;}
 /* Toast */
 .toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:9px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.15);}
 .toast.show{opacity:1;}
+/* Scrollbar global — sutil en móvil */
 ::-webkit-scrollbar{width:3px;}
-::-webkit-scrollbar-thumb{background:var(--border-mid);border-radius:2px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border-mid);border-radius:4px;}
+* { scrollbar-width:thin; scrollbar-color: var(--border-mid) transparent; }
 
 /* ── SKELETON LOADER ── */
 @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
@@ -578,6 +581,22 @@ body.auth-mode{justify-content:center;}
 @media (min-width: 1280px) {
   #catalog-grid { padding: 24px; gap: 20px; }
   #chat-messages { padding: 24px 32px; }
+}
+
+/* ── Scrollbar elegante en desktop ── */
+@media (min-width: 768px) {
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(184,154,80,0.25);
+    border-radius: 6px;
+    transition: background .2s;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(184,154,80,0.55); }
+  * { scrollbar-width: thin; scrollbar-color: rgba(184,154,80,0.3) transparent; }
+
+  /* Ocultar scrollbar del sidebar de miniaturas del modal */
+  #mpd-thumbs::-webkit-scrollbar { display: none; }
 }
 </style>
 </head>
