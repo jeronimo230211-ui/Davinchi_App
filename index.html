@@ -618,17 +618,27 @@ body.auth-mode{justify-content:center;}
   </div>
 
   <nav class="dsb-nav" id="dsb-nav" style="display:none;">
-    <button class="dsb-nav-item" id="dsb-btn-catalog"  onclick="switchScreen('catalog')">
+    <button class="dsb-nav-item" id="dsb-btn-catalog" onclick="switchScreen('catalog')">
       <span class="dsb-nav-icon">🛍</span><span>Catálogo</span>
     </button>
     <span class="dsb-nav-badge" id="dsb-cart-badge" style="display:none;">0</span>
-    <button class="dsb-nav-item" id="dsb-btn-chat"     onclick="switchScreen('chat')">
+
+    <!-- Dropdown Productos / Categorías -->
+    <div id="dsb-productos-wrap" style="display:none;flex-direction:column;">
+      <button class="dsb-nav-item" onclick="toggleCategoriasMenu()" style="justify-content:space-between;">
+        <span style="display:flex;align-items:center;gap:10px;"><span class="dsb-nav-icon">🏷</span><span>Productos</span></span>
+        <span id="cat-arrow" style="font-size:11px;color:#C8A45A;margin-right:4px;">▾</span>
+      </button>
+      <div id="dsb-categorias-list" style="display:none;flex-direction:column;padding:4px 0 4px 36px;gap:2px;"></div>
+    </div>
+
+    <button class="dsb-nav-item" id="dsb-btn-chat" onclick="switchScreen('chat')">
       <span class="dsb-nav-icon">💬</span><span>Pedir</span>
     </button>
     <button class="dsb-nav-item" id="dsb-btn-myorders" onclick="switchScreen('myorders')">
       <span class="dsb-nav-icon">📦</span><span>Seguimiento</span>
     </button>
-    <button class="dsb-nav-item" id="dsb-btn-vendor"   onclick="switchScreen('vendor')" style="display:none;">
+    <button class="dsb-nav-item" id="dsb-btn-vendor" onclick="switchScreen('vendor')" style="display:none;">
       <span class="dsb-nav-icon">📊</span><span>Panel</span>
     </button>
   </nav>
@@ -674,7 +684,7 @@ body.auth-mode{justify-content:center;}
 
 <!-- CLIENT HEADER -->
 <div class="header" id="client-header" style="display:none">
-  <div><div class="logo">Davinchi</div><div class="logo-sub">Estuches & Vitrinas</div></div>
+  <div><div class="logo">Davinchi</div></div>
   <div id="client-chip" style="display:none;"></div>
 </div>
 
@@ -723,9 +733,12 @@ body.auth-mode{justify-content:center;}
 
 <!-- CATALOG -->
 <div id="screen-catalog" class="screen" style="display:none;flex-direction:column;overflow:hidden;">
-  <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(120,90,30,0.14);background:#F9F5EE;flex-shrink:0;">
-    <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:#2A2618;">Catálogo</div>
-    <div style="font-size:12px;color:#7A7060;margin-top:2px;">Toca un producto para agregarlo</div>
+  <div style="padding:10px 12px;border-bottom:1px solid rgba(120,90,30,0.12);background:#F9F5EE;flex-shrink:0;">
+    <div style="position:relative;display:flex;align-items:center;">
+      <svg style="position:absolute;left:11px;width:16px;height:16px;color:#9A8A78;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="catalog-search" type="search" placeholder="Buscar referencia o nombre..." oninput="filterCatalog()" style="width:100%;padding:9px 36px 9px 34px;border:1.5px solid rgba(120,90,30,0.18);border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;color:#2A2618;background:#fff;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#C8A45A'" onblur="this.style.borderColor='rgba(120,90,30,0.18)'">
+      <button id="catalog-search-clear" onclick="clearCatalogSearch()" style="display:none;position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#9A8A78;font-size:16px;line-height:1;padding:2px;">✕</button>
+    </div>
   </div>
   <div id="catalog-grid" style="padding:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;overflow-y:auto;flex:1;padding-bottom:80px;align-content:start;"></div>
 </div>
@@ -916,6 +929,7 @@ async function loadCatalog() {
     // Sin conexión a Sheets — el catálogo sigue funcionando con datos locales
     CATALOG = CATALOG_FALLBACK;
   }
+  buildCategoriasMenu();
   renderCatalog();
 }
 
@@ -931,6 +945,7 @@ const dateStr = () => new Date().toLocaleDateString('es-CO',{day:'2-digit',month
 const timeStr = () => new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
 
 let shopName='', contactName='', cart={}, chatHistory=[], clientOrders=[], pendingOrder=null;
+let searchQuery='', activeCategoria=null;
 let currentVendor=null, vendorTab='pedidos', allOrders=[];
 
 function getApiKey(){return 'server-side';}
@@ -1896,8 +1911,62 @@ function getVista1(p) {
   return '';
 }
 
+function filterCatalog(){
+  searchQuery = (document.getElementById('catalog-search').value||'').trim().toLowerCase();
+  const clearBtn = document.getElementById('catalog-search-clear');
+  if(clearBtn) clearBtn.style.display = searchQuery ? 'block' : 'none';
+  renderCatalog();
+}
+function clearCatalogSearch(){
+  document.getElementById('catalog-search').value='';
+  filterCatalog();
+}
+function toggleCategoriasMenu(){
+  const list  = document.getElementById('dsb-categorias-list');
+  const arrow = document.getElementById('cat-arrow');
+  const open  = list.style.display !== 'none';
+  list.style.display = open ? 'none' : 'flex';
+  arrow.textContent  = open ? '▾' : '▴';
+}
+function filterByCategoria(cat){
+  activeCategoria = cat;
+  // Resaltar categoría activa
+  document.querySelectorAll('.cat-item').forEach(b=>{
+    b.style.fontWeight = (b.dataset.cat===(cat||'')) ? '700' : '400';
+    b.style.color      = (b.dataset.cat===(cat||'')) ? '#C8A45A' : '#AEA898';
+  });
+  switchScreen('catalog');
+  renderCatalog();
+}
+function buildCategoriasMenu(){
+  const wrap = document.getElementById('dsb-productos-wrap');
+  const list = document.getElementById('dsb-categorias-list');
+  if(!list) return;
+  const cats = [...new Set(CATALOG.map(p=>p.categoria).filter(Boolean))].sort();
+  if(!cats.length){ if(wrap) wrap.style.display='none'; return; }
+  if(wrap) wrap.style.display='flex';
+  list.innerHTML = [
+    `<button class="cat-item" data-cat="" onclick="filterByCategoria(null)" style="background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;color:#C8A45A;font-weight:700;text-align:left;padding:5px 8px;border-radius:6px;">Todas</button>`,
+    ...cats.map(c=>`<button class="cat-item" data-cat="${c}" onclick="filterByCategoria('${c.replace(/'/g,"\\'")}')" style="background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;color:#AEA898;font-weight:400;text-align:left;padding:5px 8px;border-radius:6px;">${c}</button>`)
+  ].join('');
+}
+
 function renderCatalog(){
-  document.getElementById('catalog-grid').innerHTML=CATALOG.map(p=>{
+  let items = CATALOG;
+  if(activeCategoria) items = items.filter(p=>(p.categoria||'')=== activeCategoria);
+  if(searchQuery){
+    const q = searchQuery;
+    items = items.filter(p=>
+      (p.id||'').toLowerCase().includes(q)||
+      (p.name||'').toLowerCase().includes(q)||
+      (p.desc||'').toLowerCase().includes(q)
+    );
+  }
+  if(!items.length){
+    document.getElementById('catalog-grid').innerHTML='<div style="grid-column:1/-1;padding:40px 20px;text-align:center;color:#9A8A78;font-family:\'Outfit\',sans-serif;font-size:14px;">Sin resultados para tu búsqueda.</div>';
+    return;
+  }
+  document.getElementById('catalog-grid').innerHTML=items.map(p=>{
     const q=cart2[p.id]||0;
     const imgSrc = getVista1(p);
     const visual = imgSrc
