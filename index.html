@@ -757,7 +757,7 @@ body.auth-mode{justify-content:center;}
   </div>
   <div class="cart-summary" id="cart-summary" style="display:none;flex-shrink:0;">
     <div class="cart-total-row"><span class="lbl">Total</span><span class="val" id="cart-total-display">$0</span></div>
-    <button class="btn-send-cart" onclick="sendCartToChat()">Confirmar pedido →</button>
+    <button class="btn-send-cart" onclick="openCheckoutModal()">Confirmar pedido →</button>
   </div>
 </div>
 
@@ -842,6 +842,24 @@ body.auth-mode{justify-content:center;}
   </div>
   <div class="vendor-content" id="vendor-content">
     <div class="loading-orders">Cargando pedidos...</div>
+  </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div id="checkout-modal" onclick="if(event.target===this)closeCheckoutModal()" style="display:none;position:fixed;inset:0;z-index:900;background:rgba(28,26,20,0.55);align-items:flex-end;justify-content:center;">
+  <div style="background:#FAF6EF;border-radius:24px 24px 0 0;padding:28px 24px 40px;width:100%;max-width:500px;margin:0 auto;box-shadow:0 -8px 40px rgba(0,0,0,0.18);">
+    <div style="width:36px;height:4px;background:rgba(120,90,30,0.2);border-radius:4px;margin:0 auto 20px;"></div>
+    <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:#2A2618;margin-bottom:4px;">Confirmar pedido</div>
+    <div style="font-size:13px;color:#7A7060;margin-bottom:20px;">Ingresa los datos para procesar tu pedido</div>
+    <div style="display:flex;flex-direction:column;gap:11px;">
+      <input id="co-shop" type="text" placeholder="Nombre de la joyería *" autocomplete="organization" style="width:100%;padding:12px 14px;border:1.5px solid rgba(120,90,30,0.2);border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;color:#2A2618;background:#fff;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#C8A45A'" onblur="this.style.borderColor='rgba(120,90,30,0.2)'">
+      <input id="co-contact" type="text" placeholder="Tu nombre *" autocomplete="name" style="width:100%;padding:12px 14px;border:1.5px solid rgba(120,90,30,0.2);border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;color:#2A2618;background:#fff;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#C8A45A'" onblur="this.style.borderColor='rgba(120,90,30,0.2)'">
+      <input id="co-phone" type="tel" placeholder="Teléfono *" autocomplete="tel" style="width:100%;padding:12px 14px;border:1.5px solid rgba(120,90,30,0.2);border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;color:#2A2618;background:#fff;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#C8A45A'" onblur="this.style.borderColor='rgba(120,90,30,0.2)'">
+      <input id="co-cc" type="text" placeholder="Centro comercial y número de local *" autocomplete="address-line1" style="width:100%;padding:12px 14px;border:1.5px solid rgba(120,90,30,0.2);border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;color:#2A2618;background:#fff;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#C8A45A'" onblur="this.style.borderColor='rgba(120,90,30,0.2)'">
+    </div>
+    <div id="co-error" style="display:none;color:#C0442A;font-size:12px;margin-top:8px;padding:0 2px;"></div>
+    <button id="co-submit" onclick="submitCheckout()" style="width:100%;margin-top:18px;padding:14px;background:#1C1A14;color:#E2C07E;border:none;border-radius:12px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;cursor:pointer;letter-spacing:0.3px;">Enviar pedido →</button>
+    <button onclick="closeCheckoutModal()" style="width:100%;margin-top:10px;padding:11px;background:transparent;border:1px solid rgba(120,90,30,0.2);border-radius:12px;font-family:'Outfit',sans-serif;font-size:14px;color:#7A7060;cursor:pointer;">Cancelar</button>
   </div>
 </div>
 
@@ -964,11 +982,13 @@ function getSavedClient(){
 
 // Al cargar la app: si hay sesión de cliente guardada, entra directo sin login
 window.addEventListener('DOMContentLoaded', function(){
-  const saved = getSavedClient();
-  if(saved && saved.shop){
-    loadClientAndEnter(saved);
+  // Vendedores/CEO acceden via ?admin en la URL
+  if(new URLSearchParams(location.search).has('admin')){
+    showLanding();
+    return;
   }
-  // Si no hay sesión, el login ya está activo por defecto (class="screen active" en HTML)
+  // Clientes entran directo al catálogo — sin login
+  enterCatalogDirect();
 });
 
 // nextRegStep / prevRegStep eliminados — registro ahora es de un solo paso
@@ -1027,32 +1047,38 @@ async function submitRegistroCliente(){
 function submitRegistro(){}
 
 function enterAppReturning(){
-  const saved = getSavedClient();
-  if(saved) loadClientAndEnter(saved);
+  enterCatalogDirect();
 }
 
-function loadClientAndEnter(client){
+function enterCatalogDirect(){
+  // Restaurar datos de checkout guardados (pre-llena el formulario en próxima compra)
+  const saved = getSavedClient();
+  if(saved){
+    shopName    = saved.shop    || '';
+    contactName = saved.contact || '';
+  }
   document.body.classList.remove('auth-mode');
-  shopName    = client.shop;
-  contactName = client.contact;
-  document.getElementById('client-chip').textContent = shopName;
-  document.getElementById('banner-shop').textContent = shopName;
-  // Load saved orders for this client
+  const banner = document.getElementById('banner-shop');
+  if(banner) banner.textContent = shopName || 'Davinchi';
   try{
-    const saved = JSON.parse(localStorage.getItem('dav_orders_'+shopName)||'[]');
-    clientOrders = saved;
+    clientOrders = saved ? JSON.parse(localStorage.getItem('dav_orders_'+(saved.shop||''))||'[]') : [];
   }catch(e){ clientOrders=[]; }
   updateOrdersBadge();
   hideAll();
   document.getElementById('client-header').style.display='flex';
   document.getElementById('client-nav').style.display='flex';
-  loadCatalog(); // carga catálogo dinámico desde Sheets (renderCatalog se llama al terminar)
+  loadCatalog();
   initChat();
   const cat = document.getElementById('screen-catalog');
   cat.classList.add('active'); cat.style.display='flex';
   document.getElementById('nav-catalog').classList.add('active');
   updateSidebarUser();
   updateSidebarActive('catalog');
+}
+
+function loadClientAndEnter(client){
+  localStorage.setItem('dav_client', JSON.stringify(client));
+  enterCatalogDirect();
 }
 
 function clearRegistro(){
@@ -1130,12 +1156,13 @@ function enterClientView(data){
 function doLogout(){
   currentVendor=null;
   stopVendorRefresh();
-  showLanding();
+  // Vuelve al login de admin
+  location.href = location.pathname + '?admin';
 }
 
 function doLogoutClient(){
-  localStorage.removeItem('dav_client');
-  showLanding();
+  // "Salir" del panel vendedor — vuelve al catálogo
+  location.href = location.pathname;
 }
 
 // ── VENDOR PANEL ──
@@ -1969,23 +1996,67 @@ function renderCartScreen(){
   document.getElementById('cart-total-display').textContent=fmt(cartTotal());
   summ.style.display='block';
 }
-function sendCartToChat(){
-  const items=Object.entries(cart2).filter(([,q])=>q>0);
-  if(!items.length)return;
-  const lines=items.map(([id,q])=>{const p=CATALOG.find(x=>x.id===id);return `${q} ${p.name}`;});
-  showToast('Enviando pedido al asistente...');
+function openCheckoutModal(){
+  const items = Object.entries(cart2).filter(([,q])=>q>0);
+  if(!items.length){ showToast('Tu carrito está vacío'); return; }
+  // Pre-llenar con datos guardados
+  const saved = getSavedClient();
+  if(saved){
+    const f = id => { const el=document.getElementById(id); if(el && !el.value) el.value = saved[id.replace('co-','')] || ''; };
+    f('co-shop'); f('co-contact'); f('co-phone'); f('co-cc');
+  }
+  document.getElementById('co-error').style.display='none';
+  document.getElementById('checkout-modal').style.display='flex';
+}
+
+function closeCheckoutModal(){
+  document.getElementById('checkout-modal').style.display='none';
+}
+
+function submitCheckout(){
+  const shop    = document.getElementById('co-shop').value.trim();
+  const contact = document.getElementById('co-contact').value.trim();
+  const phone   = document.getElementById('co-phone').value.trim();
+  const cc      = document.getElementById('co-cc').value.trim();
+  const errEl   = document.getElementById('co-error');
+  const btn     = document.getElementById('co-submit');
+
+  if(!shop || !contact || !phone || !cc){
+    errEl.textContent='Por favor completa todos los campos.';
+    errEl.style.display='block'; return;
+  }
+  errEl.style.display='none';
+  btn.disabled=true; btn.textContent='Enviando...';
+
+  // Guardar para próxima vez
+  shopName = shop; contactName = contact;
+  localStorage.setItem('dav_client', JSON.stringify({shop, contact, phone, cc}));
+
+  // Construir mensaje de pedido
+  const items = Object.entries(cart2).filter(([,q])=>q>0);
+  const lines = items.map(([id,q])=>{ const p=CATALOG.find(x=>x.id===id); return `${q}x ${p?p.name:id}`; });
+  const msg = `Pedido de *${shop}*\nContacto: ${contact} · Tel: ${phone}\nLocal: ${cc}\n\nProductos: ${lines.join(', ')}`;
+
+  closeCheckoutModal();
+  showToast('Enviando pedido...');
   setTimeout(()=>{
     switchScreen('chat');
-    document.getElementById('chat-in').value=`Quiero pedir: ${lines.join(', ')}`;
+    document.getElementById('chat-in').value = msg;
     sendMsg();
-  }, 900);
+    btn.disabled=false; btn.textContent='Enviar pedido →';
+  }, 700);
+}
+
+function sendCartToChat(){
+  openCheckoutModal();
 }
 
 // ── CHAT ──
 function initChat(){
   chatHistory=[];
   document.getElementById('chat-messages').innerHTML='';
-  addAI(`Hola, bienvenida **${shopName}** 👋\n\nSoy el asistente de Davinchi. Cuéntame qué productos necesitas y en qué cantidades.`,false);
+  const saludo = shopName ? `Hola, bienvenida **${shopName}** 👋` : `Hola 👋`;
+  addAI(`${saludo}\n\nSoy el asistente de Davinchi. Cuéntame qué productos necesitas y en qué cantidades.`,false);
   setChips(['Ver catálogo','¿Qué tienen disponible?','Quiero hacer un pedido']);
 }
 function setChips(list){
