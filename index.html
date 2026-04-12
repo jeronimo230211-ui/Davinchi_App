@@ -2369,20 +2369,10 @@ function updateSidebarUser() {
     return;
   }
 
-  // Intentar desde localStorage cliente
-  try {
-    const client = JSON.parse(localStorage.getItem('dav_client') || '{}');
-    if (client.shop) {
-      document.getElementById('dsb-avatar').textContent = client.contact ? client.contact[0].toUpperCase() : 'C';
-      document.getElementById('dsb-user-name').textContent = client.shop;
-      document.getElementById('dsb-user-role').textContent = 'Cliente';
-      userInfo.style.display = 'flex';
-      nav.style.display      = 'flex';
-      footer.style.display   = 'flex';
-      const vendorBtn = document.getElementById('dsb-btn-vendor');
-      if (vendorBtn) vendorBtn.style.display = 'none';
-    }
-  } catch(e) {}
+  // Clientes: sidebar sin info de usuario ni botones de sesión
+  userInfo.style.display = 'none';
+  footer.style.display   = 'none';
+  nav.style.display      = 'flex';
 }
 
 function updateSidebarCartBadge(count) {
