@@ -1550,28 +1550,31 @@ function _kpiTopProductos(orders){
   return Object.entries(conteo).sort((a,b)=>b[1]-a[1]).slice(0,8);
 }
 
-function _kpiBlock(id, html){ return `<div class="kpi-block" id="${id}">${html}</div>`; }
+function _kpiBlock(id, html){ return `<div class="kpi-block" id="${id}" style="display:block;">${html}</div>`; }
 
 function toggleKpi(id){
   const el=document.getElementById(id);
   if(!el) return;
-  const visible = el.style.display!=='none';
-  el.style.display = visible ? 'none' : 'block';
-  // Actualizar botón activo
+  const nowVisible = el.style.display !== 'none';
+  el.style.display = nowVisible ? 'none' : 'block';
+  // Botón: activo (oscuro) = bloque visible; inactivo = oculto
   document.querySelectorAll('.kpi-btn').forEach(b=>{
     if(b.dataset.kpi===id){
-      b.style.background   = visible ? 'transparent' : '#1C1A14';
-      b.style.color        = visible ? '#7A6A50'      : '#E2C07E';
-      b.style.borderColor  = visible ? 'rgba(120,90,30,0.2)' : '#1C1A14';
+      const on = !nowVisible; // después del toggle
+      b.style.background  = on ? '#1C1A14'             : 'transparent';
+      b.style.color       = on ? '#E2C07E'             : '#7A6A50';
+      b.style.borderColor = on ? '#1C1A14'             : 'rgba(120,90,30,0.2)';
     }
   });
 }
 function showAllKpis(){
   document.querySelectorAll('.kpi-block').forEach(el=>el.style.display='block');
+  // Todos los botones individuales activos, "Todos" inactivo (ya cumplió su función)
   document.querySelectorAll('.kpi-btn').forEach(b=>{
-    b.style.background  = b.dataset.kpi==='all' ? '#1C1A14' : 'transparent';
-    b.style.color       = b.dataset.kpi==='all' ? '#E2C07E' : '#7A6A50';
-    b.style.borderColor = b.dataset.kpi==='all' ? '#1C1A14' : 'rgba(120,90,30,0.2)';
+    const isAll = b.dataset.kpi==='all';
+    b.style.background  = isAll ? 'transparent' : '#1C1A14';
+    b.style.color       = isAll ? '#7A6A50'      : '#E2C07E';
+    b.style.borderColor = isAll ? 'rgba(120,90,30,0.2)' : '#1C1A14';
   });
 }
 
@@ -1593,20 +1596,23 @@ function renderVendorResumen(){
 
   // ── Botones de filtro KPI (comunes a vendedor y CEO) ──────────────────────
   const btnStyle=`font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;padding:5px 13px;border-radius:20px;border:1.5px solid;cursor:pointer;transition:all .15s;white-space:nowrap;`;
+  // Botones: todos inician activos (fondo oscuro) porque todos los bloques están visibles
+  const btnOn =`${btnStyle}background:#1C1A14;color:#E2C07E;border-color:#1C1A14;`;
+  const btnOff=`${btnStyle}background:transparent;color:#7A6A50;border-color:rgba(120,90,30,0.2);`;
   const kpiBtns = isCEO ? `
-    <button class="kpi-btn" data-kpi="all"             onclick="showAllKpis()"              style="${btnStyle}background:#1C1A14;color:#E2C07E;border-color:#1C1A14;">Todos</button>
-    <button class="kpi-btn" data-kpi="kpi-entregas"    onclick="toggleKpi('kpi-entregas')"  style="${btnStyle}background:transparent;color:#7A6A50;border-color:rgba(120,90,30,0.2);">Entregas</button>
-    <button class="kpi-btn" data-kpi="kpi-otif"        onclick="toggleKpi('kpi-otif')"      style="${btnStyle}background:transparent;color:#7A6A50;border-color:rgba(120,90,30,0.2);">OTIF</button>
-    <button class="kpi-btn" data-kpi="kpi-ventas"      onclick="toggleKpi('kpi-ventas')"    style="${btnStyle}background:transparent;color:#7A6A50;border-color:rgba(120,90,30,0.2);">Ventas</button>
-    <button class="kpi-btn" data-kpi="kpi-parciales"   onclick="toggleKpi('kpi-parciales')" style="${btnStyle}background:transparent;color:#7A6A50;border-color:rgba(120,90,30,0.2);">Parciales</button>
-    <button class="kpi-btn" data-kpi="kpi-productos"   onclick="toggleKpi('kpi-productos')" style="${btnStyle}background:transparent;color:#7A6A50;border-color:rgba(120,90,30,0.2);">Top Refs</button>
-    <button class="kpi-btn" data-kpi="kpi-clientes"    onclick="toggleKpi('kpi-clientes')"  style="${btnStyle}background:transparent;color:#7A6A50;border-color:rgba(120,90,30,0.2);">Clientes</button>
-    <button class="kpi-btn" data-kpi="kpi-vendedores"  onclick="toggleKpi('kpi-vendedores')"style="${btnStyle}background:transparent;color:#7A6A50;border-color:rgba(120,90,30,0.2);">Vendedores</button>
+    <button class="kpi-btn" data-kpi="all"             onclick="showAllKpis()"              style="${btnOff}">Todos</button>
+    <button class="kpi-btn" data-kpi="kpi-entregas"    onclick="toggleKpi('kpi-entregas')"  style="${btnOn}">Entregas</button>
+    <button class="kpi-btn" data-kpi="kpi-otif"        onclick="toggleKpi('kpi-otif')"      style="${btnOn}">OTIF</button>
+    <button class="kpi-btn" data-kpi="kpi-ventas"      onclick="toggleKpi('kpi-ventas')"    style="${btnOn}">Ventas</button>
+    <button class="kpi-btn" data-kpi="kpi-parciales"   onclick="toggleKpi('kpi-parciales')" style="${btnOn}">Parciales</button>
+    <button class="kpi-btn" data-kpi="kpi-productos"   onclick="toggleKpi('kpi-productos')" style="${btnOn}">Top Refs</button>
+    <button class="kpi-btn" data-kpi="kpi-clientes"    onclick="toggleKpi('kpi-clientes')"  style="${btnOn}">Clientes</button>
+    <button class="kpi-btn" data-kpi="kpi-vendedores"  onclick="toggleKpi('kpi-vendedores')"style="${btnOn}">Vendedores</button>
   ` : `
-    <button class="kpi-btn" data-kpi="all"             onclick="showAllKpis()"              style="${btnStyle}background:#1C1A14;color:#E2C07E;border-color:#1C1A14;">Todos</button>
-    <button class="kpi-btn" data-kpi="kpi-entregas"    onclick="toggleKpi('kpi-entregas')"  style="${btnStyle}background:transparent;color:#7A6A50;border-color:rgba(120,90,30,0.2);">Entregas</button>
-    <button class="kpi-btn" data-kpi="kpi-ventas"      onclick="toggleKpi('kpi-ventas')"    style="${btnStyle}background:transparent;color:#7A6A50;border-color:rgba(120,90,30,0.2);">Ventas</button>
-    <button class="kpi-btn" data-kpi="kpi-productos"   onclick="toggleKpi('kpi-productos')" style="${btnStyle}background:transparent;color:#7A6A50;border-color:rgba(120,90,30,0.2);">Top Refs</button>
+    <button class="kpi-btn" data-kpi="all"             onclick="showAllKpis()"              style="${btnOff}">Todos</button>
+    <button class="kpi-btn" data-kpi="kpi-entregas"    onclick="toggleKpi('kpi-entregas')"  style="${btnOn}">Entregas</button>
+    <button class="kpi-btn" data-kpi="kpi-ventas"      onclick="toggleKpi('kpi-ventas')"    style="${btnOn}">Ventas</button>
+    <button class="kpi-btn" data-kpi="kpi-productos"   onclick="toggleKpi('kpi-productos')" style="${btnOn}">Top Refs</button>
   `;
 
   if(!isCEO){
@@ -2064,6 +2070,8 @@ function filterByCategoria(cat){
   renderCatalog();
 }
 function buildCategoriasMenu(){
+  // No mostrar categorías en el sidebar cuando estamos en panel vendedor/CEO
+  if(currentVendor) return;
   const list  = document.getElementById('dsb-categorias-list');
   const arrow = document.getElementById('cat-arrow');
   const chipsRow = document.getElementById('cat-chips-row');
