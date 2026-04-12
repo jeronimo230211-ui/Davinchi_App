@@ -1805,7 +1805,7 @@ function renderAdminProductList() {
       <div style="background:#fff;border:1px solid rgba(120,90,30,0.14);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;">
         <div style="flex:1;min-width:0;">
           <div style="font-weight:500;color:#2A2618;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
-          <div style="font-size:13px;color:#7A7060;margin-top:2px;">${fmt(p.price)} · Stock: ${p.stock}</div>
+          <div style="font-size:13px;color:#7A7060;margin-top:2px;">${fmt(p.price)}${p.unidades&&p.unidades>1?` × ${p.unidades} uds`:''} · Stock: ${p.stock}</div>
         </div>
         <span style="font-size:11px;padding:3px 8px;border-radius:10px;flex-shrink:0;
           background:${activo?'#EBF5F0':'#FAEAE6'};
@@ -2012,7 +2012,10 @@ function renderCatalog(){
       <div style="padding:7px 8px 9px;display:flex;flex-direction:column;gap:2px;flex:1;">
         <p style="font-family:'Playfair Display',serif;font-size:11px;font-weight:600;margin:0 0 2px;color:#2A2618;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;">${p.name}</p>
         <p style="font-size:10px;color:#7A7060;line-height:1.35;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:26px;">${p.desc||PRODUCT_DESCRIPTIONS[p.id]||PRODUCT_DESCRIPTIONS[p.name]||''}</p>
-        <p style="font-size:15px;font-weight:700;color:#1C1A14;margin:4px 0 5px;font-family:'Outfit',sans-serif;letter-spacing:-0.2px;">${fmt(p.price)}</p>
+        <p style="font-size:15px;font-weight:700;color:#1C1A14;margin:4px 0 5px;font-family:'Outfit',sans-serif;letter-spacing:-0.2px;display:flex;align-items:baseline;gap:5px;flex-wrap:wrap;">
+          ${fmt(p.price)}
+          ${(p.unidades&&p.unidades>1)?`<span style="font-size:10px;font-weight:600;color:#9A8A78;letter-spacing:0.2px;">× ${p.unidades} uds</span>`:''}
+        </p>
         ${inCart
           ? `<div style="display:flex;align-items:center;border:1.5px solid #1C1A14;border-radius:8px;overflow:hidden;">
                <button onclick="event.stopPropagation();chQty('${p.id}',-1)" style="flex:1;padding:6px 0;border:none;background:#F8F4EE;font-size:14px;font-weight:700;cursor:pointer;color:#1C1A14;line-height:1;">−</button>
@@ -2079,7 +2082,7 @@ function renderCartScreen(){
       ${thumb}
       <div class="cart-item-info">
         <div class="cart-item-name">${p.name}</div>
-        <div class="cart-item-price">${fmt(p.price)} c/u</div>
+        <div class="cart-item-price">${fmt(p.price)}${p.unidades&&p.unidades>1?` × ${p.unidades} uds`:' c/u'}</div>
         <div class="cart-item-sub">${fmt(p.price*q)}</div>
       </div>
       <div class="qty-control">
@@ -2827,7 +2830,10 @@ function openProductModal(productId) {
 
   // Nombre, precio, descripción
   document.getElementById('mpd-name').textContent  = p.name  || p.nombre  || p.id;
-  document.getElementById('mpd-price').textContent = fmt ? fmt(p.price || p.precio || 0) : '$' + (p.price || p.precio || 0);
+  const priceEl = document.getElementById('mpd-price');
+  const basePrice = p.price || p.precio || 0;
+  const uds = p.unidades && p.unidades > 1 ? p.unidades : null;
+  priceEl.innerHTML = (fmt ? fmt(basePrice) : '$'+basePrice) + (uds ? `<span style="font-size:13px;font-weight:500;color:#9A8A78;margin-left:6px;">× ${uds} uds</span>` : '');
   document.getElementById('mpd-desc').textContent  = p.desc  || p.descripcion || PRODUCT_DESCRIPTIONS[p.name || p.nombre] || '';
 
   // Cantidad
