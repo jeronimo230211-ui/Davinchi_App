@@ -2193,13 +2193,20 @@ async function sendMsg(){
 }
 
 function buildSystem(){
-  const cat=CATALOG.map(p=>`- ${p.emoji} ${p.name} | ${fmt(p.price)} | Stock: ${p.stock} uds`).join('\n');
+  const cat=CATALOG.map(p=>{
+    const uds = p.unidades && p.unidades > 1;
+    const precioLinea = uds
+      ? `${fmt(p.price)} x${p.unidades} uds (${fmt(Math.round(p.price/p.unidades))} c/u)`
+      : fmt(p.price);
+    return `- ${p.name} | ${precioLinea} | Stock: ${p.stock}`;
+  }).join('\n');
   return `Eres el asistente de pedidos de DAVINCHI, empresa de estuches y vitrinas para joyerías en Colombia.
 CLIENTE: ${shopName} | Contacto: ${contactName} | Fecha: ${dateStr()}
 CATÁLOGO:\n${cat}
 FORMAS DE PAGO: ${PAY_METHODS.join(', ')}
+IMPORTANTE — referencias con precio por paquete: cuando un producto indica "xN uds", el precio es por ese lote de N unidades. Si el cliente pregunta cuánto vale cada estuche individual, divide el precio entre N y explícalo claramente. El subtotal del pedido se calcula siempre con el precio del lote × cantidad de lotes pedidos.
 Ayuda al cliente a hacer su pedido de forma natural. Cuando tengas productos, cantidades, fecha de entrega y forma de pago, genera el resumen con este bloque exacto al final:
-<PEDIDO_JSON>{"shop":"${shopName}","contact":"${contactName}","products":[{"id":"ID","name":"nombre","qty":número,"price":precio,"subtotal":qty_x_precio}],"payMethod":"pago","deliveryDate":"fecha","notes":"","total":número}</PEDIDO_JSON>
+<PEDIDO_JSON>{"shop":"${shopName}","contact":"${contactName}","products":[{"id":"ID","name":"nombre","qty":número,"price":precio,"unidades":N_o_null,"subtotal":qty_x_precio}],"payMethod":"pago","deliveryDate":"fecha","notes":"","total":número}</PEDIDO_JSON>
 Sé conciso y amigable. Avisa si hay poco stock (≤3 uds). Sugiere productos complementarios cuando sea natural.`;
 }
 
@@ -2224,7 +2231,13 @@ function showConfirmCard(o){
   el.innerHTML=`<div class="msg-av ai">D</div><div style="max-width:88%"><div class="order-confirm">
     <div class="oc-title">Resumen de tu pedido</div>
     <div class="oc-row"><span class="lbl">Joyería</span><span class="val">${o.shop}</span></div>
-    <div class="oc-row"><span class="lbl">Productos</span><span class="val">${o.products.map(p=>`${p.qty}× ${p.name}`).join('<br>')}</span></div>
+    <div class="oc-row"><span class="lbl">Productos</span><span class="val">${o.products.map(p=>{
+      const uds = p.unidades && p.unidades > 1;
+      const detalle = uds
+        ? `${p.qty}× ${p.name} <span style="font-size:11px;color:#9A8A78;">(x${p.unidades} uds · ${fmt(Math.round(p.price/p.unidades))} c/u)</span>`
+        : `${p.qty}× ${p.name}`;
+      return detalle;
+    }).join('<br>')}</span></div>
     <div class="oc-row"><span class="lbl">Entrega</span><span class="val">${o.deliveryDate}</span></div>
     <div class="oc-row"><span class="lbl">Pago</span><span class="val">${o.payMethod}</span></div>
     ${o.notes?`<div class="oc-row"><span class="lbl">Notas</span><span class="val">${o.notes}</span></div>`:''}
