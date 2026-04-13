@@ -73,6 +73,7 @@ body.auth-mode{justify-content:center;}
 
 /* ── CATALOG ── */
 #screen-catalog{background:var(--surface);display:flex;flex-direction:column;min-height:0;}
+#catalog-grid{grid-template-columns:repeat(2,1fr);}
 .catalog-grid{padding:14px;display:flex;flex-direction:column;gap:11px;overflow-y:auto;flex:1;padding-bottom:20px;width:100%;min-height:0;}
 .product-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:border-color .2s,transform .15s;width:100%;display:block;}
 .product-card:hover{border-color:var(--border-strong);transform:translateY(-1px);}
@@ -471,6 +472,7 @@ body.auth-mode{justify-content:center;}
     padding: 12px;
   }
 
+
   /* ── Chat — burbujas con max-width razonable ── */
   .bubble { max-width: 60%; }
   #chat-messages { padding: 20px 24px; }
@@ -738,7 +740,7 @@ body.auth-mode{justify-content:center;}
     </div>
   </div>
   <div id="cat-chips-row" style="display:none;overflow-x:auto;padding:8px 12px 6px;gap:6px;flex-shrink:0;border-bottom:1px solid rgba(120,90,30,0.08);scrollbar-width:none;-webkit-overflow-scrolling:touch;white-space:nowrap;"></div>
-  <div id="catalog-grid" style="padding:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;overflow-y:auto;flex:1;padding-bottom:80px;align-content:start;"></div>
+  <div id="catalog-grid" style="padding:8px;display:grid;gap:8px;overflow-y:auto;flex:1;padding-bottom:80px;align-content:start;"></div>
 </div>
 
 <!-- CHAT -->
