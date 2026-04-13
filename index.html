@@ -1217,7 +1217,12 @@ async function loadVendorOrders(silent=false){
       }
       lastKnownOrderCount = newOrders.length;
       allOrders = newOrders;
-      renderVendorContent();
+      // En refresh silencioso, solo re-renderizar Pedidos.
+      // Resumen y Catálogo tienen estado de UI activo (filtros, formularios)
+      // que no deben resetearse cada 30 segundos.
+      if(!silent || vendorTab === 'pedidos'){
+        renderVendorContent();
+      }
     } else {
       if(!silent) document.getElementById('vendor-content').innerHTML='<div class="loading-orders">Error al cargar. Intenta de nuevo.</div>';
     }
